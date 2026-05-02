@@ -8,6 +8,28 @@ const tips = [
   "Hydration matters as much as protein — drink at least 3 litres of water on workout days.",
 ];
 
+// Utility functions for loading and errors
+function showLoading() {
+  const overlay = document.getElementById("loadingOverlay");
+  if (overlay) overlay.classList.remove("hidden");
+}
+
+function hideLoading() {
+  const overlay = document.getElementById("loadingOverlay");
+  if (overlay) overlay.classList.add("hidden");
+}
+
+function showError(message) {
+  const errorEl = document.getElementById("errorMessage");
+  if (errorEl) {
+    errorEl.textContent = message;
+    errorEl.style.display = "block";
+    setTimeout(() => {
+      errorEl.style.display = "none";
+    }, 5000); // Hide after 5 seconds
+  }
+}
+
 function getGreeting() {
   const hour = new Date().getHours();
   if (hour < 12) return "Good morning";

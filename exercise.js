@@ -3,6 +3,8 @@ import {
   onAuthStateChanged,
   saveWorkoutCycle,
   getWorkoutCycle,
+  saveWorkoutLog,
+  getWorkoutLog,
 } from "./firebase.js";
 
 // ─── MY SPLIT DATA ───────────────────────────────────────
@@ -1142,6 +1144,15 @@ function renderMyWorkout() {
                             <iframe src="https://www.youtube.com/embed/${ex.video}?rel=0&modestbranding=1"
                                 allowfullscreen loading="lazy"></iframe>
                         </div>
+                        <div class="workout-logging" data-exercise="${ex.name}">
+                            <div class="logging-header">
+                                <span>Log your sets</span>
+                                <button class="add-set-btn" data-exercise="${ex.name}">+ Add Set</button>
+                            </div>
+                            <div class="sets-container" id="sets-${ex.name.replace(/\s+/g, "-")}">
+                                <!-- Sets will be added here -->
+                            </div>
+                        </div>
                     </div>
                 `,
                         )
@@ -1154,6 +1165,15 @@ function renderMyWorkout() {
     `;
 
   attachSplitListeners();
+
+  // Load workout logs for today
+  const todayKey = new Date().toISOString().split("T")[0];
+  for (const ex of dayExercises) {
+    loadExerciseLogs(ex.name, todayKey);
+  }
+
+  // Attach logging listeners
+  attachLoggingListeners();
 }
 
 // ─── ATTACH SPLIT LISTENERS ──────────────────────────────
@@ -1174,6 +1194,112 @@ function attachSplitListeners() {
       updateHomeWorkout();
     });
   });
+}
+
+// ─── WORKOUT LOGGING ─────────────────────────────────────
+async function loadExerciseLogs(exerciseName, dateKey) {
+  const sets = await getWorkoutLog(currentUser.uid, dateKey, exerciseName);
+  renderSets(exerciseName, sets);
+}
+
+function renderSets(exerciseName, sets) {
+  const container = document.getElementById(
+    `sets-${exerciseName.replace(/\s+/g, "-")}`,
+  );
+  if (!container) return;
+
+  container.innerHTML = sets
+    .map(
+      (set, index) => `
+    <div class="set-row">
+      <span class="set-label">Set ${index + 1}</span>
+      <input type="number" class="set-input reps-input" placeholder="Reps" value="${set.reps || ""}" min="1">
+      <input type="number" class="set-input weight-input" placeholder="Weight" value="${set.weight || ""}" min="0" step="0.5">
+      <button class="remove-set-btn" data-exercise="${exerciseName}" data-set-index="${index}">×</button>
+    </div>
+  `,
+    )
+    .join("");
+}
+
+function attachLoggingListeners() {
+  // Add set buttons
+  document.querySelectorAll(".add-set-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      const exerciseName = e.target.dataset.exercise;
+      const container = document.getElementById(
+        `sets-${exerciseName.replace(/\s+/g, "-")}`,
+      );
+      const setRows = container.querySelectorAll(".set-row");
+      const newIndex = setRows.length;
+
+      const newSet = document.createElement("div");
+      newSet.className = "set-row";
+      newSet.innerHTML = `
+        <span class="set-label">Set ${newIndex + 1}</span>
+        <input type="number" class="set-input reps-input" placeholder="Reps" min="1">
+        <input type="number" class="set-input weight-input" placeholder="Weight" min="0" step="0.5">
+        <button class="remove-set-btn" data-exercise="${exerciseName}" data-set-index="${newIndex}">×</button>
+      `;
+      container.appendChild(newSet);
+
+      // Re-attach remove listeners
+      attachRemoveListeners();
+      saveCurrentSets(exerciseName);
+    });
+  });
+
+  attachRemoveListeners();
+  attachInputListeners();
+}
+
+function attachRemoveListeners() {
+  document.querySelectorAll(".remove-set-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      const exerciseName = e.target.dataset.exercise;
+      const setIndex = parseInt(e.target.dataset.setIndex);
+      const container = document.getElementById(
+        `sets-${exerciseName.replace(/\s+/g, "-")}`,
+      );
+      const setRows = container.querySelectorAll(".set-row");
+      if (setRows[setIndex]) {
+        setRows[setIndex].remove();
+        // Renumber remaining sets
+        container.querySelectorAll(".set-row").forEach((row, idx) => {
+          row.querySelector(".set-label").textContent = `Set ${idx + 1}`;
+          row.querySelector(".remove-set-btn").dataset.setIndex = idx;
+        });
+        saveCurrentSets(exerciseName);
+      }
+    });
+  });
+}
+
+function attachInputListeners() {
+  document.querySelectorAll(".set-input").forEach((input) => {
+    input.addEventListener("input", (e) => {
+      const exerciseName =
+        e.target.closest(".workout-logging").dataset.exercise;
+      saveCurrentSets(exerciseName);
+    });
+  });
+}
+
+async function saveCurrentSets(exerciseName) {
+  const container = document.getElementById(
+    `sets-${exerciseName.replace(/\s+/g, "-")}`,
+  );
+  const setRows = container.querySelectorAll(".set-row");
+  const sets = Array.from(setRows)
+    .map((row) => {
+      const reps = parseInt(row.querySelector(".reps-input").value) || 0;
+      const weight = parseFloat(row.querySelector(".weight-input").value) || 0;
+      return { reps, weight };
+    })
+    .filter((set) => set.reps > 0 || set.weight > 0);
+
+  const todayKey = new Date().toISOString().split("T")[0];
+  await saveWorkoutLog(currentUser.uid, todayKey, exerciseName, sets);
 }
 
 // ─── RENDER EXERCISE LIBRARY ─────────────────────────────

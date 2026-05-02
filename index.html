@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FitDesi</title>
+    <link rel="manifest" href="manifest.json" />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
@@ -75,7 +76,32 @@
 
     <footer>Fitdesi · Personal use only</footer>
 
+    <!-- Loading Overlay -->
+    <div class="loading-overlay hidden" id="loadingOverlay">
+      <div class="spinner"></div>
+      <span>Loading...</span>
+    </div>
+
+    <!-- Error Message -->
+    <div id="errorMessage" class="error-message" style="display: none"></div>
+
     <script src="app.js"></script>
+
+    <!-- Register Service Worker -->
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/sw.js")
+            .then((registration) => {
+              console.log("SW registered: ", registration);
+            })
+            .catch((registrationError) => {
+              console.log("SW registration failed: ", registrationError);
+            });
+        });
+      }
+    </script>
 
     <script type="module">
       import {
@@ -192,76 +218,89 @@
           return;
         }
 
-        // Greeting
-        const firstName = user.displayName
-          ? user.displayName.split(" ")[0]
-          : "there";
-        document.getElementById("greeting").textContent =
-          `Good ${getTimeOfDay()}, ${firstName}`;
+        try {
+          // Greeting
+          const firstName = user.displayName
+            ? user.displayName.split(" ")[0]
+            : "there";
+          document.getElementById("greeting").textContent =
+            `Good ${getTimeOfDay()}, ${firstName}`;
 
-        // Admin badge
-        if (isAdmin(user)) {
-          const adminBadge = document.createElement("a");
-          adminBadge.href = "admin.html";
-          adminBadge.style.cssText = `font-size:10px;color:#f0a050;background:rgba(240,160,80,0.1);border:0.5px solid rgba(240,160,80,0.2);padding:4px 10px;border-radius:20px;text-decoration:none;margin-left:8px;`;
-          adminBadge.textContent = "⚙️ Admin";
-          document.querySelector(".nav-right").prepend(adminBadge);
-        }
+          // Admin badge
+          if (isAdmin(user)) {
+            const adminBadge = document.createElement("a");
+            adminBadge.href = "admin.html";
+            adminBadge.style.cssText = `font-size:10px;color:#f0a050;background:rgba(240,160,80,0.1);border:0.5px solid rgba(240,160,80,0.2);padding:4px 10px;border-radius:20px;text-decoration:none;margin-left:8px;`;
+            adminBadge.textContent = "⚙️ Admin";
+            document.querySelector(".nav-right").prepend(adminBadge);
+          }
 
-        // Sign out button
-        const signOutBtn = document.createElement("button");
-        signOutBtn.textContent = "Sign Out";
-        signOutBtn.style.cssText = `font-size:11px;color:rgba(255,255,255,0.3);background:none;border:0.5px solid rgba(255,255,255,0.1);padding:4px 10px;border-radius:20px;cursor:pointer;font-family:Inter,sans-serif;`;
-        signOutBtn.addEventListener("click", async () => {
-          const { signOutUser } = await import("./firebase.js");
-          await signOutUser();
-          window.location.href = "login.html";
-        });
-        document.querySelector(".nav-right").appendChild(signOutBtn);
+          // Sign out button
+          const signOutBtn = document.createElement("button");
+          signOutBtn.textContent = "Sign Out";
+          signOutBtn.style.cssText = `font-size:11px;color:rgba(255,255,255,0.3);background:none;border:0.5px solid rgba(255,255,255,0.1);padding:4px 10px;border-radius:20px;cursor:pointer;font-family:Inter,sans-serif;`;
+          signOutBtn.addEventListener("click", async () => {
+            try {
+              const { signOutUser } = await import("./firebase.js");
+              await signOutUser();
+              window.location.href = "login.html";
+            } catch (error) {
+              console.error("Sign out error:", error);
+              showError("Failed to sign out. Please try again.");
+            }
+          });
+          document.querySelector(".nav-right").appendChild(signOutBtn);
 
-        // Today's workout from Firebase
-        const cycleData = await getWorkoutCycle(user.uid);
-        const todayWorkout = getTodayWorkout(cycleData);
-        const workoutEl = document.getElementById("todayWorkout");
+          // Today's workout from Firebase
+          showLoading();
+          const cycleData = await getWorkoutCycle(user.uid);
+          hideLoading();
+          const todayWorkout = getTodayWorkout(cycleData);
+          const workoutEl = document.getElementById("todayWorkout");
 
-        if (workoutEl) {
-          if (todayWorkout) {
-            if (todayWorkout.isCardio) {
-              workoutEl.innerHTML = `
+          if (workoutEl) {
+            if (todayWorkout) {
+              if (todayWorkout.isCardio) {
+                workoutEl.innerHTML = `
                             <span class="workout-day">Today</span>
                             <span class="workout-muscles cardio">${todayWorkout.icon} ${todayWorkout.name}</span>
                         `;
-            } else {
-              workoutEl.innerHTML = `
+              } else {
+                workoutEl.innerHTML = `
                             <span class="workout-day">Today's Workout</span>
                             <span class="workout-muscles">${todayWorkout.icon} ${todayWorkout.name}</span>
                         `;
-            }
-          } else {
-            workoutEl.innerHTML = `
+              }
+            } else {
+              workoutEl.innerHTML = `
                         <span class="workout-day">Today</span>
                         <span class="workout-muscles empty">Set up your cycle in the Exercise page</span>
                     `;
+            }
           }
+
+          // Protein goal from Firebase profile
+          try {
+            const profile = await getUserProfile(user.uid);
+            if (profile) {
+              const macros = calculateMacros(profile);
+              document.getElementById("proteinGoal").textContent =
+                macros.protein + "g";
+            }
+          } catch (e) {}
+
+          // Protein consumed today
+          const proteinData = JSON.parse(
+            localStorage.getItem("proteinData") || "{}",
+          );
+          const todayProtein = proteinData[new Date().toDateString()] || 0;
+          document.getElementById("proteinToday").textContent =
+            todayProtein + "g";
+        } catch (error) {
+          console.error("Error loading user data:", error);
+          hideLoading();
+          showError("Failed to load user data. Please refresh the page.");
         }
-
-        // Protein goal from Firebase profile
-        try {
-          const profile = await getUserProfile(user.uid);
-          if (profile) {
-            const macros = calculateMacros(profile);
-            document.getElementById("proteinGoal").textContent =
-              macros.protein + "g";
-          }
-        } catch (e) {}
-
-        // Protein consumed today
-        const proteinData = JSON.parse(
-          localStorage.getItem("proteinData") || "{}",
-        );
-        const todayProtein = proteinData[new Date().toDateString()] || 0;
-        document.getElementById("proteinToday").textContent =
-          todayProtein + "g";
       });
     </script>
   </body>

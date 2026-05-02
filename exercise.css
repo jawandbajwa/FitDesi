@@ -149,6 +149,81 @@
   color: rgba(126, 217, 154, 0.5);
 }
 
+/* Workout Logging */
+.workout-logging {
+  margin-top: 16px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 0.5px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+}
+
+.logging-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.logging-header span {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.add-set-btn {
+  background: rgba(126, 217, 154, 0.1);
+  border: 0.5px solid rgba(126, 217, 154, 0.3);
+  color: #7ed99a;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: Inter, sans-serif;
+}
+
+.set-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.01);
+  border-radius: 8px;
+}
+
+.set-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+  min-width: 40px;
+}
+
+.set-input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 6px 8px;
+  color: #f0f0f0;
+  font-size: 12px;
+  width: 60px;
+  text-align: center;
+}
+
+.set-input:focus {
+  outline: none;
+  border-color: #7ed99a;
+}
+
+.remove-set-btn {
+  background: rgba(255, 100, 100, 0.1);
+  border: 0.5px solid rgba(255, 100, 100, 0.3);
+  color: #ff6464;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 10px;
+  cursor: pointer;
+}
+
 .week-day-muscle {
   font-size: 9px;
   color: rgba(126, 217, 154, 0.6);
