@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FitDesi</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="glow-1"></div>
+    <div class="glow-2"></div>
+
+    <nav>
+      <div class="logo">FitDesi <span>personal</span></div>
+      <div class="nav-right">
+        <div class="nav-date" id="currentDate"></div>
+      </div>
+    </nav>
+
+    <div class="hero">
+      <div class="greeting" id="greeting"></div>
+      <h1>Stay consistent,<br />stay <em>strong</em></h1>
+      <p>Indian vegetarian · Beginner friendly · All in one place</p>
+    </div>
+
+    <div class="today-workout" id="todayWorkout">
+      <span class="workout-day">Today</span>
+      <span class="workout-muscles empty"
+        >Set up your cycle in the Exercise page</span
+      >
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="val" id="proteinToday">0g</div>
+        <div class="lbl">Protein today</div>
+      </div>
+      <div class="stat">
+        <div class="val" id="workoutsDone">0</div>
+        <div class="lbl">Workouts done</div>
+      </div>
+      <div class="stat">
+        <div class="val" id="proteinGoal">—</div>
+        <div class="lbl">Daily goal</div>
+      </div>
+    </div>
+
+    <div class="divider">— quick access —</div>
+
+    <div class="card-container">
+      <a href="exercise.html" class="card">
+        <div class="icon">💪</div>
+        <h2>Exercise</h2>
+        <p>Workouts built for your routine</p>
+        <div class="arrow">→</div>
+      </a>
+      <a href="tracker.html" class="card">
+        <div class="icon">📊</div>
+        <h2>Protein Tracker</h2>
+        <p>Daily macros & meal check-ins</p>
+        <div class="arrow">→</div>
+      </a>
+      <a href="recipes.html" class="card">
+        <div class="icon">🍛</div>
+        <h2>Recipes</h2>
+        <p>Indian veg cookbook with macros</p>
+        <div class="arrow">→</div>
+      </a>
+    </div>
+
+    <div class="tip-box">
+      <div class="tip-label">💡 Daily tip</div>
+      <div class="tip-text" id="dailyTip"></div>
+    </div>
+
+    <footer>Fitdesi · Personal use only</footer>
+
+    <script src="app.js"></script>
+
+    <script type="module">
+      import {
+        onAuthStateChanged,
+        auth,
+        isAdmin,
+        getWorkoutCycle,
+      } from "./firebase.js";
+      import { getUserProfile } from "./firebase.js";
+
+      function getTimeOfDay() {
+        const h = new Date().getHours();
+        if (h < 12) return "morning";
+        if (h < 17) return "afternoon";
+        return "evening";
+      }
+
+      const MY_SPLIT = [
+        { name: "Chest + Triceps", icon: "💪" },
+        { name: "Back + Biceps", icon: "🏋️" },
+        { name: "Legs + Core", icon: "🦵" },
+        { name: "Shoulders + Abs", icon: "🏔️" },
+        { name: "Light Cardio", icon: "🏃", isCardio: true },
+      ];
+
+      const STANDARD_SPLITS = {
+        mysplit: MY_SPLIT,
+        ppl: [
+          { name: "Push Day", icon: "💪" },
+          { name: "Pull Day", icon: "🏋️" },
+          { name: "Leg Day", icon: "🦵" },
+        ],
+        upperlower: [
+          { name: "Upper Body", icon: "💪" },
+          { name: "Lower Body", icon: "🦵" },
+        ],
+        fullbody: [{ name: "Full Body", icon: "🔥" }],
+        brosplit: [
+          { name: "Chest Day", icon: "💪" },
+          { name: "Back Day", icon: "🏋️" },
+          { name: "Shoulder Day", icon: "🏔️" },
+          { name: "Arm Day", icon: "💪" },
+          { name: "Leg Day", icon: "🦵" },
+        ],
+        arnold: [
+          { name: "Chest + Back", icon: "🏋️" },
+          { name: "Shoulders + Arms", icon: "💪" },
+          { name: "Legs", icon: "🦵" },
+        ],
+        ppl6: [
+          { name: "Push Day A", icon: "💪" },
+          { name: "Pull Day A", icon: "🏋️" },
+          { name: "Leg Day A", icon: "🦵" },
+          { name: "Push Day B", icon: "💪" },
+          { name: "Pull Day B", icon: "🏋️" },
+          { name: "Leg Day B", icon: "🦵" },
+        ],
+        ul4: [
+          { name: "Upper A", icon: "💪" },
+          { name: "Lower A", icon: "🦵" },
+          { name: "Upper B", icon: "💪" },
+          { name: "Lower B", icon: "🦵" },
+        ],
+      };
+
+      function getTodayWorkout(cycleData) {
+        if (!cycleData || !cycleData.startDate) return null;
+        const splitKey = cycleData.activeSplit || "mysplit";
+        let splitDays;
+
+        if (splitKey === "custom" && cycleData.customSplitDays) {
+          splitDays = cycleData.customSplitDays.map((day, idx) => ({
+            name: `Day ${idx + 1} — ${day.muscles.join(", ") || "Rest"}`,
+            icon: day.muscles.includes("Cardio") ? "🏃" : "💪",
+            isCardio:
+              day.muscles.includes("Cardio") || day.muscles.includes("Rest"),
+          }));
+        } else {
+          splitDays = STANDARD_SPLITS[splitKey] || MY_SPLIT;
+        }
+
+        const start = new Date(cycleData.startDate);
+        const today = new Date();
+        start.setHours(0, 0, 0, 0);
+        today.setHours(0, 0, 0, 0);
+        const diffDays = Math.floor((today - start) / (1000 * 60 * 60 * 24));
+        const dayIdx = diffDays % splitDays.length;
+        return splitDays[dayIdx];
+      }
+
+      function calculateMacros(profile) {
+        const { weight, height, age, gender, activity, goal } = profile;
+        let bmr =
+          gender === "male"
+            ? 10 * weight + 6.25 * height - 5 * age + 5
+            : 10 * weight + 6.25 * height - 5 * age - 161;
+        const multipliers = {
+          sedentary: 1.2,
+          light: 1.375,
+          moderate: 1.55,
+          active: 1.725,
+        };
+        let tdee = bmr * (multipliers[activity] || 1.55);
+        let protein;
+        if (goal === "recomp") protein = Math.round(weight * 2.2);
+        else if (goal === "muscle") protein = Math.round(weight * 2.0);
+        else protein = Math.round(weight * 2.4);
+        return { protein };
+      }
+
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+          window.location.href = "login.html";
+          return;
+        }
+
+        // Greeting
+        const firstName = user.displayName
+          ? user.displayName.split(" ")[0]
+          : "there";
+        document.getElementById("greeting").textContent =
+          `Good ${getTimeOfDay()}, ${firstName}`;
+
+        // Admin badge
+        if (isAdmin(user)) {
+          const adminBadge = document.createElement("a");
+          adminBadge.href = "admin.html";
+          adminBadge.style.cssText = `font-size:10px;color:#f0a050;background:rgba(240,160,80,0.1);border:0.5px solid rgba(240,160,80,0.2);padding:4px 10px;border-radius:20px;text-decoration:none;margin-left:8px;`;
+          adminBadge.textContent = "⚙️ Admin";
+          document.querySelector(".nav-right").prepend(adminBadge);
+        }
+
+        // Sign out button
+        const signOutBtn = document.createElement("button");
+        signOutBtn.textContent = "Sign Out";
+        signOutBtn.style.cssText = `font-size:11px;color:rgba(255,255,255,0.3);background:none;border:0.5px solid rgba(255,255,255,0.1);padding:4px 10px;border-radius:20px;cursor:pointer;font-family:Inter,sans-serif;`;
+        signOutBtn.addEventListener("click", async () => {
+          const { signOutUser } = await import("./firebase.js");
+          await signOutUser();
+          window.location.href = "login.html";
+        });
+        document.querySelector(".nav-right").appendChild(signOutBtn);
+
+        // Today's workout from Firebase
+        const cycleData = await getWorkoutCycle(user.uid);
+        const todayWorkout = getTodayWorkout(cycleData);
+        const workoutEl = document.getElementById("todayWorkout");
+
+        if (workoutEl) {
+          if (todayWorkout) {
+            if (todayWorkout.isCardio) {
+              workoutEl.innerHTML = `
+                            <span class="workout-day">Today</span>
+                            <span class="workout-muscles cardio">${todayWorkout.icon} ${todayWorkout.name}</span>
+                        `;
+            } else {
+              workoutEl.innerHTML = `
+                            <span class="workout-day">Today's Workout</span>
+                            <span class="workout-muscles">${todayWorkout.icon} ${todayWorkout.name}</span>
+                        `;
+            }
+          } else {
+            workoutEl.innerHTML = `
+                        <span class="workout-day">Today</span>
+                        <span class="workout-muscles empty">Set up your cycle in the Exercise page</span>
+                    `;
+          }
+        }
+
+        // Protein goal from Firebase profile
+        try {
+          const profile = await getUserProfile(user.uid);
+          if (profile) {
+            const macros = calculateMacros(profile);
+            document.getElementById("proteinGoal").textContent =
+              macros.protein + "g";
+          }
+        } catch (e) {}
+
+        // Protein consumed today
+        const proteinData = JSON.parse(
+          localStorage.getItem("proteinData") || "{}",
+        );
+        const todayProtein = proteinData[new Date().toDateString()] || 0;
+        document.getElementById("proteinToday").textContent =
+          todayProtein + "g";
+      });
+    </script>
+  </body>
+</html>

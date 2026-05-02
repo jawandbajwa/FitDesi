@@ -1,0 +1,2234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FitDesi — Recipe Importer</title>
+    <style>
+        body { background:#0a0f0c; color:#f0f0f0; font-family:'Inter',sans-serif; padding:32px; }
+        h2 { color:#7ed99a; margin-bottom:8px; }
+        p { color:rgba(255,255,255,0.4); font-size:13px; margin-bottom:24px; }
+        .btn-row { display:flex; gap:12px; margin-bottom:24px; flex-wrap:wrap; }
+        button { padding:12px 24px; border-radius:10px; border:0.5px solid #7ed99a; background:rgba(126,217,154,0.1); color:#7ed99a; font-size:14px; cursor:pointer; font-family:'Inter',sans-serif; }
+        button:hover { background:rgba(126,217,154,0.2); }
+        button:disabled { opacity:0.4; cursor:not-allowed; }
+        #log { background:#0d1a10; border:0.5px solid rgba(255,255,255,0.08); border-radius:12px; padding:16px; font-size:12px; font-family:monospace; white-space:pre-wrap; max-height:500px; overflow-y:auto; line-height:1.8; }
+        .ok { color:#7ed99a; }
+        .err { color:#ff6b6b; }
+    </style>
+</head>
+<body>
+    <h2>FitDesi — Recipe Importer</h2>
+    <p>Import all Indian and Canadian recipes with full ingredient lists and step-by-step cooking instructions.</p>
+    <div class="btn-row">
+        <button id="btnIndian">🇮🇳 Import Indian Recipes (35)</button>
+        <button id="btnCanadian">🇨🇦 Import Canadian Recipes (39)</button>
+    </div>
+    <div id="log">Ready. Click a button to start importing...</div>
+
+    <script type="module">
+        import { saveRecipe } from './firebase.js';
+
+        const log = document.getElementById('log');
+        function write(msg, cls='') {
+            const line = document.createElement('div');
+            if (cls) line.className = cls;
+            line.textContent = msg;
+            log.appendChild(line);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        const indian = [
+
+            // ── BREAKFAST ────────────────────────────────────────
+
+            {
+                name: 'Paneer Bhurji',
+                category: 'breakfast',
+                cuisine: 'indian',
+                servingSize: '1 plate',
+                prepTime: '15 min',
+                videoId: 'qWbHSOplcvY',
+                protein: 32, carbs: 9, fat: 24, calories: 378,
+                ingredients: [
+                    { name:'Paneer (full fat)', amount:150, unit:'g' },
+                    { name:'Onion', amount:60, unit:'g' },
+                    { name:'Tomato', amount:80, unit:'g' },
+                    { name:'Capsicum / Bell Pepper', amount:50, unit:'g' },
+                    { name:'Ghee', amount:5, unit:'g' },
+                    { name:'Cumin Seeds (Jeera)', amount:2, unit:'g' },
+                    { name:'Turmeric Powder (Haldi)', amount:1, unit:'g' },
+                    { name:'Red Chilli Powder', amount:2, unit:'g' },
+                    { name:'Garam Masala', amount:2, unit:'g' },
+                    { name:'Salt', amount:3, unit:'g' },
+                    { name:'Coriander Leaves (Dhania)', amount:10, unit:'g' },
+                ],
+                instructions: [
+                    'Crumble 150g paneer into small pieces with your hands and set aside.',
+                    'Finely chop onion, tomato and capsicum.',
+                    'Heat ghee in a pan over medium heat. Add cumin seeds and let them splutter for 30 seconds.',
+                    'Add chopped onion and sauté for 3-4 minutes until golden.',
+                    'Add tomato and capsicum. Cook for 3 minutes until tomatoes soften.',
+                    'Add turmeric, red chilli powder, garam masala and salt. Mix well.',
+                    'Add crumbled paneer. Toss everything together and cook for 2 minutes.',
+                    'Garnish with fresh coriander leaves and serve hot with roti or as is.',
+                ]
+            },
+
+            {
+                name: 'Moong Dal Chilla',
+                category: 'breakfast',
+                cuisine: 'indian',
+                servingSize: '2 chillas',
+                prepTime: '20 min + 4hr soak',
+                videoId: 'K5VB9OpSgOI',
+                protein: 22, carbs: 40, fat: 4, calories: 284,
+                ingredients: [
+                    { name:'Moong Dal (Yellow, split)', amount:80, unit:'g' },
+                    { name:'Ginger (Adrak)', amount:5, unit:'g' },
+                    { name:'Green Chilli', amount:5, unit:'g' },
+                    { name:'Onion', amount:40, unit:'g' },
+                    { name:'Coriander Leaves (Dhania)', amount:10, unit:'g' },
+                    { name:'Cumin Seeds (Jeera)', amount:2, unit:'g' },
+                    { name:'Turmeric Powder (Haldi)', amount:1, unit:'g' },
+                    { name:'Salt', amount:2, unit:'g' },
+                    { name:'Sunflower Oil', amount:5, unit:'g' },
+                ],
+                instructions: [
+                    'Soak 80g yellow moong dal in water for 4 hours or overnight.',
+                    'Drain the water and blend the soaked dal with ginger, green chilli and a splash of water into a smooth batter.',
+                    'Transfer batter to a bowl. Add finely chopped onion, coriander, cumin seeds, turmeric and salt. Mix well.',
+                    'The batter should be pourable like dosa batter. Add a little water if too thick.',
+                    'Heat a non-stick pan over medium heat. Brush lightly with oil.',
+                    'Pour one ladle of batter and spread in a circular motion to make a thin crepe.',
+                    'Cook for 2-3 minutes until bottom is golden. Flip and cook 1 more minute.',
+                    'Repeat for second chilla. Serve hot with green chutney.',
+                ]
+            },
+
+            {
+                name: 'Besan Chilla',
+                category: 'breakfast',
+                cuisine: 'indian',
+                servingSize: '2 chillas',
+                prepTime: '15 min',
+                videoId: 'xQBBLJiNgJI',
+                protein: 20, carbs: 38, fat: 5, calories: 277,
+                ingredients: [
+                    { name:'Besan (Chickpea Flour)', amount:80, unit:'g' },
+                    { name:'Onion', amount:50, unit:'g' },
+                    { name:'Tomato', amount:50, unit:'g' },
+                    { name:'Capsicum / Bell Pepper', amount:30, unit:'g' },
+                    { name:'Ginger (Adrak)', amount:5, unit:'g' },
+                    { name:'Green Chilli', amount:5, unit:'g' },
+                    { name:'Cumin Seeds (Jeera)', amount:2, unit:'g' },
+                    { name:'Turmeric Powder (Haldi)', amount:1, unit:'g' },
+                    { name:'Salt', amount:2, unit:'g' },
+                    { name:'Sunflower Oil', amount:5, unit:'g' },
+                ],
+                instructions: [
+                    'In a bowl, mix 80g besan with turmeric, cumin seeds and salt.',
+                    'Add enough water gradually and whisk until smooth lump-free batter forms — consistency of pancake batter.',
+                    'Add finely chopped onion, tomato, capsicum, ginger and green chilli. Mix well.',
+                    'Heat a non-stick tawa over medium heat. Grease with a few drops of oil.',
+                    'Pour one ladle of batter and spread into a thin circle.',
+                    'Drizzle a few drops of oil around the edges. Cook 2-3 minutes until base is golden.',
+                    'Flip carefully and cook 1 minute on other side.',
+                    'Serve hot with mint chutney or curd.',
+                ]
+            },
+
+            {
+                name: 'Overnight Oats (High Protein)',
+                category: 'breakfast',
+                cuisine: 'indian',
+                servingSize: '1 bowl',
+                prepTime: '5 min + overnight',
+                videoId: '',
+                protein: 42, carbs: 52, fat: 12, calories: 484,
+                ingredients: [
+                    { name:'Oats (rolled)', amount:60, unit:'g' },
+                    { name:'Curd / Dahi (full fat)', amount:100, unit:'g' },
+                    { name:'Diesel NZ Whey Isolate', amount:30, unit:'g' },
+                    { name:'Chia Seeds', amount:10, unit:'g' },
+                    { name:'Banana (ripe)', amount:80, unit:'g' },
+                    { name:'Almonds (Badam)', amount:15, unit:'g' },
+                ],
+                instructions: [
+                    'In a jar or bowl, add 60g rolled oats and 10g chia seeds.',
+                    'Mix whey protein powder with curd until smooth with no lumps.',
+                    'Pour the protein curd mixture over the oats and chia.',
+                    'Stir everything together. Cover and refrigerate overnight or minimum 4 hours.',
+                    'In the morning, the oats will have absorbed the liquid and become thick and creamy.',
+                    'Top with sliced banana and chopped almonds.',
+                    'If too thick, add a splash of milk and stir. Eat cold straight from the jar.',
+                ]
+            },
+
+            {
+                name: 'Protein Smoothie',
+                category: 'breakfast',
+                cuisine: 'indian',
+                servingSize: '1 glass',
+                prepTime: '5 min',
+                videoId: '',
+                protein: 38, carbs: 38, fat: 9, calories: 393,
+                ingredients: [
+                    { name:'Diesel NZ Whey Isolate', amount:30, unit:'g' },
+                    { name:'Milk (cow, full fat)', amount:250, unit:'g' },
+                    { name:'Banana (ripe)', amount:100, unit:'g' },
+                    { name:'Peanut Butter (natural)', amount:20, unit:'g' },
+                    { name:'Chia Seeds', amount:10, unit:'g' },
+                ],
+                instructions: [
+                    'Add all ingredients to a blender — milk, banana, peanut butter, chia seeds and whey protein.',
+                    'Blend on high for 30-45 seconds until completely smooth.',
+                    'Pour into a large glass. Drink immediately for best texture.',
+                    'Tip: Freeze the banana beforehand for a thicker, colder smoothie.',
+                    'If too thick, add a splash more milk and blend again.',
+                ]
+            },
+
+            {
+                name: 'Quinoa Upma',
+                category: 'breakfast',
+                cuisine: 'indian',
+                servingSize: '1 bowl',
+                prepTime: '20 min',
+                videoId: 'rCfTnlYqFuY',
+                protein: 12, carbs: 48, fat: 6, calories: 294,
+                ingredients: [
+                    { name:'Quinoa (raw)', amount:60, unit:'g' },
+                    { name:'Onion', amount:60, unit:'g' },
+                    { name:'Tomato', amount:60, unit:'g' },
+                    { name:'Peas (Matar, fresh)', amount:40, unit:'g' },
+                    { name:'Carrot (Gajar)', amount:40, unit:'g' },
+                    { name:'Mustard Oil', amount:5, unit:'g' },
+                    { name:'Cumin Seeds (Jeera)', amount:2, unit:'g' },
+                    { name:'Ginger (Adrak)', amount:5, unit:'g' },
+                    { name:'Green Chilli', amount:5, unit:'g' },
+                    { name:'Curry Leaves', amount:3, unit:'g' },
+                    { name:'Salt', amount:2, unit:'g' },
+                    { name:'Coriander Leaves (Dhania)', amount:10, unit:'g' },
+                ],
+                instructions: [
+                    'Rinse 60g quinoa thoroughly under running water. Drain and set aside.',
+                    'Heat oil in a pan over medium heat. Add cumin seeds and curry leaves.',
+                    'Add finely chopped ginger, green chilli and onion. Sauté 3-4 minutes until onion is soft.',
+                    'Add diced carrot and peas. Cook 3 minutes.',
+                    'Add chopped tomato. Cook 2 minutes until soft.',
+                    'Add rinsed quinoa and salt. Mix well with the vegetables.',
+                    'Add 120ml water (2:1 ratio for quinoa). Bring to boil.',
+                    'Cover, reduce heat to low and cook 12-15 minutes until water is absorbed.',
+                    'Fluff with a fork. Garnish with coriander and serve hot.',
+                ]
+            },
+
+            {
+                name: 'Poha with Peanuts',
+                category: 'breakfast',
+                cuisine: 'indian',
+                servingSize: '1 plate',
+                prepTime: '15 min',
+                videoId: 'lWkCLGoQzaE',
+                protein: 12, carbs: 62, fat: 12, calories: 404,
+                ingredients: [
+                    { name:'Poha (Flattened Rice)', amount:80, unit:'g' },
+                    { name:'Peanuts / Groundnuts', amount:30, unit:'g' },
+                    { name:'Onion', amount:60, unit:'g' },
+                    { name:'Tomato', amount:40, unit:'g' },
+                    { name:'Green Chilli', amount:5, unit:'g' },
+                    { name:'Curry Leaves', amount:3, unit:'g' },
+                    { name:'Mustard Oil', amount:5, unit:'g' },
+                    { name:'Cumin Seeds (Jeera)', amount:2, unit:'g' },
+                    { name:'Turmeric Powder (Haldi)', amount:1, unit:'g' },
+                    { name:'Salt', amount:2, unit:'g' },
+                    { name:'Coriander Leaves (Dhania)', amount:8, unit:'g' },
+                ],
+                instructions: [
+                    'Place 80g poha in a colander and rinse under running water for 30 seconds. Let drain. The poha should soften but not become mushy.',
+                    'Heat oil in a pan. Add peanuts and roast until golden. Remove and set aside.',
+                    'In the same pan add cumin seeds and curry leaves. Let them splutter.',
+                    'Add chopped onion and green chilli. Sauté 3 minutes until translucent.',
+                    'Add chopped tomato. Cook 2 minutes.',
+                    'Add turmeric and salt. Mix.',
+                    'Add the drained poha and roasted peanuts. Toss gently to combine — do not break the poha.',
+                    'Cook 2 minutes on low heat. Garnish with coriander and serve hot.',
+                ]
+            },
+
+            {
+                name: 'Soya Oats Porridge',
+                category: 'breakfast',
+                cuisine: 'indian',
+                servingSize: '1 bowl',
+                prepTime: '10 min',
+                videoId: '',
+                protein: 26, carbs: 58, fat: 14, calories: 466,
+                ingredients: [
+                    { name:'Oats (rolled)', amount:60, unit:'g' },
+                    { name:'Soya Chunks', amount:20, unit:'g' },
+                    { name:'Milk (cow, full fat)', amount:200, unit:'g' },
+                    { name:'Banana (ripe)', amount:80, unit:'g' },
+                    { name:'Peanut Butter (natural)', amount:15, unit:'g' },
+                    { name:'Almonds (Badam)', amount:10, unit:'g' },
+                ],
+                instructions: [
+                    'Soak 20g soya chunks in hot water for 5 minutes. Drain and squeeze out water. Chop or blend into small pieces.',
+                    'Bring 200ml milk to a gentle simmer in a saucepan.',
+                    'Add 60g rolled oats and the chopped soya chunks.',
+                    'Stir continuously on medium-low heat for 4-5 minutes until oats are cooked and porridge is thick and creamy.',
+                    'Remove from heat. Stir in peanut butter until combined.',
+                    'Pour into a bowl. Top with sliced banana and chopped almonds.',
+                    'Eat immediately while hot. Add a drizzle of honey if desired.',
+                ]
+            },
+
+            {
+                name: 'Sprouts Chaat',
+                category: 'breakfast',
+                cuisine: 'indian',
+                servingSize: '1 bowl',
+                prepTime: '5 min (+ overnight sprouting)',
+                videoId: 'tVXzaRBZWtY',
+                protein: 16, carbs: 26, fat: 1, calories: 177,
+                ingredients: [
+                    { name:'Whole Moong (Green Gram)', amount:60, unit:'g' },
+                    { name:'Onion', amount:40, unit:'g' },
+                    { name:'Tomato', amount:40, unit:'g' },
+                    { name:'Cucumber (Kheera)', amount:50, unit:'g' },
+                    { name:'Green Chilli', amount:5, unit:'g' },
+                    { name:'Coriander Leaves (Dhania)', amount:8, unit:'g' },
+                    { name:'Salt', amount:2, unit:'g' },
+                ],
+                instructions: [
+                    'To sprout: Soak 60g whole moong in water overnight. Next morning, drain and tie in a muslin cloth or cover the bowl. Leave 8-12 hours until small white tails appear.',
+                    'Rinse sprouted moong thoroughly.',
+                    'Optional: Steam the sprouts for 3-4 minutes for better digestion. Let cool.',
+                    'Finely chop onion, tomato, cucumber and green chilli.',
+                    'In a bowl, mix sprouts with all chopped vegetables.',
+                    'Add salt and toss well. Garnish with fresh coriander.',
+                    'Squeeze lemon juice on top if desired. Serve immediately.',
+                ]
+            },
+
+            // ── LUNCH ────────────────────────────────────────────
+
+            {
+                name: 'Dal Tadka',
+                category: 'lunch',
+                cuisine: 'indian',
+                servingSize: '1 bowl',
+                prepTime: '30 min',
+                videoId: '_oyxCn2iSjU',
+                protein: 18, carbs: 38, fat: 8, calories: 298,
+                ingredients: [
+                    { name:'Toor Dal', amount:60, unit:'g' },
+                    { name:'Onion', amount:80, unit:'g' },
+                    { name:'Tomato', amount:80, unit:'g' },
+                    { name:'Garlic (Lehsun)', amount:10, unit:'g' },
+                    { name:'Ginger (Adrak)', amount:5, unit:'g' },
+                    { name:'Ghee', amount:10, unit:'g' },
+                    { name:'Cumin Seeds (Jeera)', amount:3, unit:'g' },
+                    { name:'Turmeric Powder (Haldi)', amount:2, unit:'g' },
+                    { name:'Red Chilli Powder', amount:2, unit:'g' },
+                    { name:'Garam Masala', amount:2, unit:'g' },
+                    { name:'Salt', amount:3, unit:'g' },
+                    { name:'Coriander Leaves (Dhania)', amount:10, unit:'g' },
+                ],
+                instructions: [
+                    'Wash 60g toor dal. Pressure cook with 240ml water, turmeric and salt for 3-4 whistles until soft. Mash lightly.',
+                    'Heat ghee in a separate pan. Add cumin seeds and let splutter.',
+                    'Add finely chopped garlic and ginger. Sauté 1 minute until golden.',
+                    'Add chopped onion. Sauté 5 minutes until golden brown.',
+                    'Add chopped tomato. Cook 4-5 minutes until oil separates.',
+                    'Add red chilli powder and garam masala. Cook 1 minute.',
+                    'Pour this tadka (tempering) into the cooked dal. Mix well.',
+                    'Simmer together for 3-5 minutes. Adjust consistency with water if needed.',
+                    'Garnish with fresh coriander. Serve with rice or roti.',
+                ]
+            },
+
+            {
+                name: 'Rajma Masala',
+                category: 'lunch',
+                cuisine: 'indian',
+                servingSize: '1 bowl',
+                prepTime: '45 min + overnight soak',
+                videoId: 'YHKGpHuNz3Y',
+                protein: 22, carbs: 52, fat: 9, calories: 381,
+                ingredients: [
+                    { name:'Rajma (Kidney Beans)', amount:80, unit:'g' },
+                    { name:'Onion', amount:100, unit:'g' },
+                    { name:'Tomato', amount:100, unit:'g' },
+                    { name:'Garlic (Lehsun)', amount:10, unit:'g' },
+                    { name:'Ginger (Adrak)', amount:8, unit:'g' },
+                    { name:'Mustard Oil', amount:10, unit:'g' },
+                    { name:'Cumin Seeds (Jeera)', amount:3, unit:'g' },
+                    { name:'Turmeric Powder (Haldi)', amount:2, unit:'g' },
+                    { name:'Red Chilli Powder', amount:3, unit:'g' },
+                    { name:'Garam Masala', amount:3, unit:'g' },
+                    { name:'Salt', amount:3, unit:'g' },
+                    { name:'Coriander Leaves (Dhania)', amount:10, unit:'g' },
+                ],
+                instructions: [
+                    'Soak 80g rajma in water overnight (minimum 8 hours). Drain.',
+                    'Pressure cook rajma with fresh water and salt for 8-10 whistles until completely soft.',
+                    'Blend onion, ginger and garlic into a paste.',
+                    'Heat oil in a deep pan. Add cumin seeds.',
+                    'Add the onion paste. Cook on medium heat for 8-10 minutes, stirring regularly, until golden and oil separates.',
+                    'Blend tomatoes and add to the pan. Cook 8 minutes until masala thickens.',
+                    'Add turmeric, red chilli powder and garam masala. Cook 2 minutes.',
+                    'Add cooked rajma with its cooking water. Mix well.',
+                    'Simmer 10-15 minutes until gravy thickens. Mash a few beans for creaminess.',
+                    'Garnish with coriander. Serve with steamed rice.',
+                ]
+            },
+
+            {
+                name: 'Chana Masala',
+                category: 'lunch',
+                cuisine: 'indian',
+                servingSize: '1 bowl',
+                prepTime: '40 min',
+                videoId: 'Tsr2CIQEH9Y',
+                protein: 20, carbs: 54, fat: 10, calories: 386,
+                ingredients: [
+                    { name:'Kabuli Chana (Chickpeas)', amount:80, unit:'g' },
+                    { name:'Onion', amount:100, unit:'g' },
+                    { name:'Tomato', amount:100, unit:'g' },
+                    { name:'Garlic (Lehsun)', amount:10, unit:'g' },
+                    { name:'Ginger (Adrak)', amount:8, unit:'g' },
+                    { name:'Sunflower Oil', amount:10, unit:'g' },
+                    { name:'Cumin Seeds (Jeera)', amount:3, unit:'g' },
+                    { name:'Turmeric Powder (Haldi)', amount:2, unit:'g' },
+                    { name:'Red Chilli Powder', amount:3, unit:'g' },
+                    { name:'Garam Masala', amount:3, unit:'g' },
+                    { name:'Salt', amount:3, unit:'g' },
+                    { name:'Coriander Leaves (Dhania)', amount:10, unit:'g' },
+                ],
+                instructions: [
+                    'Soak chickpeas overnight. Pressure cook with salt until tender (6-7 whistles). Reserve cooking water.',
+                    'Make a paste of onion, ginger and garlic.',
+                    'Heat oil. Add cumin seeds. Once they splutter, add the onion paste.',
+                    'Cook on medium heat 8-10 minutes until the paste turns golden and raw smell disappears.',
+                    'Add pureed tomatoes. Cook 7-8 minutes until oil floats on top.',
+                    'Add turmeric, red chilli powder and garam masala. Cook 2 minutes.',
+                    'Add cooked chickpeas and some cooking water to get a thick gravy.',
+                    'Simmer 10 minutes. Crush a few chickpeas with the back of a spoon to thicken the gravy.',
+                    'Taste and adjust salt. Garnish with coriander.',
+                ]
+            },
+
+            {
+                name: 'Palak Paneer',
+                category: 'lunch',
+                cuisine: 'indian',
+                servingSize: '1 bowl',
+                prepTime: '30 min',
+                videoId: 'vYGywZYHBOg',
+                protein: 24, carbs: 12, fat: 22, calories: 336,
+                ingredients: [
+                    { name:'Paneer (full fat)', amount:100, unit:'g' },
+                    { name:'Spinach (Palak)', amount:150, unit:'g' },
+                    { name:'Onion', amount:80, unit:'g' },
+                    { name:'Tomato', amount:60, unit:'g' },
+                    { name:'Garlic (Lehsun)', amount:8, unit:'g' },
+                    { name:'Ginger (Adrak)', amount:5, unit:'g' },
+                    { name:'Ghee', amount:8, unit:'g' },
+                    { name:'Cumin Seeds (Jeera)', amount:2, unit:'g' },
+                    { name:'Turmeric Powder (Haldi)', amount:1, unit:'g' },
+                    { name:'Red Chilli Powder', amount:2, unit:'g' },
+                    { name:'Garam Masala', amount:2, unit:'g' },
+                    { name:'Salt', amount:3, unit:'g' },
+                ],
+                instructions: [
+                    'Blanch 150g spinach in boiling water for 2 minutes. Drain and immediately transfer to ice cold water to preserve green colour.',
+                    'Blend blanched spinach into a smooth purée. Set aside.',
+                    'Cut paneer into cubes. Lightly pan fry in a teaspoon of ghee until golden on edges. Remove and set aside.',
+                    'In the same pan heat remaining ghee. Add cumin seeds.',
+                    'Add finely chopped onion. Sauté 5 minutes until golden.',
+                    'Add ginger, garlic paste. Cook 2 minutes.',
+                    'Add chopped tomato. Cook until soft and oil separates.',
+                    'Add turmeric, red chilli powder and garam masala. Mix.',
+                    'Add the spinach purée. Stir and cook 3-4 minutes.',
+                    'Gently fold in the pan-fried paneer cubes. Simmer 3 minutes.',
+                    'Add salt to taste. Serve with roti or rice.',
+                ]
+            },
+
+            {
+                name: 'Soya Chunk Masala',
+                category: 'lunch',
+                cuisine: 'indian',
+                servingSize: '1 bowl',
+                prepTime: '25 min',
+                videoId: 'yt0xZ3hBjDM',
+                protein: 32, carbs: 22, fat: 7, calories: 279,
+                ingredients: [
+                    { name:'Soya Chunks', amount:50, unit:'g' },
+                    { name:'Onion', amount:80, unit:'g' },
+                    { name:'Tomato', amount:80, unit:'g' },
+                    { name:'Capsicum / Bell Pepper', amount:50, unit:'g' },
+                    { name:'Garlic (Lehsun)', amount:8, unit:'g' },
+                    { name:'Ginger (Adrak)', amount:5, unit:'g' },
+                    { name:'Sunflower Oil', amount:8, unit:'g' },
+                    { name:'Cumin Seeds (Jeera)', amount:2, unit:'g' },
+                    { name:'Turmeric Powder (Haldi)', amount:2, unit:'g' },
+                    { name:'Red Chilli Powder', amount:2, unit:'g' },
+                    { name:'Garam Masala', amount:2, unit:'g' },
+                    { name:'Salt', amount:3, unit:'g' },
+                    { name:'Coriander Leaves (Dhania)', amount:10, unit:'g' },
+                ],
+                instructions: [
+                    'Boil 50g soya chunks in water with a pinch of salt for 5 minutes. Drain and squeeze out all water firmly with your hands. This removes the raw soya smell.',
+                    'Heat oil in a wok or pan over high heat. Add cumin seeds.',
+                    'Add finely chopped onion and sauté 4 minutes until golden.',
+                    'Add ginger garlic paste. Cook 1-2 minutes.',
+                    'Add chopped tomato. Cook 4-5 minutes until masala is dry.',
+                    'Add turmeric, red chilli powder and garam masala. Stir well.',
+                    'Add the squeezed soya chunks and diced capsicum. Toss on high heat 3-4 minutes.',
+                    'Add salt and splash of water if needed. Cook 2 more minutes.',
+                    'Garnish with coriander. Serve with roti or rice.',
+                ]
+            },
+
+            {
+                name: 'Dal Khichdi',
+                category: 'lunch',
+                cuisine: 'indian',
+                servingSize: '1 bowl',
+                prepTime: '25 min',
+                videoId: 'b3pJOXbqACs',
+                protein: 16, carbs: 46, fat: 4, calories: 284,
+                ingredients: [
+                    { name:'Moong Dal (Yellow, split)', amount:50, unit:'g' },
+                    { name:'Basmati Rice (raw)', amount:40, unit:'g' },
+                    { name:'Ghee', amount:5, unit:'g' },
+                    { name:'Cumin Seeds (Jeera)', amount:2, unit:'g' },
+                    { name:'Turmeric Powder (Haldi)', amount:1, unit:'g' },
+                    { name:'Ginger (Adrak)', amount:5, unit:'g' },
+                    { name:'Carrot (Gajar)', amount:40, unit:'g' },
+                    { name:'Peas (Matar, fresh)', amount:40, unit:'g' },
+                    { name:'Salt', amount:2, unit:'g' },
+                    { name:'Coriander Leaves (Dhania)', amount:8, unit:'g' },
+                ],
+                instructions: [
+                    'Wash rice and moong dal together under running water until water runs clear.',
+                    'Heat ghee in a pressure cooker. Add cumin seeds and grated ginger.',
+                    'Add diced carrot and peas. Sauté 2 minutes.',
+                    'Add the washed rice and dal. Mix well with the vegetables.',
+                    'Add turmeric, salt and 350ml water.',
+                    'Pressure cook for 3 whistles on medium heat.',
+                    'Let pressure release naturally. Open and mix gently.',
+                    'The khichdi should be soft and slightly porridge-like. Add hot water if too thick.',
+                    'Serve hot with a dollop of ghee and fresh coriander on top.',
+                ]
+            },
+
+            {
+                name: 'Basmati Rice',
+                category: 'lunch',
+                cuisine: 'indian',
+                servingSize: '1 katori cooked',
+                prepTime: '15 min',
+                videoId: '',
+                protein: 5, carbs: 52, fat: 5, calories: 277,
+                ingredients: [
+                    { name:'Basmati Rice (raw)', amount:60, unit:'g' },
+                    { name:'Ghee', amount:5, unit:'g' },
+                    { name:'Salt', amount:1, unit:'g' },
+                ],
+                instructions: [
+                    'Wash 60g basmati rice in cold water 2-3 times until water runs clear. Soak for 20 minutes if time allows.',
+                    'Bring 180ml water to boil in a saucepan. Add salt.',
+                    'Add drained rice. Stir once.',
+                    'Cover with a tight lid. Cook on lowest heat for 12-15 minutes.',
+                    'Do not lift the lid during cooking.',
+                    'Turn off heat and let rest covered for 5 minutes.',
+                    'Fluff gently with a fork. Add ghee and mix lightly.',
+                    'Serve with any dal or curry.',
+                ]
+            },
+
+            {
+                name: 'Whole Wheat Roti',
+                category: 'lunch',
+                cuisine: 'indian',
+                servingSize: '2 rotis',
+                prepTime: '15 min',
+                videoId: '',
+                protein: 8, carbs: 42, fat: 5, calories: 245,
+                ingredients: [
+                    { name:'Whole Wheat Flour (Atta)', amount:60, unit:'g' },
+                    { name:'Ghee', amount:5, unit:'g' },
+                    { name:'Salt', amount:1, unit:'g' },
+                ],
+                instructions: [
+                    'In a bowl, mix 60g whole wheat flour with a pinch of salt.',
+                    'Add water gradually (roughly 30ml) and knead into a soft smooth dough. It should not stick to hands.',
+                    'Cover and rest the dough for 10 minutes.',
+                    'Divide into 2 equal balls. Roll each ball into a thin circle about 15cm diameter using a rolling pin and dry flour to prevent sticking.',
+                    'Heat a tawa or flat pan on high heat.',
+                    'Place roti on hot tawa. Cook 30-45 seconds until small bubbles appear.',
+                    'Flip and cook 30 seconds on other side.',
+                    'Press edges with a cloth to help it puff up.',
+                    'Apply ghee on top. Serve immediately.',
+                ]
+            },
+
+            {
+                name: 'Panchmel Dal',
+                category: 'lunch',
+                cuisine: 'indian',
+                servingSize: '1 bowl',
+                prepTime: '35 min',
+                videoId: 'AYU-UGY8W0A',
+                protein: 20, carbs: 44, fat: 8, calories: 328,
+                ingredients: [
+                    { name:'Toor Dal', amount:20, unit:'g' },
+                    { name:'Moong Dal (Yellow, split)', amount:15, unit:'g' },
+                    { name:'Masoor Dal (Red Lentil)', amount:15, unit:'g' },
+                    { name:'Chana Dal', amount:15, unit:'g' },
+                    { name:'Urad Dal', amount:15, unit:'g' },
+                    { name:'Onion', amount:80, unit:'g' },
+                    { name:'Tomato', amount:80, unit:'g' },
+                    { name:'Garlic (Lehsun)', amount:8, unit:'g' },
+                    { name:'Ginger (Adrak)', amount:5, unit:'g' },
+                    { name:'Ghee', amount:8, unit:'g' },
+                    { name:'Cumin Seeds (Jeera)', amount:3, unit:'g' },
+                    { name:'Turmeric Powder (Haldi)', amount:2, unit:'g' },
+                    { name:'Red Chilli Powder', amount:2, unit:'g' },
+                    { name:'Garam Masala', amount:2, unit:'g' },
+                    { name:'Salt', amount:3, unit:'g' },
+                ],
+                instructions: [
+                    'Mix all 5 dals together. Wash thoroughly. Soak for 30 minutes.',
+                    'Pressure cook the soaked dals with water, turmeric and salt for 4-5 whistles until soft.',
+                    'Heat ghee in a pan. Add cumin seeds.',
+                    'Add ginger garlic paste. Cook 1 minute.',
+                    'Add chopped onion. Sauté 6-7 minutes until deeply golden.',
+                    'Add chopped tomato. Cook until oil separates.',
+                    'Add red chilli powder and garam masala. Cook 1 minute.',
+                    'Add this tadka to the cooked dals. Stir well.',
+                    'Simmer 5 minutes. The combination of 5 dals gives a complete amino acid profile.',
+                    'Serve with basmati rice or roti.',
+                ]
+            },
+
+            {
+                name: 'Tofu Bhurji',
+                category: 'lunch',
+                cuisine: 'indian',
+                servingSize: '1 plate',
+                prepTime: '15 min',
+                videoId: 'ZyNs3BLFMTA',
+                protein: 18, carbs: 10, fat: 10, calories: 202,
+                ingredients: [
+                    { name:'Tofu (extra firm)', amount:150, unit:'g' },
+                    { name:'Onion', amount:60, unit:'g' },
+                    { name:'Tomato', amount:80, unit:'g' },
+                    { name:'Capsicum / Bell Pepper', amount:50, unit:'g' },
+                    { name:'Sunflower Oil', amount:8, unit:'g' },
+                    { name:'Cumin Seeds (Jeera)', amount:2, unit:'g' },
+                    { name:'Turmeric Powder (Haldi)', amount:1, unit:'g' },
+                    { name:'Red Chilli Powder', amount:2, unit:'g' },
+                    { name:'Garam Masala', amount:2, unit:'g' },
+                    { name:'Salt', amount:3, unit:'g' },
+                    { name:'Coriander Leaves (Dhania)', amount:10, unit:'g' },
+                ],
+                instructions: [
+                    'Press the tofu block between two plates with a heavy object for 10 minutes to remove excess water. This is important.',
+                    'Crumble the pressed tofu into small pieces with your hands — like scrambled paneer.',
+                    'Heat oil in a non-stick pan. Add cumin seeds.',
+                    'Add chopped onion and sauté 3-4 minutes until golden.',
+                    'Add tomato and capsicum. Cook 3 minutes.',
+                    'Add turmeric, red chilli powder and garam masala. Mix.',
+                    'Add crumbled tofu. Toss and cook on medium-high heat for 4-5 minutes.',
+                    'The tofu will absorb all the flavours. Add salt to taste.',
+                    'Garnish with coriander. Tastes nearly identical to paneer bhurji at half the calories.',
+                ]
+            },
+
+            {
+                name: 'Methi Thepla',
+                category: 'lunch',
+                cuisine: 'indian',
+                servingSize: '3 theplas',
+                prepTime: '25 min',
+                videoId: 'i_F5XLSKVSY',
+                protein: 12, carbs: 52, fat: 6, calories: 314,
+                ingredients: [
+                    { name:'Whole Wheat Flour (Atta)', amount:80, unit:'g' },
+                    { name:'Fenugreek Leaves (Methi)', amount:40, unit:'g' },
+                    { name:'Curd / Dahi (full fat)', amount:40, unit:'g' },
+                    { name:'Ginger (Adrak)', amount:5, unit:'g' },
+                    { name:'Green Chilli', amount:5, unit:'g' },
+                    { name:'Turmeric Powder (Haldi)', amount:1, unit:'g' },
+                    { name:'Cumin Seeds (Jeera)', amount:2, unit:'g' },
+                    { name:'Salt', amount:2, unit:'g' },
+                    { name:'Sunflower Oil', amount:5, unit:'g' },
+                ],
+                instructions: [
+                    'Wash and finely chop 40g fresh methi leaves.',
+                    'In a bowl, combine atta, chopped methi, curd, grated ginger, minced green chilli, turmeric, cumin and salt.',
+                    'Mix everything together. Add water only if needed — the curd provides moisture.',
+                    'Knead into a semi-soft dough. It will be slightly stickier than roti dough due to methi.',
+                    'Divide into 3 equal balls. Roll each thin (thinner than roti).',
+                    'Cook on medium-hot tawa. Apply oil and cook 1-2 minutes per side until golden spots appear.',
+                    'Theplas stay fresh for 2-3 days at room temperature — great for meal prep.',
+                    'Serve with curd or pickle.',
+                ]
+            },
+
+            // ── DINNER ───────────────────────────────────────────
+
+            {
+                name: 'Masoor Dal',
+                category: 'dinner',
+                cuisine: 'indian',
+                servingSize: '1 bowl',
+                prepTime: '20 min',
+                videoId: 'ZZIatXMFaQI',
+                protein: 18, carbs: 38, fat: 7, calories: 287,
+                ingredients: [
+                    { name:'Masoor Dal (Red Lentil)', amount:60, unit:'g' },
+                    { name:'Onion', amount:60, unit:'g' },
+                    { name:'Tomato', amount:60, unit:'g' },
+                    { name:'Garlic (Lehsun)', amount:8, unit:'g' },
+                    { name:'Ginger (Adrak)', amount:5, unit:'g' },
+                    { name:'Ghee', amount:8, unit:'g' },
+                    { name:'Cumin Seeds (Jeera)', amount:2, unit:'g' },
+                    { name:'Turmeric Powder (Haldi)', amount:1, unit:'g' },
+                    { name:'Red Chilli Powder', amount:2, unit:'g' },
+                    { name:'Salt', amount:2, unit:'g' },
+                    { name:'Coriander Leaves (Dhania)', amount:8, unit:'g' },
+                ],
+                instructions: [
+                    'Rinse 60g masoor dal (no soaking needed — it cooks fast).',
+                    'In a saucepan boil dal with 240ml water, turmeric and salt for 15 minutes until soft and mushy.',
+                    'In a separate small pan heat ghee. Add cumin seeds.',
+                    'Add sliced garlic. Fry until golden — watch carefully, 1-2 minutes.',
+                    'Add chopped onion. Cook 4-5 minutes until translucent.',
+                    'Add chopped tomato and red chilli powder. Cook 3 minutes.',
+                    'Pour this tadka into the cooked dal. Stir and simmer 3 minutes.',
+                    'Garnish with coriander. Quick, light and perfect for dinner.',
+                ]
+            },
+
+            {
+                name: 'Paneer Tikka',
+                category: 'dinner',
+                cuisine: 'indian',
+                servingSize: '1 plate',
+                prepTime: '30 min',
+                videoId: 'KaFRuMPLYcM',
+                protein: 34, carbs: 14, fat: 26, calories: 422,
+                ingredients: [
+                    { name:'Paneer (full fat)', amount:150, unit:'g' },
+                    { name:'Curd / Dahi (full fat)', amount:60, unit:'g' },
+                    { name:'Capsicum / Bell Pepper', amount:60, unit:'g' },
+                    { name:'Onion', amount:60, unit:'g' },
+                    { name:'Tomato', amount:60, unit:'g' },
+                    { name:'Ginger (Adrak)', amount:5, unit:'g' },
+                    { name:'Garlic (Lehsun)', amount:5, unit:'g' },
+                    { name:'Turmeric Powder (Haldi)', amount:1, unit:'g' },
+                    { name:'Red Chilli Powder', amount:3, unit:'g' },
+                    { name:'Garam Masala', amount:2, unit:'g' },
+                    { name:'Sunflower Oil', amount:5, unit:'g' },
+                    { name:'Salt', amount:3, unit:'g' },
+                ],
+                instructions: [
+                    'Cut paneer into 2cm cubes. Cut onion, tomato and capsicum into similar-sized chunks.',
+                    'Make marinade: mix curd, ginger paste, garlic paste, turmeric, red chilli powder, garam masala, oil and salt.',
+                    'Add paneer and vegetables to marinade. Coat well. Marinate minimum 30 minutes (overnight is best).',
+                    'Skewer alternating pieces of paneer, onion, tomato and capsicum.',
+                    'Grill option: Preheat grill or oven to 220°C. Grill 12-15 minutes, turning once, until charred edges appear.',
+                    'Tawa option: Heat a cast iron pan very hot. Cook skewers 2-3 minutes per side until charred.',
+                    'Air fryer option: 200°C for 12 minutes, turning halfway.',
+                    'Serve with mint chutney and lemon wedge. This is the highest protein dinner in the app.',
+                ]
+            },
+
+            {
+                name: 'Tofu Tikka Masala',
+                category: 'dinner',
+                cuisine: 'indian',
+                servingSize: '1 bowl',
+                prepTime: '30 min',
+                videoId: 'IQMcAlNqsHE',
+                protein: 18, carbs: 12, fat: 10, calories: 210,
+                ingredients: [
+                    { name:'Tofu (extra firm)', amount:150, unit:'g' },
+                    { name:'Onion', amount:80, unit:'g' },
+                    { name:'Tomato', amount:100, unit:'g' },
+                    { name:'Garlic (Lehsun)', amount:8, unit:'g' },
+                    { name:'Ginger (Adrak)', amount:5, unit:'g' },
+                    { name:'Sunflower Oil', amount:8, unit:'g' },
+                    { name:'Cumin Seeds (Jeera)', amount:2, unit:'g' },
+                    { name:'Turmeric Powder (Haldi)', amount:1, unit:'g' },
+                    { name:'Red Chilli Powder', amount:2, unit:'g' },
+                    { name:'Garam Masala', amount:2, unit:'g' },
+                    { name:'Salt', amount:3, unit:'g' },
+                    { name:'Coriander Leaves (Dhania)', amount:10, unit:'g' },
+                ],
+                instructions: [
+                    'Press tofu for 10 minutes. Cut into cubes. Pan fry in 3g oil on high heat until golden on all sides. Set aside.',
+                    'In the same pan heat remaining oil. Add cumin seeds.',
+                    'Add ginger garlic paste. Cook 1 minute.',
+                    'Add finely chopped onion. Cook 6-7 minutes until deep golden.',
+                    'Blend tomatoes and add to pan. Cook 8 minutes until oil separates — this is the key step for tikka masala.',
+                    'Add turmeric, red chilli powder, garam masala and salt. Cook 2 minutes.',
+                    'Add the fried tofu cubes. Toss to coat in masala.',
+                    'Add a splash of water for gravy. Simmer 5 minutes.',
+                    'Garnish with coriander. Serve with roti.',
+                ]
+            },
+
+            {
+                name: 'Rajma Rice Bowl',
+                category: 'dinner',
+                cuisine: 'indian',
+                servingSize: '1 bowl',
+                prepTime: '10 min (if pre-cooked)',
+                videoId: '',
+                protein: 24, carbs: 88, fat: 10, calories: 546,
+                ingredients: [
+                    { name:'Rajma (Kidney Beans)', amount:80, unit:'g' },
+                    { name:'Basmati Rice (raw)', amount:60, unit:'g' },
+                    { name:'Onion', amount:80, unit:'g' },
+                    { name:'Tomato', amount:80, unit:'g' },
+                    { name:'Garlic (Lehsun)', amount:8, unit:'g' },
+                    { name:'Ghee', amount:8, unit:'g' },
+                    { name:'Cumin Seeds (Jeera)', amount:2, unit:'g' },
+                    { name:'Turmeric Powder (Haldi)', amount:1, unit:'g' },
+                    { name:'Garam Masala', amount:2, unit:'g' },
+                    { name:'Salt', amount:3, unit:'g' },
+                ],
+                instructions: [
+                    'Cook basmati rice as per the Basmati Rice recipe. Set aside.',
+                    'If rajma is not pre-cooked: Soak overnight, pressure cook 8-10 whistles.',
+                    'Heat ghee, add cumin seeds and sliced garlic. Fry 1 minute.',
+                    'Add chopped onion. Cook 5 minutes until golden.',
+                    'Add tomato. Cook 4 minutes.',
+                    'Add turmeric, garam masala and salt.',
+                    'Add cooked rajma with a splash of its liquid. Simmer 5 minutes.',
+                    'Serve the rajma masala over steamed rice in a bowl.',
+                    'This is the classic Punjabi comfort meal — rajma chawal.',
+                ]
+            },
+
+            {
+                name: 'Kadai Paneer',
+                category: 'dinner',
+                cuisine: 'indian',
+                servingSize: '1 bowl',
+                prepTime: '30 min',
+                videoId: 'SjFMdH-sZo4',
+                protein: 32, carbs: 16, fat: 26, calories: 424,
+                ingredients: [
+                    { name:'Paneer (full fat)', amount:150, unit:'g' },
+                    { name:'Capsicum / Bell Pepper', amount:80, unit:'g' },
+                    { name:'Onion', amount:80, unit:'g' },
+                    { name:'Tomato', amount:100, unit:'g' },
+                    { name:'Garlic (Lehsun)', amount:10, unit:'g' },
+                    { name:'Ginger (Adrak)', amount:8, unit:'g' },
+                    { name:'Sunflower Oil', amount:10, unit:'g' },
+                    { name:'Cumin Seeds (Jeera)', amount:2, unit:'g' },
+                    { name:'Turmeric Powder (Haldi)', amount:1, unit:'g' },
+                    { name:'Red Chilli Powder', amount:3, unit:'g' },
+                    { name:'Garam Masala', amount:2, unit:'g' },
+                    { name:'Salt', amount:3, unit:'g' },
+                    { name:'Coriander Leaves (Dhania)', amount:10, unit:'g' },
+                ],
+                instructions: [
+                    'Cut paneer into cubes. Cut capsicum and onion into thick squares (same size as paneer).',
+                    'Heat oil in a kadai or wok on high heat. Quickly sauté capsicum and onion squares for 2-3 minutes. They should stay slightly crunchy. Remove and set aside.',
+                    'In the same oil add cumin seeds, then ginger garlic paste. Cook 1 minute.',
+                    'Add finely chopped remaining onion. Cook 5 minutes.',
+                    'Add pureed or crushed tomatoes. Cook 7-8 minutes until oil separates.',
+                    'Add turmeric, red chilli powder and garam masala. Cook 2 minutes.',
+                    'Add paneer cubes. Toss gently.',
+                    'Add the sautéed capsicum and onion back in. Mix carefully.',
+                    'Cook 3 minutes on high heat. Garnish with coriander.',
+                    'Kadai paneer should have visible chunks, not a smooth curry.',
+                ]
+            },
+
+            {
+                name: 'Chana Dal with Spinach',
+                category: 'dinner',
+                cuisine: 'indian',
+                servingSize: '1 bowl',
+                prepTime: '35 min',
+                videoId: 'cRmPLCMjEjA',
+                protein: 18, carbs: 42, fat: 8, calories: 314,
+                ingredients: [
+                    { name:'Chana Dal', amount:70, unit:'g' },
+                    { name:'Spinach (Palak)', amount:100, unit:'g' },
+                    { name:'Onion', amount:60, unit:'g' },
+                    { name:'Tomato', amount:60, unit:'g' },
+                    { name:'Garlic (Lehsun)', amount:8, unit:'g' },
+                    { name:'Ginger (Adrak)', amount:5, unit:'g' },
+                    { name:'Ghee', amount:8, unit:'g' },
+                    { name:'Cumin Seeds (Jeera)', amount:2, unit:'g' },
+                    { name:'Turmeric Powder (Haldi)', amount:1, unit:'g' },
+                    { name:'Red Chilli Powder', amount:2, unit:'g' },
+                    { name:'Salt', amount:3, unit:'g' },
+                ],
+                instructions: [
+                    'Wash and soak chana dal for 1 hour (or 30 minutes in hot water).',
+                    'Pressure cook soaked dal with water, turmeric and salt for 5-6 whistles. Dal should be cooked but still hold shape.',
+                    'Roughly chop spinach.',
+                    'Heat ghee. Add cumin seeds, then chopped garlic and ginger.',
+                    'Add onion. Sauté until golden, 5 minutes.',
+                    'Add tomato and red chilli powder. Cook 4 minutes.',
+                    'Add the cooked chana dal. Stir and simmer 5 minutes.',
+                    'Add chopped spinach. Cook 3-4 minutes until spinach wilts into the dal.',
+                    'Chana dal gives a nutty flavour and holds its shape unlike other dals.',
+                ]
+            },
+
+            {
+                name: 'Matar Paneer',
+                category: 'dinner',
+                cuisine: 'indian',
+                servingSize: '1 bowl',
+                prepTime: '25 min',
+                videoId: 'W0fqnMPN_LI',
+                protein: 24, carbs: 20, fat: 20, calories: 356,
+                ingredients: [
+                    { name:'Paneer (full fat)', amount:100, unit:'g' },
+                    { name:'Peas (Matar, fresh)', amount:80, unit:'g' },
+                    { name:'Onion', amount:80, unit:'g' },
+                    { name:'Tomato', amount:80, unit:'g' },
+                    { name:'Garlic (Lehsun)', amount:8, unit:'g' },
+                    { name:'Ginger (Adrak)', amount:5, unit:'g' },
+                    { name:'Sunflower Oil', amount:8, unit:'g' },
+                    { name:'Cumin Seeds (Jeera)', amount:2, unit:'g' },
+                    { name:'Turmeric Powder (Haldi)', amount:1, unit:'g' },
+                    { name:'Red Chilli Powder', amount:2, unit:'g' },
+                    { name:'Garam Masala', amount:2, unit:'g' },
+                    { name:'Salt', amount:3, unit:'g' },
+                ],
+                instructions: [
+                    'Cut paneer into cubes. Optionally fry briefly in a teaspoon of oil until edges are lightly golden.',
+                    'Blend onion, ginger and garlic into a paste.',
+                    'Heat oil in a pan. Add cumin seeds.',
+                    'Add the onion paste. Cook 7-8 minutes on medium heat until it turns golden.',
+                    'Blend tomatoes and add. Cook 6-7 minutes until oil separates.',
+                    'Add turmeric, red chilli powder and garam masala. Cook 2 minutes.',
+                    'Add peas. Cook 3-4 minutes until peas are tender.',
+                    'Add paneer. Stir gently. Add a splash of water for gravy.',
+                    'Simmer 5 minutes. The peas add natural sweetness that balances the spices.',
+                    'Serve with roti or rice.',
+                ]
+            },
+
+            // ── SNACKS ───────────────────────────────────────────
+
+            {
+                name: 'Sattu Drink',
+                category: 'snack',
+                cuisine: 'indian',
+                servingSize: '1 glass',
+                prepTime: '3 min',
+                videoId: '',
+                protein: 9, carbs: 34, fat: 3, calories: 199,
+                ingredients: [
+                    { name:'Sattu (Roasted Chana Flour)', amount:40, unit:'g' },
+                    { name:'Jaggery (Gur)', amount:10, unit:'g' },
+                ],
+                instructions: [
+                    'Add 40g sattu flour to a glass.',
+                    'Add powdered jaggery or grate jaggery finely.',
+                    'Add 250ml cold water.',
+                    'Stir vigorously with a spoon until no lumps remain.',
+                    'Optionally add a pinch of black salt and a squeeze of lemon.',
+                    'Drink immediately — Bihar and UP athletes swear by this for recovery.',
+                    'Sattu is roasted bengal gram flour — high protein, high fibre, instant energy.',
+                ]
+            },
+
+            {
+                name: 'Greek Yogurt with Nuts',
+                category: 'snack',
+                cuisine: 'indian',
+                servingSize: '1 bowl',
+                prepTime: '2 min',
+                videoId: '',
+                protein: 18, carbs: 8, fat: 16, calories: 248,
+                ingredients: [
+                    { name:'Greek Yogurt (full fat)', amount:150, unit:'g' },
+                    { name:'Almonds (Badam)', amount:15, unit:'g' },
+                    { name:'Walnuts (Akhrot)', amount:10, unit:'g' },
+                    { name:'Flaxseeds (Alsi)', amount:8, unit:'g' },
+                ],
+                instructions: [
+                    'Scoop 150g Greek yogurt into a bowl.',
+                    'Roughly chop almonds and walnuts.',
+                    'Sprinkle nuts and flaxseeds on top.',
+                    'Optionally add a drizzle of honey.',
+                    'This is the ideal pre-bed snack — slow-digesting casein protein from yogurt plus omega-3 from walnuts and flax feeds muscle repair through the night.',
+                ]
+            },
+
+            {
+                name: 'Peanut Butter Banana',
+                category: 'snack',
+                cuisine: 'indian',
+                servingSize: '1 serving',
+                prepTime: '2 min',
+                videoId: '',
+                protein: 8, carbs: 24, fat: 16, calories: 272,
+                ingredients: [
+                    { name:'Peanut Butter (natural)', amount:30, unit:'g' },
+                    { name:'Banana (ripe)', amount:100, unit:'g' },
+                ],
+                instructions: [
+                    'Peel banana and slice into rounds, or eat whole.',
+                    'Dip each piece into peanut butter or spread peanut butter on banana slices.',
+                    'That is literally it. Best pre-workout snack — banana gives fast carbs, peanut butter gives slow protein and fat.',
+                    'Eat 30-45 minutes before training.',
+                ]
+            },
+
+            {
+                name: 'Sprouted Moong Salad',
+                category: 'snack',
+                cuisine: 'indian',
+                servingSize: '1 bowl',
+                prepTime: '5 min',
+                videoId: 'tVXzaRBZWtY',
+                protein: 16, carbs: 24, fat: 1, calories: 169,
+                ingredients: [
+                    { name:'Whole Moong (Green Gram)', amount:60, unit:'g' },
+                    { name:'Onion', amount:40, unit:'g' },
+                    { name:'Tomato', amount:40, unit:'g' },
+                    { name:'Cucumber (Kheera)', amount:50, unit:'g' },
+                    { name:'Green Chilli', amount:5, unit:'g' },
+                    { name:'Coriander Leaves (Dhania)', amount:8, unit:'g' },
+                ],
+                instructions: [
+                    'Sprout moong as described in Sprouts Chaat recipe (overnight soak + 12hr covered).',
+                    'Once sprouted, rinse moong under cold water.',
+                    'Finely dice onion, tomato and cucumber. Chop green chilli.',
+                    'Combine sprouted moong with all vegetables in a bowl.',
+                    'Add salt to taste, fresh coriander and a squeeze of lemon.',
+                    'Toss well and serve. Sprouting increases protein bioavailability by 30%.',
+                ]
+            },
+
+            {
+                name: 'Protein Shake',
+                category: 'snack',
+                cuisine: 'indian',
+                servingSize: '1 glass',
+                prepTime: '2 min',
+                videoId: '',
+                protein: 30, carbs: 14, fat: 12, calories: 284,
+                ingredients: [
+                    { name:'Diesel NZ Whey Isolate', amount:30, unit:'g' },
+                    { name:'Milk (cow, full fat)', amount:300, unit:'g' },
+                ],
+                instructions: [
+                    'Add 300ml cold milk to a shaker bottle or blender.',
+                    'Add 30g whey protein powder.',
+                    'Shake vigorously for 20-30 seconds until fully mixed.',
+                    'Drink immediately post-workout for maximum muscle protein synthesis.',
+                    'Consume within 30-45 minutes after training for best results.',
+                    'Diesel NZ Whey Isolate has 90g protein per 100g — one of the highest quality whey proteins available.',
+                ]
+            },
+
+            {
+                name: 'Mixed Nuts and Dates',
+                category: 'snack',
+                cuisine: 'indian',
+                servingSize: '1 handful',
+                prepTime: '0 min',
+                videoId: '',
+                protein: 6, carbs: 26, fat: 20, calories: 308,
+                ingredients: [
+                    { name:'Almonds (Badam)', amount:15, unit:'g' },
+                    { name:'Cashews (Kaju)', amount:10, unit:'g' },
+                    { name:'Pumpkin Seeds', amount:10, unit:'g' },
+                    { name:'Dates (Khajoor, dry)', amount:20, unit:'g' },
+                ],
+                instructions: [
+                    'Measure out nuts and dates into a small container or zip-lock bag.',
+                    'Pre-portion into daily servings at the start of the week for meal prep.',
+                    'Eat as is. No preparation needed.',
+                    'Best eaten mid-morning or mid-afternoon to control hunger between meals.',
+                    'The dates provide quick energy. Nuts provide slow-burning fat and protein.',
+                    'Tip: Soak almonds overnight — soaked almonds are easier to digest.',
+                ]
+            },
+
+            {
+                name: 'Roasted Chana',
+                category: 'snack',
+                cuisine: 'indian',
+                servingSize: '1 handful (30g)',
+                prepTime: '0 min',
+                videoId: '',
+                protein: 5, carbs: 18, fat: 2, calories: 110,
+                ingredients: [
+                    { name:'Chana (Bengal Gram whole)', amount:30, unit:'g' },
+                ],
+                instructions: [
+                    'Buy pre-roasted chana from any Indian grocery store.',
+                    'Measure 30g into a small container.',
+                    'Eat directly as a crunchy snack.',
+                    'Optionally add a pinch of chaat masala and lemon juice.',
+                    'Roasted chana is one of the cheapest and highest protein-per-rupee snacks in India.',
+                    'Great for desk snacking — keeps you full and does not spike blood sugar.',
+                ]
+            },
+
+            {
+                name: 'Paneer Cubes',
+                category: 'snack',
+                cuisine: 'indian',
+                servingSize: '1 serving (100g)',
+                prepTime: '0 min',
+                videoId: '',
+                protein: 18, carbs: 1, fat: 21, calories: 265,
+                ingredients: [
+                    { name:'Paneer (full fat)', amount:100, unit:'g' },
+                    { name:'Salt', amount:1, unit:'g' },
+                    { name:'Red Chilli Powder', amount:1, unit:'g' },
+                ],
+                instructions: [
+                    'Cut paneer block into bite-sized cubes.',
+                    'Sprinkle salt and red chilli powder. Toss to coat.',
+                    'Eat immediately as is — no cooking needed.',
+                    'Alternatively, quickly toast in a dry pan 1 minute per side for a golden crust.',
+                    'This is the highest protein-to-carb ratio snack on this app.',
+                    'Zero carbs, 18g protein per 100g — ideal if you have hit your carb limit for the day.',
+                ]
+            },
+        ];
+
+        const canadian = [
+
+            // ── BREAKFAST ────────────────────────────────────────
+
+            {
+                name: 'Classic Rolled Oatmeal',
+                category: 'breakfast',
+                cuisine: 'canadian',
+                servingSize: '1 bowl',
+                prepTime: '5 min',
+                videoId: '',
+                protein: 14, carbs: 68, fat: 9, calories: 413,
+                ingredients: [
+                    { name:'Rolled Oats (large flake)', amount:80, unit:'g' },
+                    { name:'Milk (2% fat, pasteurized)', amount:250, unit:'g' },
+                    { name:'Banana (ripe)', amount:100, unit:'g' },
+                    { name:'Cinnamon (ground)', amount:2, unit:'g' },
+                    { name:'Maple Syrup (pure)', amount:10, unit:'g' },
+                ],
+                instructions: [
+                    'Bring 250ml milk to a gentle simmer in a small saucepan.',
+                    'Add 80g rolled oats. Stir to combine.',
+                    'Cook on medium-low heat for 4-5 minutes, stirring occasionally, until oats are thick and creamy.',
+                    'Remove from heat. Add cinnamon and maple syrup. Stir.',
+                    'Pour into a bowl. Top with sliced banana.',
+                    'Eat immediately. The large flake oats stay chewy — they have lower glycemic index than instant oats.',
+                ]
+            },
+
+            {
+                name: 'High Protein Oatmeal',
+                category: 'breakfast',
+                cuisine: 'canadian',
+                servingSize: '1 bowl',
+                prepTime: '5 min',
+                videoId: '',
+                protein: 48, carbs: 72, fat: 14, calories: 614,
+                ingredients: [
+                    { name:'Rolled Oats (large flake)', amount:80, unit:'g' },
+                    { name:'Soy Milk (unsweetened)', amount:250, unit:'g' },
+                    { name:'Diesel NZ Whey Isolate', amount:30, unit:'g' },
+                    { name:'Banana (ripe)', amount:100, unit:'g' },
+                    { name:'Peanut Butter (natural, no sugar)', amount:20, unit:'g' },
+                    { name:'Chia Seeds', amount:12, unit:'g' },
+                    { name:'Cinnamon (ground)', amount:2, unit:'g' },
+                ],
+                instructions: [
+                    'Heat soy milk in a saucepan until simmering.',
+                    'Add rolled oats and chia seeds. Cook 4-5 minutes until thick.',
+                    'Remove from heat. Let cool 1-2 minutes — important before adding protein.',
+                    'Stir in whey protein and cinnamon. Mix until no lumps.',
+                    'Do not add protein to boiling liquid — heat denatures protein and changes texture.',
+                    'Pour into a bowl. Top with sliced banana and peanut butter.',
+                    'This one bowl gives you almost 50g protein — a third of your daily goal before 9am.',
+                ]
+            },
+
+            {
+                name: 'Banana Oat Pancakes',
+                category: 'breakfast',
+                cuisine: 'canadian',
+                servingSize: '4 pancakes',
+                prepTime: '15 min',
+                videoId: '',
+                protein: 12, carbs: 58, fat: 8, calories: 356,
+                ingredients: [
+                    { name:'Rolled Oats (large flake)', amount:80, unit:'g' },
+                    { name:'Banana (ripe)', amount:120, unit:'g' },
+                    { name:'Soy Milk (unsweetened)', amount:60, unit:'g' },
+                    { name:'Cinnamon (ground)', amount:2, unit:'g' },
+                    { name:'Baking Powder', amount:4, unit:'g' },
+                    { name:'Coconut Oil', amount:5, unit:'g' },
+                    { name:'Maple Syrup (pure)', amount:15, unit:'g' },
+                ],
+                instructions: [
+                    'Blend 80g oats in a blender until they become oat flour.',
+                    'Add banana, soy milk, cinnamon and baking powder to the blender. Blend until smooth batter forms.',
+                    'The ripe banana acts as both sweetener and binder — no eggs needed.',
+                    'Heat a non-stick pan over medium heat. Brush with coconut oil.',
+                    'Pour small rounds of batter (about 60ml each). Cook 2-3 minutes until bubbles appear on surface.',
+                    'Flip carefully. Cook 1-2 minutes on other side.',
+                    'Repeat for all 4 pancakes.',
+                    'Serve stacked with a drizzle of pure maple syrup.',
+                ]
+            },
+
+            {
+                name: 'Protein Pancakes',
+                category: 'breakfast',
+                cuisine: 'canadian',
+                servingSize: '4 pancakes',
+                prepTime: '15 min',
+                videoId: '',
+                protein: 38, carbs: 56, fat: 10, calories: 474,
+                ingredients: [
+                    { name:'Oat Flour', amount:60, unit:'g' },
+                    { name:'Diesel NZ Whey Isolate', amount:30, unit:'g' },
+                    { name:'Banana (ripe)', amount:100, unit:'g' },
+                    { name:'Soy Milk (unsweetened)', amount:120, unit:'g' },
+                    { name:'Baking Powder', amount:5, unit:'g' },
+                    { name:'Vanilla Extract (pure)', amount:4, unit:'g' },
+                    { name:'Cinnamon (ground)', amount:2, unit:'g' },
+                    { name:'Coconut Oil', amount:5, unit:'g' },
+                ],
+                instructions: [
+                    'Mix oat flour, whey protein, baking powder and cinnamon in a bowl.',
+                    'Mash banana. Add to dry ingredients along with soy milk and vanilla extract.',
+                    'Mix until smooth batter forms. Let rest 2 minutes — batter will thicken slightly.',
+                    'Heat non-stick pan on medium-low heat. Brush with coconut oil.',
+                    'Pour batter to make 4 equal pancakes.',
+                    'Cook 2-3 minutes each side. Important: keep heat medium-low — protein burns faster than regular flour.',
+                    'The trick is not overcooking — pull them when they are just set.',
+                    'Top with Greek yogurt and berries for extra protein.',
+                ]
+            },
+
+            {
+                name: 'Overnight Oats with Berries',
+                category: 'breakfast',
+                cuisine: 'canadian',
+                servingSize: '1 jar',
+                prepTime: '5 min + overnight',
+                videoId: '',
+                protein: 20, carbs: 68, fat: 8, calories: 428,
+                ingredients: [
+                    { name:'Rolled Oats (large flake)', amount:80, unit:'g' },
+                    { name:'Greek Yogurt (plain, 0% fat)', amount:100, unit:'g' },
+                    { name:'Soy Milk (unsweetened)', amount:120, unit:'g' },
+                    { name:'Chia Seeds', amount:15, unit:'g' },
+                    { name:'Mixed Berries (frozen)', amount:80, unit:'g' },
+                    { name:'Maple Syrup (pure)', amount:10, unit:'g' },
+                ],
+                instructions: [
+                    'In a mason jar or container, add oats and chia seeds.',
+                    'Mix Greek yogurt and soy milk together until smooth.',
+                    'Pour liquid over oats. Add maple syrup. Stir everything well.',
+                    'Add frozen berries on top — they will thaw overnight and create a natural jam layer.',
+                    'Cover and refrigerate overnight (minimum 6 hours).',
+                    'In the morning, stir everything together. The oats will be creamy and thick.',
+                    'If too thick, add a splash more milk. Eat cold — no heating needed.',
+                    'Prep 5 jars Sunday night for the whole week.',
+                ]
+            },
+
+            {
+                name: 'Protein Overnight Oats',
+                category: 'breakfast',
+                cuisine: 'canadian',
+                servingSize: '1 jar',
+                prepTime: '5 min + overnight',
+                videoId: '',
+                protein: 48, carbs: 66, fat: 14, calories: 578,
+                ingredients: [
+                    { name:'Rolled Oats (large flake)', amount:80, unit:'g' },
+                    { name:'Diesel NZ Whey Isolate', amount:30, unit:'g' },
+                    { name:'Greek Yogurt (plain, 0% fat)', amount:150, unit:'g' },
+                    { name:'Soy Milk (unsweetened)', amount:100, unit:'g' },
+                    { name:'Chia Seeds', amount:15, unit:'g' },
+                    { name:'Blueberries (fresh or frozen)', amount:80, unit:'g' },
+                    { name:'Almond Butter (natural)', amount:15, unit:'g' },
+                ],
+                instructions: [
+                    'Mix Greek yogurt, soy milk and whey protein in a bowl until smooth. No lumps.',
+                    'Add oats and chia seeds. Stir to combine.',
+                    'Pour into a jar. Top with blueberries and a dollop of almond butter.',
+                    'Cover and refrigerate overnight.',
+                    'In the morning, stir and eat cold.',
+                    'This is the highest protein breakfast on the app at 48g — almost a third of a 160g daily goal in one meal.',
+                ]
+            },
+
+            {
+                name: 'Chia Pudding',
+                category: 'breakfast',
+                cuisine: 'canadian',
+                servingSize: '1 jar',
+                prepTime: '5 min + 4hr set',
+                videoId: '',
+                protein: 14, carbs: 42, fat: 14, calories: 346,
+                ingredients: [
+                    { name:'Chia Seeds', amount:40, unit:'g' },
+                    { name:'Soy Milk (unsweetened)', amount:300, unit:'g' },
+                    { name:'Maple Syrup (pure)', amount:15, unit:'g' },
+                    { name:'Vanilla Extract (pure)', amount:4, unit:'g' },
+                    { name:'Mixed Berries (frozen)', amount:80, unit:'g' },
+                ],
+                instructions: [
+                    'Mix chia seeds, soy milk, maple syrup and vanilla in a jar.',
+                    'Stir very well — chia seeds clump if not mixed properly.',
+                    'Wait 5 minutes and stir again to prevent clumping.',
+                    'Cover and refrigerate minimum 4 hours or overnight.',
+                    'The chia seeds absorb the liquid and become a thick pudding — like tapioca.',
+                    'Top with berries before serving.',
+                    'Ratio for success: 3 tbsp chia to every 250ml liquid.',
+                ]
+            },
+
+            {
+                name: 'Peanut Butter Banana Toast',
+                category: 'breakfast',
+                cuisine: 'canadian',
+                servingSize: '2 slices',
+                prepTime: '3 min',
+                videoId: '',
+                protein: 18, carbs: 52, fat: 18, calories: 446,
+                ingredients: [
+                    { name:'Whole Wheat Bread', amount:70, unit:'g' },
+                    { name:'Peanut Butter (natural, no sugar)', amount:32, unit:'g' },
+                    { name:'Banana (ripe)', amount:100, unit:'g' },
+                    { name:'Hemp Hearts (shelled hemp seeds)', amount:15, unit:'g' },
+                    { name:'Cinnamon (ground)', amount:1, unit:'g' },
+                ],
+                instructions: [
+                    'Toast 2 slices of whole wheat bread until golden.',
+                    'Spread 16g peanut butter on each slice.',
+                    'Slice banana and layer on top.',
+                    'Sprinkle hemp hearts and a pinch of cinnamon.',
+                    'Hemp hearts add 5g protein and complete amino acids with zero flavour change.',
+                    'Buy Silver Hills Sprouted bread from Superstore for extra protein and lower GI.',
+                ]
+            },
+
+            {
+                name: 'Greek Yogurt Parfait',
+                category: 'breakfast',
+                cuisine: 'canadian',
+                servingSize: '1 bowl',
+                prepTime: '3 min',
+                videoId: '',
+                protein: 28, carbs: 42, fat: 12, calories: 388,
+                ingredients: [
+                    { name:'Greek Yogurt (plain, 0% fat)', amount:200, unit:'g' },
+                    { name:'Rolled Oats (large flake)', amount:30, unit:'g' },
+                    { name:'Blueberries (fresh or frozen)', amount:80, unit:'g' },
+                    { name:'Hemp Hearts (shelled hemp seeds)', amount:20, unit:'g' },
+                    { name:'Almonds (raw)', amount:15, unit:'g' },
+                    { name:'Maple Syrup (pure)', amount:10, unit:'g' },
+                ],
+                instructions: [
+                    'Scoop 200g Greek yogurt into a bowl or glass.',
+                    'Layer dry oats on top (no cooking needed — they soften in the yogurt).',
+                    'Add blueberries, chopped almonds and hemp hearts.',
+                    'Drizzle maple syrup.',
+                    'Eat immediately or let sit 5 minutes for oats to soften.',
+                    'Oikos Triple Zero or Liberte Greek yogurt available at all Canadian grocery stores.',
+                ]
+            },
+
+            {
+                name: 'Protein Smoothie (Post Workout)',
+                category: 'breakfast',
+                cuisine: 'canadian',
+                servingSize: '1 large glass',
+                prepTime: '3 min',
+                videoId: '',
+                protein: 44, carbs: 52, fat: 12, calories: 492,
+                ingredients: [
+                    { name:'Diesel NZ Whey Isolate', amount:30, unit:'g' },
+                    { name:'Banana (ripe)', amount:120, unit:'g' },
+                    { name:'Soy Milk (unsweetened)', amount:300, unit:'g' },
+                    { name:'Peanut Butter (natural, no sugar)', amount:20, unit:'g' },
+                    { name:'Mixed Berries (frozen)', amount:80, unit:'g' },
+                    { name:'Flaxseeds (ground)', amount:10, unit:'g' },
+                ],
+                instructions: [
+                    'Add all ingredients to a blender.',
+                    'Blend on high for 45 seconds until completely smooth.',
+                    'Drink within 30 minutes post-workout for best muscle protein synthesis.',
+                    'Frozen berries make it colder and thicker without needing ice.',
+                    'Ground flaxseeds add omega-3 and fibre — you cannot taste them.',
+                    'Soy milk gives extra protein versus almond milk — significant difference.',
+                ]
+            },
+
+            {
+                name: 'Avocado Toast with Hemp Hearts',
+                category: 'breakfast',
+                cuisine: 'canadian',
+                servingSize: '2 slices',
+                prepTime: '5 min',
+                videoId: '',
+                protein: 16, carbs: 38, fat: 22, calories: 410,
+                ingredients: [
+                    { name:'Whole Wheat Bread', amount:70, unit:'g' },
+                    { name:'Avocado', amount:75, unit:'g' },
+                    { name:'Hemp Hearts (shelled hemp seeds)', amount:20, unit:'g' },
+                    { name:'Nutritional Yeast', amount:10, unit:'g' },
+                    { name:'Sriracha Hot Sauce', amount:5, unit:'g' },
+                ],
+                instructions: [
+                    'Toast bread until crispy.',
+                    'Mash half an avocado with a fork. Add a pinch of salt.',
+                    'Spread mashed avocado generously on both slices.',
+                    'Sprinkle hemp hearts and nutritional yeast on top.',
+                    'Drizzle sriracha for heat.',
+                    'Nutritional yeast adds a cheesy flavour and 7.5g protein per 15g serving.',
+                    'Manitoba Harvest hemp hearts available at Costco — best value in Canada.',
+                ]
+            },
+
+            // ── LUNCH ────────────────────────────────────────────
+
+            {
+                name: 'Red Lentil Dal',
+                category: 'lunch',
+                cuisine: 'canadian',
+                servingSize: '1 bowl',
+                prepTime: '25 min',
+                videoId: '',
+                protein: 28, carbs: 62, fat: 8, calories: 436,
+                ingredients: [
+                    { name:'Red Lentils (dry)', amount:100, unit:'g' },
+                    { name:'Canned Tomatoes (diced)', amount:200, unit:'g' },
+                    { name:'Coconut Milk (canned, full fat)', amount:60, unit:'g' },
+                    { name:'Vegetable Broth (low sodium)', amount:240, unit:'g' },
+                    { name:'Olive Oil (extra virgin)', amount:10, unit:'g' },
+                    { name:'Curry Powder', amount:5, unit:'g' },
+                    { name:'Cinnamon (ground)', amount:1, unit:'g' },
+                ],
+                instructions: [
+                    'Rinse 100g red lentils under cold water until water runs clear.',
+                    'Heat olive oil in a pot over medium heat.',
+                    'Add curry powder and cinnamon. Toast for 30 seconds until fragrant.',
+                    'Add canned diced tomatoes. Cook 3 minutes.',
+                    'Add rinsed lentils and vegetable broth. Stir well.',
+                    'Bring to boil then reduce to simmer. Cook 15-20 minutes until lentils are completely soft.',
+                    'Red lentils dissolve into the broth naturally — no blending needed.',
+                    'Stir in coconut milk. Simmer 3 minutes.',
+                    'Adjust salt and thickness. Serve with whole wheat bread or over rice.',
+                ]
+            },
+
+            {
+                name: 'Black Bean Burrito Bowl',
+                category: 'lunch',
+                cuisine: 'canadian',
+                servingSize: '1 bowl',
+                prepTime: '20 min',
+                videoId: '',
+                protein: 18, carbs: 62, fat: 14, calories: 446,
+                ingredients: [
+                    { name:'Black Beans (canned, drained)', amount:160, unit:'g' },
+                    { name:'Brown Rice (dry)', amount:60, unit:'g' },
+                    { name:'Bell Pepper (red)', amount:80, unit:'g' },
+                    { name:'Avocado', amount:75, unit:'g' },
+                    { name:'Canned Tomatoes (diced)', amount:80, unit:'g' },
+                    { name:'Olive Oil (extra virgin)', amount:8, unit:'g' },
+                    { name:'Smoked Paprika', amount:3, unit:'g' },
+                    { name:'Curry Powder', amount:2, unit:'g' },
+                    { name:'Sriracha Hot Sauce', amount:5, unit:'g' },
+                ],
+                instructions: [
+                    'Cook brown rice: rinse, add 2:1 water ratio, bring to boil, simmer covered 35-40 minutes.',
+                    'Rinse and drain canned black beans. Heat in a small pan with smoked paprika, curry powder and a pinch of salt.',
+                    'Dice bell pepper. Slice avocado.',
+                    'Build the bowl: rice base, then black beans, then bell pepper, avocado and tomatoes.',
+                    'Drizzle olive oil and sriracha on top.',
+                    'Rinse canned beans before use to remove 40% of sodium.',
+                    'PC brand black beans at No Frills is the best value in Canada.',
+                ]
+            },
+
+            {
+                name: 'Chickpea and Lentil Soup',
+                category: 'lunch',
+                cuisine: 'canadian',
+                servingSize: '1 large bowl',
+                prepTime: '30 min',
+                videoId: '',
+                protein: 24, carbs: 58, fat: 8, calories: 404,
+                ingredients: [
+                    { name:'Red Lentils (dry)', amount:80, unit:'g' },
+                    { name:'Chickpeas (canned, drained)', amount:120, unit:'g' },
+                    { name:'Canned Tomatoes (diced)', amount:200, unit:'g' },
+                    { name:'Vegetable Broth (low sodium)', amount:400, unit:'g' },
+                    { name:'Coconut Milk (canned, full fat)', amount:60, unit:'g' },
+                    { name:'Olive Oil (extra virgin)', amount:10, unit:'g' },
+                    { name:'Curry Powder', amount:5, unit:'g' },
+                    { name:'Smoked Paprika', amount:2, unit:'g' },
+                ],
+                instructions: [
+                    'Rinse red lentils and drain chickpeas.',
+                    'Heat olive oil in a large pot. Add curry powder and smoked paprika. Toast 30 seconds.',
+                    'Add canned tomatoes. Cook 3 minutes.',
+                    'Add lentils, chickpeas and vegetable broth. Stir.',
+                    'Bring to boil. Reduce heat, simmer 20 minutes until lentils dissolve.',
+                    'Stir in coconut milk. Simmer 5 more minutes.',
+                    'The lentils thicken the broth while chickpeas stay whole — two textures in one bowl.',
+                    'Freeze portions in containers for easy meal prep.',
+                ]
+            },
+
+            {
+                name: 'Quinoa Power Bowl',
+                category: 'lunch',
+                cuisine: 'canadian',
+                servingSize: '1 bowl',
+                prepTime: '20 min',
+                videoId: '',
+                protein: 26, carbs: 50, fat: 18, calories: 466,
+                ingredients: [
+                    { name:'Quinoa (dry)', amount:60, unit:'g' },
+                    { name:'Chickpeas (canned, drained)', amount:120, unit:'g' },
+                    { name:'Kale (fresh)', amount:60, unit:'g' },
+                    { name:'Avocado', amount:75, unit:'g' },
+                    { name:'Hemp Hearts (shelled hemp seeds)', amount:20, unit:'g' },
+                    { name:'Tahini (sesame paste)', amount:20, unit:'g' },
+                    { name:'Olive Oil (extra virgin)', amount:8, unit:'g' },
+                ],
+                instructions: [
+                    'Rinse quinoa. Cook with 1.5x water: bring to boil, simmer covered 12-15 minutes until water absorbed. Fluff with fork.',
+                    'Rinse and drain chickpeas. Toss in olive oil and a pinch of salt. Optional: roast at 200°C for 20 minutes for crunch.',
+                    'Massage kale with a pinch of salt for 1-2 minutes — this breaks down tough fibres and makes it easier to eat raw.',
+                    'Build the bowl: quinoa base, massaged kale, chickpeas, sliced avocado.',
+                    'Mix tahini with 2 tbsp water and a squeeze of lemon for dressing.',
+                    'Drizzle tahini dressing. Sprinkle hemp hearts.',
+                    'Quinoa is a complete protein — all 9 essential amino acids.',
+                ]
+            },
+
+            {
+                name: 'Veggie Wrap with Hummus',
+                category: 'lunch',
+                cuisine: 'canadian',
+                servingSize: '1 large wrap',
+                prepTime: '10 min',
+                videoId: '',
+                protein: 18, carbs: 46, fat: 14, calories: 386,
+                ingredients: [
+                    { name:'Whole Wheat Tortilla (large)', amount:45, unit:'g' },
+                    { name:'Hummus (store-bought)', amount:60, unit:'g' },
+                    { name:'Spinach (fresh)', amount:40, unit:'g' },
+                    { name:'Bell Pepper (red)', amount:60, unit:'g' },
+                    { name:'Avocado', amount:60, unit:'g' },
+                    { name:'Chickpeas (canned, drained)', amount:80, unit:'g' },
+                    { name:'Tahini (sesame paste)', amount:15, unit:'g' },
+                ],
+                instructions: [
+                    'Lay tortilla flat on a plate.',
+                    'Spread hummus generously leaving 2cm border.',
+                    'Layer spinach leaves across the hummus.',
+                    'Add sliced bell pepper, sliced avocado and chickpeas.',
+                    'Drizzle tahini over the vegetables.',
+                    'Fold in the sides then roll tightly from the bottom up.',
+                    'Cut in half diagonally.',
+                    'Sabra hummus or PC brand at Superstore. Mission whole wheat tortillas.',
+                ]
+            },
+
+            {
+                name: 'Lentil and Sweet Potato Curry',
+                category: 'lunch',
+                cuisine: 'canadian',
+                servingSize: '1 bowl',
+                prepTime: '30 min',
+                videoId: '',
+                protein: 22, carbs: 58, fat: 10, calories: 410,
+                ingredients: [
+                    { name:'Red Lentils (dry)', amount:80, unit:'g' },
+                    { name:'Sweet Potato', amount:150, unit:'g' },
+                    { name:'Canned Tomatoes (diced)', amount:150, unit:'g' },
+                    { name:'Coconut Milk (canned, full fat)', amount:80, unit:'g' },
+                    { name:'Vegetable Broth (low sodium)', amount:200, unit:'g' },
+                    { name:'Olive Oil (extra virgin)', amount:8, unit:'g' },
+                    { name:'Curry Powder', amount:6, unit:'g' },
+                    { name:'Smoked Paprika', amount:2, unit:'g' },
+                ],
+                instructions: [
+                    'Peel and dice sweet potato into 2cm cubes.',
+                    'Heat olive oil in a pot. Add curry powder and smoked paprika. Toast 30 seconds.',
+                    'Add sweet potato. Stir to coat in spices. Cook 3 minutes.',
+                    'Add rinsed red lentils, canned tomatoes and vegetable broth.',
+                    'Bring to boil. Simmer 15-20 minutes until lentils and sweet potato are both soft.',
+                    'Stir in coconut milk. Cook 5 more minutes.',
+                    'The sweet potato adds natural sweetness that balances the curry spices.',
+                    'Excellent for meal prep — tastes better the next day.',
+                ]
+            },
+
+            {
+                name: 'Chickpea Salad Sandwich',
+                category: 'lunch',
+                cuisine: 'canadian',
+                servingSize: '1 sandwich',
+                prepTime: '10 min',
+                videoId: '',
+                protein: 20, carbs: 48, fat: 14, calories: 394,
+                ingredients: [
+                    { name:'Chickpeas (canned, drained)', amount:160, unit:'g' },
+                    { name:'Whole Wheat Bread', amount:70, unit:'g' },
+                    { name:'Avocado', amount:50, unit:'g' },
+                    { name:'Tahini (sesame paste)', amount:15, unit:'g' },
+                    { name:'Spinach (fresh)', amount:30, unit:'g' },
+                    { name:'Bell Pepper (red)', amount:40, unit:'g' },
+                ],
+                instructions: [
+                    'Drain and rinse chickpeas. Place in a bowl.',
+                    'Mash chickpeas roughly with a fork — leave some texture, not completely smooth.',
+                    'Mash in avocado. Add tahini, salt and pepper. Mix well.',
+                    'Optionally add a squeeze of lemon and pinch of cumin.',
+                    'Toast bread slices.',
+                    'Spread the chickpea mixture on one slice.',
+                    'Top with fresh spinach and sliced bell pepper.',
+                    'Close sandwich. Cut diagonally and serve.',
+                    'This chickpea salad is a vegan alternative to tuna salad — same texture, similar protein.',
+                ]
+            },
+
+            {
+                name: 'Edamame and Quinoa Bowl',
+                category: 'lunch',
+                cuisine: 'canadian',
+                servingSize: '1 bowl',
+                prepTime: '15 min',
+                videoId: '',
+                protein: 30, carbs: 52, fat: 10, calories: 422,
+                ingredients: [
+                    { name:'Quinoa (dry)', amount:60, unit:'g' },
+                    { name:'Edamame (frozen, shelled)', amount:120, unit:'g' },
+                    { name:'Kale (fresh)', amount:50, unit:'g' },
+                    { name:'Broccoli (fresh)', amount:80, unit:'g' },
+                    { name:'Soy Sauce (low sodium)', amount:15, unit:'g' },
+                    { name:'Hemp Hearts (shelled hemp seeds)', amount:15, unit:'g' },
+                ],
+                instructions: [
+                    'Cook quinoa as per standard method. Set aside.',
+                    'Microwave frozen edamame for 3 minutes or boil 5 minutes. Drain.',
+                    'Chop broccoli into small florets. Steam or microwave 3-4 minutes until tender.',
+                    'Massage kale with a pinch of salt for 1 minute.',
+                    'Build bowl: quinoa base, then broccoli, edamame and kale.',
+                    'Drizzle soy sauce over everything.',
+                    'Sprinkle hemp hearts on top.',
+                    'Edamame from Costco frozen aisle is the best value. This bowl has 30g protein from plants only.',
+                ]
+            },
+
+            {
+                name: 'Three Bean Chili',
+                category: 'lunch',
+                cuisine: 'canadian',
+                servingSize: '1 large bowl',
+                prepTime: '35 min',
+                videoId: '',
+                protein: 28, carbs: 72, fat: 8, calories: 472,
+                ingredients: [
+                    { name:'Black Beans (canned, drained)', amount:120, unit:'g' },
+                    { name:'Kidney Beans (canned, drained)', amount:120, unit:'g' },
+                    { name:'Chickpeas (canned, drained)', amount:120, unit:'g' },
+                    { name:'Canned Tomatoes (diced)', amount:300, unit:'g' },
+                    { name:'Vegetable Broth (low sodium)', amount:200, unit:'g' },
+                    { name:'Olive Oil (extra virgin)', amount:10, unit:'g' },
+                    { name:'Smoked Paprika', amount:4, unit:'g' },
+                    { name:'Curry Powder', amount:3, unit:'g' },
+                ],
+                instructions: [
+                    'Drain and rinse all three cans of beans.',
+                    'Heat olive oil in a large pot over medium heat.',
+                    'Add smoked paprika and curry powder. Toast 30 seconds.',
+                    'Add canned tomatoes. Cook 5 minutes.',
+                    'Add all three beans and vegetable broth.',
+                    'Bring to boil. Reduce heat and simmer 20-25 minutes until thick.',
+                    'Stir occasionally. Mash some beans against the pot wall to thicken.',
+                    'Season with salt to taste.',
+                    'Serve with whole wheat bread or over rice. Freezes perfectly for meal prep.',
+                ]
+            },
+
+            {
+                name: 'Whole Wheat Pasta with Chickpeas',
+                category: 'lunch',
+                cuisine: 'canadian',
+                servingSize: '1 bowl',
+                prepTime: '20 min',
+                videoId: '',
+                protein: 26, carbs: 68, fat: 10, calories: 466,
+                ingredients: [
+                    { name:'Whole Wheat Pasta (dry)', amount:80, unit:'g' },
+                    { name:'Chickpeas (canned, drained)', amount:120, unit:'g' },
+                    { name:'Canned Tomatoes (diced)', amount:150, unit:'g' },
+                    { name:'Spinach (fresh)', amount:50, unit:'g' },
+                    { name:'Olive Oil (extra virgin)', amount:10, unit:'g' },
+                    { name:'Nutritional Yeast', amount:10, unit:'g' },
+                ],
+                instructions: [
+                    'Cook whole wheat pasta in salted boiling water 8-10 minutes until al dente. Reserve 100ml pasta water before draining.',
+                    'Heat olive oil in a pan. Add drained chickpeas. Cook 3 minutes until slightly golden.',
+                    'Add canned tomatoes. Cook 5 minutes.',
+                    'Add fresh spinach. Stir until wilted, 2 minutes.',
+                    'Add drained pasta and a splash of pasta water. Toss everything together.',
+                    'The starchy pasta water helps the sauce cling to the pasta.',
+                    'Sprinkle nutritional yeast on top for cheesy flavour.',
+                    'Barilla whole wheat pasta available everywhere in Canada.',
+                ]
+            },
+
+            // ── DINNER ───────────────────────────────────────────
+
+            {
+                name: 'Black Bean and Rice',
+                category: 'dinner',
+                cuisine: 'canadian',
+                servingSize: '1 bowl',
+                prepTime: '20 min',
+                videoId: '',
+                protein: 18, carbs: 68, fat: 8, calories: 420,
+                ingredients: [
+                    { name:'Black Beans (canned, drained)', amount:160, unit:'g' },
+                    { name:'Brown Rice (dry)', amount:60, unit:'g' },
+                    { name:'Canned Tomatoes (diced)', amount:100, unit:'g' },
+                    { name:'Bell Pepper (red)', amount:80, unit:'g' },
+                    { name:'Olive Oil (extra virgin)', amount:8, unit:'g' },
+                    { name:'Smoked Paprika', amount:3, unit:'g' },
+                    { name:'Curry Powder', amount:2, unit:'g' },
+                ],
+                instructions: [
+                    'Cook brown rice: 1 cup rice to 2 cups water, bring to boil, simmer covered 35-40 minutes.',
+                    'Drain and rinse black beans.',
+                    'Heat olive oil in a pan. Add diced bell pepper. Cook 3 minutes.',
+                    'Add black beans, canned tomatoes, smoked paprika and curry powder.',
+                    'Simmer 8-10 minutes until sauce thickens.',
+                    'Season with salt.',
+                    'Serve beans over brown rice.',
+                    'This is a Cuban-inspired dish. Simple, filling and complete protein when rice and beans combine.',
+                ]
+            },
+
+            {
+                name: 'Coconut Chickpea Curry',
+                category: 'dinner',
+                cuisine: 'canadian',
+                servingSize: '1 bowl',
+                prepTime: '25 min',
+                videoId: '',
+                protein: 20, carbs: 44, fat: 18, calories: 418,
+                ingredients: [
+                    { name:'Chickpeas (canned, drained)', amount:200, unit:'g' },
+                    { name:'Coconut Milk (canned, full fat)', amount:120, unit:'g' },
+                    { name:'Canned Tomatoes (diced)', amount:150, unit:'g' },
+                    { name:'Vegetable Broth (low sodium)', amount:100, unit:'g' },
+                    { name:'Olive Oil (extra virgin)', amount:10, unit:'g' },
+                    { name:'Curry Powder', amount:8, unit:'g' },
+                    { name:'Smoked Paprika', amount:2, unit:'g' },
+                ],
+                instructions: [
+                    'Heat olive oil. Add curry powder and smoked paprika. Toast 30 seconds.',
+                    'Add canned tomatoes. Cook 4 minutes.',
+                    'Add drained chickpeas and vegetable broth. Stir.',
+                    'Simmer 10 minutes.',
+                    'Stir in coconut milk. Simmer 8 more minutes until thick and creamy.',
+                    'Season with salt.',
+                    'The full-fat coconut milk is key — light coconut milk makes a watery sauce.',
+                    'Serve with brown rice or whole wheat bread.',
+                ]
+            },
+
+            {
+                name: 'Lentil Bolognese with Pasta',
+                category: 'dinner',
+                cuisine: 'canadian',
+                servingSize: '1 bowl',
+                prepTime: '30 min',
+                videoId: '',
+                protein: 28, carbs: 72, fat: 10, calories: 490,
+                ingredients: [
+                    { name:'Green Lentils (dry)', amount:80, unit:'g' },
+                    { name:'Whole Wheat Pasta (dry)', amount:80, unit:'g' },
+                    { name:'Canned Tomatoes (diced)', amount:200, unit:'g' },
+                    { name:'Vegetable Broth (low sodium)', amount:150, unit:'g' },
+                    { name:'Olive Oil (extra virgin)', amount:10, unit:'g' },
+                    { name:'Nutritional Yeast', amount:10, unit:'g' },
+                    { name:'Smoked Paprika', amount:2, unit:'g' },
+                ],
+                instructions: [
+                    'Rinse green lentils. Cook in vegetable broth for 20-25 minutes until tender but holding shape.',
+                    'Meanwhile cook whole wheat pasta until al dente. Reserve pasta water.',
+                    'Heat olive oil in a wide pan. Add smoked paprika. Cook 30 seconds.',
+                    'Add canned tomatoes. Cook 8-10 minutes until thick — this is the base.',
+                    'Add cooked lentils. Mix well. Simmer 5 minutes.',
+                    'The lentils mimic ground meat texture in bolognese.',
+                    'Add pasta and a splash of pasta water. Toss together.',
+                    'Top with nutritional yeast for cheesy flavour.',
+                ]
+            },
+
+            {
+                name: 'Buddha Bowl with Tahini',
+                category: 'dinner',
+                cuisine: 'canadian',
+                servingSize: '1 bowl',
+                prepTime: '30 min',
+                videoId: '',
+                protein: 26, carbs: 56, fat: 20, calories: 500,
+                ingredients: [
+                    { name:'Quinoa (dry)', amount:60, unit:'g' },
+                    { name:'Chickpeas (canned, drained)', amount:120, unit:'g' },
+                    { name:'Sweet Potato', amount:130, unit:'g' },
+                    { name:'Broccoli (fresh)', amount:80, unit:'g' },
+                    { name:'Kale (fresh)', amount:50, unit:'g' },
+                    { name:'Tahini (sesame paste)', amount:25, unit:'g' },
+                    { name:'Olive Oil (extra virgin)', amount:8, unit:'g' },
+                    { name:'Hemp Hearts (shelled hemp seeds)', amount:15, unit:'g' },
+                ],
+                instructions: [
+                    'Preheat oven to 200°C.',
+                    'Dice sweet potato. Toss with olive oil and salt. Roast 25-30 minutes until caramelized.',
+                    'Drain chickpeas. Toss with olive oil, salt and smoked paprika. Add to roasting pan last 15 minutes.',
+                    'Cook quinoa as per standard method.',
+                    'Steam broccoli 4 minutes.',
+                    'Massage kale with salt 1 minute.',
+                    'Make tahini dressing: mix 25g tahini with 3 tbsp water and squeeze of lemon until pourable.',
+                    'Build bowl: quinoa, then roasted sweet potato, chickpeas, broccoli and kale.',
+                    'Drizzle tahini dressing. Sprinkle hemp hearts.',
+                ]
+            },
+
+            {
+                name: 'Split Pea Soup',
+                category: 'dinner',
+                cuisine: 'canadian',
+                servingSize: '1 large bowl',
+                prepTime: '45 min',
+                videoId: '',
+                protein: 26, carbs: 62, fat: 8, calories: 428,
+                ingredients: [
+                    { name:'Split Yellow Peas (dry)', amount:100, unit:'g' },
+                    { name:'Vegetable Broth (low sodium)', amount:500, unit:'g' },
+                    { name:'Sweet Potato', amount:100, unit:'g' },
+                    { name:'Olive Oil (extra virgin)', amount:8, unit:'g' },
+                    { name:'Smoked Paprika', amount:3, unit:'g' },
+                    { name:'Cinnamon (ground)', amount:1, unit:'g' },
+                ],
+                instructions: [
+                    'Rinse split yellow peas (no soaking needed).',
+                    'Peel and dice sweet potato into small cubes.',
+                    'Heat olive oil in a large pot. Add smoked paprika and cinnamon. Toast 30 seconds.',
+                    'Add sweet potato. Cook 3 minutes.',
+                    'Add split peas and vegetable broth. Bring to boil.',
+                    'Reduce heat, cover and simmer 35-40 minutes until peas are completely dissolved.',
+                    'Stir occasionally. Split peas break down naturally into a thick creamy soup.',
+                    'Season with salt. The smoked paprika gives a subtle smoky depth.',
+                    'Split peas are very cheap in Canada. Bulk Barn has the best prices.',
+                ]
+            },
+
+            {
+                name: 'Tofu Stir Fry with Brown Rice',
+                category: 'dinner',
+                cuisine: 'canadian',
+                servingSize: '1 plate',
+                prepTime: '20 min',
+                videoId: '',
+                protein: 22, carbs: 58, fat: 12, calories: 436,
+                ingredients: [
+                    { name:'Brown Rice (dry)', amount:60, unit:'g' },
+                    { name:'Edamame (frozen, shelled)', amount:80, unit:'g' },
+                    { name:'Broccoli (fresh)', amount:100, unit:'g' },
+                    { name:'Bell Pepper (red)', amount:80, unit:'g' },
+                    { name:'Mushrooms (cremini)', amount:80, unit:'g' },
+                    { name:'Soy Sauce (low sodium)', amount:20, unit:'g' },
+                    { name:'Coconut Oil', amount:8, unit:'g' },
+                    { name:'Hemp Hearts (shelled hemp seeds)', amount:15, unit:'g' },
+                ],
+                instructions: [
+                    'Cook brown rice ahead of time (35-40 minutes). Best to use day-old rice for stir fry.',
+                    'Microwave edamame 3 minutes.',
+                    'Chop broccoli, bell pepper and slice mushrooms.',
+                    'Heat coconut oil in a wok or large pan on HIGH heat — stir fry needs high heat.',
+                    'Add mushrooms first. Cook 2 minutes until golden.',
+                    'Add broccoli and bell pepper. Stir constantly 3 minutes.',
+                    'Add edamame. Cook 1 minute.',
+                    'Add cooked rice. Toss everything together.',
+                    'Add soy sauce. Toss and cook 1 minute more on high heat.',
+                    'Sprinkle hemp hearts. Serve immediately.',
+                ]
+            },
+
+            {
+                name: 'Lentil Chickpea Stew',
+                category: 'dinner',
+                cuisine: 'canadian',
+                servingSize: '1 bowl',
+                prepTime: '30 min',
+                videoId: '',
+                protein: 26, carbs: 56, fat: 10, calories: 418,
+                ingredients: [
+                    { name:'Red Lentils (dry)', amount:70, unit:'g' },
+                    { name:'Chickpeas (canned, drained)', amount:120, unit:'g' },
+                    { name:'Canned Tomatoes (diced)', amount:150, unit:'g' },
+                    { name:'Coconut Milk (canned, full fat)', amount:80, unit:'g' },
+                    { name:'Spinach (fresh)', amount:60, unit:'g' },
+                    { name:'Vegetable Broth (low sodium)', amount:200, unit:'g' },
+                    { name:'Olive Oil (extra virgin)', amount:8, unit:'g' },
+                    { name:'Curry Powder', amount:5, unit:'g' },
+                    { name:'Nutritional Yeast', amount:10, unit:'g' },
+                ],
+                instructions: [
+                    'Rinse red lentils.',
+                    'Heat olive oil. Toast curry powder 30 seconds.',
+                    'Add canned tomatoes. Cook 3 minutes.',
+                    'Add lentils, chickpeas and vegetable broth. Bring to boil.',
+                    'Simmer 15 minutes until lentils dissolve.',
+                    'Stir in coconut milk and fresh spinach. Cook until spinach wilts, 3 minutes.',
+                    'Stir in nutritional yeast for umami depth.',
+                    'Season with salt. The combination of lentils and chickpeas gives a very high protein stew.',
+                ]
+            },
+
+            {
+                name: 'Black Bean Tacos',
+                category: 'dinner',
+                cuisine: 'canadian',
+                servingSize: '2 tacos',
+                prepTime: '15 min',
+                videoId: '',
+                protein: 20, carbs: 58, fat: 16, calories: 460,
+                ingredients: [
+                    { name:'Black Beans (canned, drained)', amount:160, unit:'g' },
+                    { name:'Whole Wheat Tortilla (large)', amount:70, unit:'g' },
+                    { name:'Avocado', amount:75, unit:'g' },
+                    { name:'Bell Pepper (red)', amount:60, unit:'g' },
+                    { name:'Canned Tomatoes (diced)', amount:80, unit:'g' },
+                    { name:'Smoked Paprika', amount:3, unit:'g' },
+                    { name:'Sriracha Hot Sauce', amount:5, unit:'g' },
+                    { name:'Greek Yogurt (plain, 0% fat)', amount:40, unit:'g' },
+                ],
+                instructions: [
+                    'Drain and rinse black beans. Heat in a pan with smoked paprika and salt. Mash lightly.',
+                    'Slice bell pepper.',
+                    'Mash avocado with a pinch of salt.',
+                    'Use Greek yogurt as a sour cream substitute.',
+                    'Warm tortillas in a dry pan 30 seconds per side.',
+                    'Build tacos: mashed black beans, then bell pepper, tomatoes, avocado, a dollop of Greek yogurt and sriracha.',
+                    'Fold in half. Eat immediately.',
+                    'Mission whole wheat tortillas at Walmart. PC Greek yogurt at Superstore.',
+                ]
+            },
+
+            {
+                name: 'Quinoa Vegetable Bake',
+                category: 'dinner',
+                cuisine: 'canadian',
+                servingSize: '1 serving',
+                prepTime: '40 min',
+                videoId: '',
+                protein: 22, carbs: 56, fat: 12, calories: 420,
+                ingredients: [
+                    { name:'Quinoa (dry)', amount:70, unit:'g' },
+                    { name:'Chickpeas (canned, drained)', amount:120, unit:'g' },
+                    { name:'Sweet Potato', amount:100, unit:'g' },
+                    { name:'Broccoli (fresh)', amount:80, unit:'g' },
+                    { name:'Canned Tomatoes (diced)', amount:100, unit:'g' },
+                    { name:'Coconut Milk (canned, full fat)', amount:60, unit:'g' },
+                    { name:'Olive Oil (extra virgin)', amount:8, unit:'g' },
+                    { name:'Curry Powder', amount:6, unit:'g' },
+                ],
+                instructions: [
+                    'Preheat oven to 190°C.',
+                    'Rinse quinoa. Dice sweet potato. Chop broccoli.',
+                    'In a large oven-safe dish, mix uncooked quinoa, diced sweet potato, chickpeas and broccoli.',
+                    'Mix canned tomatoes, coconut milk, olive oil and curry powder together. Pour over quinoa mixture.',
+                    'Add 200ml water. Stir everything together.',
+                    'Cover tightly with foil.',
+                    'Bake 35-40 minutes until quinoa is cooked and vegetables are tender.',
+                    'Remove foil for last 5 minutes for a slightly crispy top.',
+                    'One pan, no stirring — perfect lazy dinner with minimal cleanup.',
+                ]
+            },
+
+            // ── SNACKS ───────────────────────────────────────────
+
+            {
+                name: 'Greek Yogurt with Berries',
+                category: 'snack',
+                cuisine: 'canadian',
+                servingSize: '1 bowl',
+                prepTime: '2 min',
+                videoId: '',
+                protein: 24, carbs: 28, fat: 6, calories: 262,
+                ingredients: [
+                    { name:'Greek Yogurt (plain, 0% fat)', amount:175, unit:'g' },
+                    { name:'Mixed Berries (frozen)', amount:80, unit:'g' },
+                    { name:'Hemp Hearts (shelled hemp seeds)', amount:20, unit:'g' },
+                    { name:'Chia Seeds', amount:10, unit:'g' },
+                    { name:'Maple Syrup (pure)', amount:10, unit:'g' },
+                ],
+                instructions: [
+                    'Scoop Greek yogurt into a bowl.',
+                    'Thaw berries briefly in microwave 30 seconds or use straight from frozen.',
+                    'Top yogurt with berries, hemp hearts and chia seeds.',
+                    'Drizzle maple syrup.',
+                    'The frozen berries create a natural sauce as they thaw onto the yogurt.',
+                    'Oikos Triple Zero at Walmart has 17g protein per 175g — highest in Canada.',
+                ]
+            },
+
+            {
+                name: 'Protein Smoothie (Simple)',
+                category: 'snack',
+                cuisine: 'canadian',
+                servingSize: '1 glass',
+                prepTime: '3 min',
+                videoId: '',
+                protein: 34, carbs: 26, fat: 4, calories: 276,
+                ingredients: [
+                    { name:'Diesel NZ Whey Isolate', amount:30, unit:'g' },
+                    { name:'Soy Milk (unsweetened)', amount:300, unit:'g' },
+                    { name:'Banana (ripe)', amount:100, unit:'g' },
+                ],
+                instructions: [
+                    'Add soy milk, banana and whey protein to a blender or shaker.',
+                    'Blend 30 seconds until smooth.',
+                    'Drink immediately post-workout.',
+                    'Soy milk has 3.3g protein per 100ml versus almond milk at 0.4g — makes a significant difference.',
+                    'Silk brand soy milk at all Canadian grocery stores.',
+                ]
+            },
+
+            {
+                name: 'Peanut Butter Apple Slices',
+                category: 'snack',
+                cuisine: 'canadian',
+                servingSize: '1 plate',
+                prepTime: '2 min',
+                videoId: '',
+                protein: 10, carbs: 38, fat: 18, calories: 354,
+                ingredients: [
+                    { name:'Apple', amount:182, unit:'g' },
+                    { name:'Peanut Butter (natural, no sugar)', amount:32, unit:'g' },
+                    { name:'Hemp Hearts (shelled hemp seeds)', amount:10, unit:'g' },
+                ],
+                instructions: [
+                    'Core and slice apple into wedges.',
+                    'Place peanut butter in a small dipping bowl.',
+                    'Sprinkle hemp hearts over the peanut butter.',
+                    'Dip apple slices into peanut butter.',
+                    'Kraft Natural peanut butter (just peanuts and salt) at Walmart.',
+                    'The fibre in apple + protein and fat in peanut butter = very slow digestion, keeps you full 3-4 hours.',
+                ]
+            },
+
+            {
+                name: 'Roasted Chickpeas (Spiced)',
+                category: 'snack',
+                cuisine: 'canadian',
+                servingSize: '1/2 cup',
+                prepTime: '30 min',
+                videoId: '',
+                protein: 12, carbs: 28, fat: 6, calories: 218,
+                ingredients: [
+                    { name:'Chickpeas (canned, drained)', amount:160, unit:'g' },
+                    { name:'Olive Oil (extra virgin)', amount:8, unit:'g' },
+                    { name:'Smoked Paprika', amount:3, unit:'g' },
+                    { name:'Curry Powder', amount:2, unit:'g' },
+                ],
+                instructions: [
+                    'Preheat oven to 200°C.',
+                    'Drain and rinse chickpeas. Pat very dry with paper towels — this is critical for crunch.',
+                    'Toss with olive oil, smoked paprika, curry powder and salt.',
+                    'Spread in single layer on a baking sheet.',
+                    'Roast 25-30 minutes, shaking pan every 10 minutes, until golden and crispy.',
+                    'Let cool completely — they crisp up more as they cool.',
+                    'Store in an open container at room temperature up to 3 days.',
+                    'Way better and cheaper than store-bought roasted chickpeas.',
+                ]
+            },
+
+            {
+                name: 'Mixed Nuts and Dates',
+                category: 'snack',
+                cuisine: 'canadian',
+                servingSize: '1 handful',
+                prepTime: '0 min',
+                videoId: '',
+                protein: 8, carbs: 18, fat: 22, calories: 306,
+                ingredients: [
+                    { name:'Almonds (raw)', amount:20, unit:'g' },
+                    { name:'Walnuts', amount:15, unit:'g' },
+                    { name:'Pumpkin Seeds (raw)', amount:15, unit:'g' },
+                ],
+                instructions: [
+                    'Pre-portion nuts into small ziplock bags at the start of the week.',
+                    'Eat as is — no preparation needed.',
+                    'Costco has the best prices on raw almonds and walnuts in Canada.',
+                    'Pumpkin seeds are the highest protein seed at 30g protein per 100g.',
+                    'This combination gives complete amino acids — all 9 essential amino acids covered.',
+                    'Ideal between lunch and dinner to control afternoon hunger.',
+                ]
+            },
+
+            {
+                name: 'Cottage Cheese with Fruit',
+                category: 'snack',
+                cuisine: 'canadian',
+                servingSize: '1 bowl',
+                prepTime: '2 min',
+                videoId: '',
+                protein: 26, carbs: 26, fat: 6, calories: 262,
+                ingredients: [
+                    { name:'Cottage Cheese (2% fat)', amount:200, unit:'g' },
+                    { name:'Blueberries (fresh or frozen)', amount:80, unit:'g' },
+                    { name:'Hemp Hearts (shelled hemp seeds)', amount:15, unit:'g' },
+                    { name:'Maple Syrup (pure)', amount:10, unit:'g' },
+                ],
+                instructions: [
+                    'Scoop cottage cheese into a bowl.',
+                    'Top with blueberries, hemp hearts and a drizzle of maple syrup.',
+                    'Eat immediately or refrigerate covered.',
+                    'Gay Lea or Nordica cottage cheese at Superstore or Walmart.',
+                    'Cottage cheese is very high in casein protein — slow-digesting, excellent pre-bed snack for muscle repair.',
+                    'The 2% fat version has better flavour than fat-free and similar calorie count.',
+                ]
+            },
+
+            {
+                name: 'Hummus and Veggie Plate',
+                category: 'snack',
+                cuisine: 'canadian',
+                servingSize: '1 plate',
+                prepTime: '5 min',
+                videoId: '',
+                protein: 10, carbs: 22, fat: 8, calories: 200,
+                ingredients: [
+                    { name:'Hummus (store-bought)', amount:80, unit:'g' },
+                    { name:'Bell Pepper (red)', amount:80, unit:'g' },
+                    { name:'Celery', amount:80, unit:'g' },
+                    { name:'Broccoli (fresh)', amount:60, unit:'g' },
+                ],
+                instructions: [
+                    'Scoop hummus into the centre of a plate.',
+                    'Slice bell pepper into strips.',
+                    'Cut celery into sticks.',
+                    'Cut broccoli into florets.',
+                    'Arrange vegetables around the hummus.',
+                    'Dip and eat.',
+                    'Sabra Classic Hummus or PC brand at Superstore.',
+                    'This is the perfect desk snack — low calorie, filling, no cooking, portable.',
+                ]
+            },
+
+            {
+                name: 'Almond Butter Banana Smoothie',
+                category: 'snack',
+                cuisine: 'canadian',
+                servingSize: '1 glass',
+                prepTime: '3 min',
+                videoId: '',
+                protein: 12, carbs: 38, fat: 18, calories: 362,
+                ingredients: [
+                    { name:'Almond Butter (natural)', amount:25, unit:'g' },
+                    { name:'Banana (ripe)', amount:120, unit:'g' },
+                    { name:'Soy Milk (unsweetened)', amount:250, unit:'g' },
+                    { name:'Chia Seeds', amount:12, unit:'g' },
+                    { name:'Cinnamon (ground)', amount:2, unit:'g' },
+                ],
+                instructions: [
+                    'Add all ingredients to a blender.',
+                    'Blend 30-45 seconds until smooth.',
+                    'The chia seeds thicken the smoothie slightly.',
+                    'Drink immediately or refrigerate up to 24 hours (shake before drinking).',
+                    'Natural almond butter from Costco is best value — just almonds, no palm oil.',
+                    'Good pre-workout snack 45-60 minutes before training.',
+                ]
+            },
+
+            {
+                name: 'Hemp Heart Energy Bites',
+                category: 'snack',
+                cuisine: 'canadian',
+                servingSize: '2 bites',
+                prepTime: '15 min + 30 min freeze',
+                videoId: '',
+                protein: 16, carbs: 36, fat: 22, calories: 400,
+                ingredients: [
+                    { name:'Rolled Oats (large flake)', amount:60, unit:'g' },
+                    { name:'Peanut Butter (natural, no sugar)', amount:50, unit:'g' },
+                    { name:'Hemp Hearts (shelled hemp seeds)', amount:20, unit:'g' },
+                    { name:'Chia Seeds', amount:10, unit:'g' },
+                    { name:'Maple Syrup (pure)', amount:20, unit:'g' },
+                    { name:'Vanilla Extract (pure)', amount:4, unit:'g' },
+                ],
+                instructions: [
+                    'In a bowl mix all ingredients together: oats, peanut butter, hemp hearts, chia seeds, maple syrup and vanilla.',
+                    'Mix until everything sticks together. If too dry add a teaspoon of water.',
+                    'Place in freezer for 30 minutes to firm up.',
+                    'Roll into golf-ball sized balls.',
+                    'Store in the fridge up to 2 weeks or freezer up to 3 months.',
+                    'Batch make 20 bites on Sunday for the whole week.',
+                    'Manitoba Harvest hemp hearts from Costco — best price in Canada.',
+                ]
+            },
+        ];
+
+        async function importAll(recipes, cuisine, label) {
+            log.textContent = '';
+            write(`Starting ${label} recipe import (${recipes.length} recipes)...`);
+            let ok = 0, fail = 0;
+            for (const recipe of recipes) {
+                try {
+                    await saveRecipe(recipe, cuisine);
+                    write(`✓ [${recipe.category}] ${recipe.name}`, 'ok');
+                    ok++;
+                } catch(e) {
+                    write(`✗ ${recipe.name} — ${e.message}`, 'err');
+                    fail++;
+                }
+            }
+            write(`\nDone! ${ok} imported, ${fail} failed.`, ok > 0 ? 'ok' : 'err');
+        }
+
+        document.getElementById('btnIndian').addEventListener('click', async function() {
+            this.disabled = true;
+            await importAll(indian, 'indian', 'Indian');
+            this.disabled = false;
+        });
+
+        document.getElementById('btnCanadian').addEventListener('click', async function() {
+            this.disabled = true;
+            await importAll(canadian, 'canadian', 'Canadian');
+            this.disabled = false;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,271 @@
+# FitDesi — Full Build Log
+
+**Project:** FitDesi — Personal Indian Vegetarian Fitness Web App  
+**Developer:** Jawand Singh, 26M, 77kg, Winnipeg, Canada  
+**Stack:** HTML + CSS + JavaScript + Firebase Firestore + GitHub Pages  
+**Sessions:** 2 (April 30 + May 1, 2026)
+
+---
+
+## Project Overview
+
+FitDesi is a personal fitness web app for Indian vegetarian body recomposition. It tracks workouts, macros, and meals with a full recipe cookbook covering both Indian and Canadian cuisines.
+
+**Goal:** Body recomposition — lose fat and build muscle simultaneously  
+**Diet:** Pure vegetarian, no eggs, no meat  
+**Supplement:** Diesel NZ Whey Isolate (Perfect Sports, 27g protein per scoop)  
+**Split:** 5-day rolling cycle (Chest+Tri / Back+Bi / Legs+Core / Shoulders+Abs / Light Cardio)
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | HTML5, CSS3, Vanilla JavaScript (ES Modules) |
+| Database | Firebase Firestore |
+| Auth | Google Sign In (Firebase Auth) |
+| Hosting | GitHub Pages |
+| Dev Server | VS Code Live Server |
+| Firebase Project | `fitdesi-punjab` (Toronto region) |
+
+---
+
+## File Structure
+
+```
+fitdesi/
+├── index.html              — Home page
+├── exercise.html           — Exercise hub with workout splits
+├── exercise.js
+├── exercise.css
+├── tracker.html            — Macro tracker + meal planner
+├── tracker.js
+├── tracker.css
+├── recipes.html            — Indian/Canadian recipe cookbook
+├── recipes.js              — Frontend recipe logic
+├── recipes.css
+├── admin.html              — Admin panel (ingredient + recipe management)
+├── admin.js
+├── admin.css
+├── login.html              — Google Sign In page
+├── firebase.js             — Firebase config + all DB functions
+├── app.js                  — Home page stats
+├── style.css               — Global styles
+├── import_ingredients.html — Bulk ingredient importer (dev tool)
+├── import_recipes.html     — Bulk recipe importer (dev tool)
+```
+
+---
+
+## Firebase Firestore Structure
+
+```
+users/
+  {uid}/
+    data/
+      profile     — name, age, gender, weight, height, goal, activity
+      cycle       — workout split, start date, current set
+      notifications — meal notification times
+    logs/
+      {dateKey}   — daily meal log (breakfast/lunch/snack/dinner arrays)
+
+shared/
+  ingredients/
+    items/{id}    — ingredient with per100g macros
+  recipes_indian/
+    items/{id}    — Indian recipe with ingredients + instructions
+  recipes_canadian/
+    items/{id}    — Canadian recipe with ingredients + instructions
+```
+
+---
+
+## Session 1 — April 30, 2026
+
+### Pages Built
+- `index.html` — Home page with protein stats, workout preview, nav cards
+- `style.css` — Global dark green theme, glassmorphism cards
+- `tracker.html/js/css` — Full macro tracker with onboarding, coach messages, body stats
+- `recipes.html/js/css` — Recipe cookbook
+- `exercise.html/js/css` — Exercise hub
+- `login.html` — Google Sign In
+- `admin.html/js/css` — Admin panel
+- `firebase.js` — Full Firebase integration
+
+### Tracker Features
+- 3-step onboarding (profile → goal → results)
+- Mifflin St Jeor BMR + TDEE calculation
+- Goals: Body Recomposition (5% deficit) / Muscle Gain (10% surplus) / Fat Loss (15% deficit)
+- Macro targets: Protein, Carbs, Fat, Calories with progress bars
+- Body stats: BMI, Body Fat % (US Navy formula), Ideal Weight (Devine), Lean Mass
+- Daily meal log: Breakfast / Lunch / Snacks / Dinner
+- AI Coach messages based on time of day + macro progress
+- Edit Profile modal (pre-filled)
+- Notification scheduling
+
+---
+
+## Session 2 — May 1, 2026
+
+### Exercise Page Redesign
+- Rolling 5-day cycle (not Mon-Sun anchored)
+- Set A/B popup at start of each new cycle
+- 8 split options: My Split, Push Pull Legs, Upper Lower, Full Body, Bro Split, Arnold Split, PPL 6 Day, Upper Lower 4 Day, + Custom
+- Week view anchored to today's actual cycle day index
+- **Bug fixed:** Week grid was showing wrong workout for Thursday — fixed by anchoring `renderWeekView()` to `getTodayDayIndex()` and calculating offsets forward/backward
+
+### Recipes Page
+- Indian / Canadian cuisine toggle
+- Category filter: All / Breakfast / Lunch / Dinner / Snacks
+- Search within active cuisine + category
+- Recipe detail panel: macros, ingredient list with amounts, step-by-step instructions, YouTube embed
+- "Add to Today's Meals" → meal selector popup → saves to Firebase log
+
+### Meal Planner
+- "Plan My Day" button on tracker page
+- Mode toggle: Plan Full Day (overwrites log) / Fill Remaining (adds to existing)
+- Cuisine toggle: Indian or Canadian
+- Macro targets display with remaining amounts
+- Algorithm: samples up to 5 from each category, scores all combinations (protein weighted 3x), picks best match
+- Swap button on each meal card to choose alternative
+- Totals with over/under indicators
+- Confirm → writes to Firebase daily log
+
+### Admin Panel Updates
+- Indian / Canadian cuisine toggle in Recipes tab
+- Stats bar: ingredient count, recipe count, member count
+- All CRUD operations pass `activeCuisine` param
+
+### Firebase Updates
+- Dual recipe collections: `recipes_indian` and `recipes_canadian`
+- `saveRecipe(recipe, cuisine)` — saves to correct collection
+- `getRecipes(cuisine)` — loads from correct collection
+- `deleteRecipe(id, cuisine)` — deletes from correct collection
+- `saveIngredient` updated to use `setDoc` with existing ID for proper edit support
+
+---
+
+## Database Files (Node.js — for local testing + bulk import)
+
+| File | Contents |
+|---|---|
+| `ingredients.js` | 77 Indian ingredients with per100g macros (IFCT 2017) |
+| `ingredients_canada.js` | 67 Canadian ingredients with store names |
+| `recipes.js` | 35 Indian recipes — 9 breakfast, 11 lunch, 7 dinner, 8 snacks |
+| `recipes_canada.js` | 39 Canadian recipes — 11 breakfast, 10 lunch, 9 dinner, 9 snacks |
+
+---
+
+## Recipe Database Summary
+
+### Indian Recipes (35 total)
+
+**Breakfast (9)**
+Paneer Bhurji, Moong Dal Chilla, Besan Chilla, Overnight Oats, Protein Smoothie, Quinoa Upma, Poha with Peanuts, Soya Oats Porridge, Sprouts Chaat
+
+**Lunch (11)**
+Dal Tadka, Rajma Masala, Chana Masala, Palak Paneer, Soya Chunk Masala, Dal Khichdi, Basmati Rice, Whole Wheat Roti, Panchmel Dal, Tofu Bhurji, Methi Thepla
+
+**Dinner (7)**
+Masoor Dal, Paneer Tikka, Tofu Tikka Masala, Rajma Rice Bowl, Kadai Paneer, Chana Dal with Spinach, Matar Paneer
+
+**Snacks (8)**
+Sattu Drink, Greek Yogurt with Nuts, Peanut Butter Banana, Sprouted Moong Salad, Protein Shake, Mixed Nuts and Dates, Roasted Chana, Paneer Cubes
+
+---
+
+### Canadian Recipes (39 total)
+
+**Breakfast (11)**
+Classic Rolled Oatmeal, High Protein Oatmeal, Banana Oat Pancakes, Protein Pancakes, Overnight Oats with Berries, Protein Overnight Oats, Chia Pudding, PB Banana Toast, Greek Yogurt Parfait, Protein Smoothie, Avocado Toast with Hemp Hearts
+
+**Lunch (10)**
+Red Lentil Dal, Black Bean Burrito Bowl, Chickpea and Lentil Soup, Quinoa Power Bowl, Veggie Wrap with Hummus, Lentil and Sweet Potato Curry, Chickpea Salad Sandwich, Edamame and Quinoa Bowl, Three Bean Chili, Whole Wheat Pasta with Chickpeas
+
+**Dinner (9)**
+Black Bean and Rice, Coconut Chickpea Curry, Lentil Bolognese with Pasta, Buddha Bowl with Tahini, Split Pea Soup, Tofu Stir Fry with Brown Rice, Lentil Chickpea Stew, Black Bean Tacos, Quinoa Vegetable Bake
+
+**Snacks (9)**
+Greek Yogurt with Berries, Protein Smoothie, Peanut Butter Apple Slices, Roasted Chickpeas, Mixed Nuts and Dates, Cottage Cheese with Fruit, Hummus and Veggie Plate, Almond Butter Banana Smoothie, Hemp Heart Energy Bites
+
+---
+
+## Key Bugs Fixed
+
+| Bug | Cause | Fix |
+|---|---|---|
+| Exercise week showing wrong workout on Thursday | `renderWeekView()` calculating offset from Monday independently instead of from today's cycle index | Anchor to `getTodayDayIndex()` and calculate offsets from there |
+| Recipes page had no styling | `recipes.css` only had instructions block — full file was never saved | Rebuilt complete `recipes.css` from scratch |
+| Cuisine toggle not switching recipes | `getRecipes()` in old `firebase.js` only fetched one collection | Updated `firebase.js` to accept `cuisine` param and fetch correct collection |
+| Category filter buttons not working | `renderRecipes()` was calling `empty.classList` on a null element | Made empty state inline HTML instead of referencing a DOM element |
+| Duplicate recipes showing | Old recipes from before bulk import still in Firebase | Delete all items in `recipes_indian` and `recipes_canadian` collections, re-import |
+| Recipes page no layout | `recipes.js` was the Node.js database file, not the frontend file | Replace with correct frontend `recipes.js` using Firebase imports |
+
+---
+
+## Deployment — GitHub Pages
+
+```bash
+git init
+git add .
+git commit -m "FitDesi initial commit"
+git branch -M main
+git remote add origin https://github.com/YOURUSERNAME/fitdesi.git
+git push -u origin main
+```
+
+Then in GitHub repo → Settings → Pages → Deploy from branch → main / root
+
+Add `YOURUSERNAME.github.io` to Firebase Console → Authentication → Settings → Authorized domains
+
+Live URL: `https://YOURUSERNAME.github.io/fitdesi`
+
+---
+
+## Macro Calculator Formula
+
+**BMR** (Mifflin St Jeor):
+- Male: `10 × weight + 6.25 × height − 5 × age + 5`
+- Female: `10 × weight + 6.25 × height − 5 × age − 161`
+
+**TDEE** = BMR × activity multiplier (1.2 / 1.375 / 1.55 / 1.725)
+
+**Goals:**
+- Recomp: 95% TDEE, protein = weight × 2.2g
+- Muscle: 110% TDEE, protein = weight × 2.0g
+- Fat Loss: 85% TDEE, protein = weight × 2.4g
+
+**Body Fat** (US Navy Formula):
+- Male: `495 / (1.0324 − 0.19077 × log10(waist − neck) + 0.15456 × log10(height)) − 450`
+
+---
+
+## Meal Planner Algorithm
+
+1. Get daily macro targets from profile
+2. If "Fill Remaining" mode — subtract already consumed from targets
+3. Load recipes from selected cuisine (Indian or Canadian)
+4. Sample up to 5 recipes from each category (random)
+5. Score every combination of breakfast + lunch + dinner + snack:
+   - `score = |protein diff| × 3 + |carbs diff| × 1 + |fat diff| × 1.5 + |calories diff| × 0.5`
+6. Pick lowest score combination
+7. Allow user to swap individual meals
+8. Confirm → write to Firebase daily log
+
+---
+
+## User Profile (Jawand Singh)
+
+- Age: 26, Male
+- Weight: 77kg
+- Height: 5'6" (168cm)
+- Location: Winnipeg, Canada
+- Goal: Body Recomposition
+- Activity: Moderate (gym 4-5x/week)
+- Daily targets approx: ~2,150 cal, ~170g protein, ~220g carbs, ~60g fat
+- Supplement: Diesel NZ Whey Isolate — 30g scoop = 27g protein
+
+---
+
+*Built with Claude Sonnet 4 — May 2026*

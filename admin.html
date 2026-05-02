@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FitDesi — Admin</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body>
+    <div class="glow-1"></div>
+    <div class="glow-2"></div>
+
+    <nav>
+      <a href="index.html" class="back-btn">← Back</a>
+      <div class="logo">FitDesi <span>admin</span></div>
+      <div class="nav-right">
+        <div class="admin-badge">⚙️ Admin Panel</div>
+      </div>
+    </nav>
+
+    <div class="access-denied hidden" id="accessDenied">
+      <div class="access-icon">🔒</div>
+      <div class="access-title">Admin Access Only</div>
+      <div class="access-desc">You don't have permission to view this page</div>
+      <a href="index.html" class="access-back">← Go Back</a>
+    </div>
+
+    <div class="admin-content hidden" id="adminContent">
+      <div class="admin-stats">
+        <div class="admin-stat-card">
+          <div class="admin-stat-val" id="statIngredients">0</div>
+          <div class="admin-stat-lbl">Ingredients</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-val" id="statRecipes">0</div>
+          <div class="admin-stat-lbl">Recipes</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-val" id="statUsers">0</div>
+          <div class="admin-stat-lbl">Members</div>
+        </div>
+      </div>
+
+      <div class="tab-bar">
+        <button class="tab-btn active" data-tab="ingredients">
+          🥬 Ingredients
+        </button>
+        <button class="tab-btn" data-tab="recipes">🍛 Recipes</button>
+        <button class="tab-btn" data-tab="users">👥 Users</button>
+      </div>
+
+      <!-- INGREDIENTS TAB -->
+      <div class="tab-content" id="tab-ingredients">
+        <div class="admin-section-header">
+          <div class="admin-section-title">Ingredient Database</div>
+          <button class="admin-add-btn" id="addIngredientBtn">
+            + Add Ingredient
+          </button>
+        </div>
+        <div class="admin-search-bar">
+          <input
+            type="text"
+            id="ingredientSearch"
+            placeholder="Search ingredients..."
+            class="search-input"
+          />
+        </div>
+        <div class="admin-list" id="ingredientList"></div>
+      </div>
+
+      <!-- RECIPES TAB -->
+      <div class="tab-content hidden" id="tab-recipes">
+        <div class="admin-section-header">
+          <div class="admin-section-title">Recipe Database</div>
+          <button class="admin-add-btn" id="addRecipeBtn">+ Add Recipe</button>
+        </div>
+        <div class="cuisine-toggle">
+          <button class="cuisine-tab active" data-cuisine="indian">
+            🇮🇳 Indian
+          </button>
+          <button class="cuisine-tab" data-cuisine="canadian">
+            🇨🇦 Canadian
+          </button>
+        </div>
+        <div class="admin-search-bar">
+          <input
+            type="text"
+            id="recipeSearch"
+            placeholder="Search recipes..."
+            class="search-input"
+          />
+        </div>
+        <div class="admin-list" id="recipeList"></div>
+      </div>
+
+      <!-- USERS TAB -->
+      <div class="tab-content hidden" id="tab-users">
+        <div class="admin-section-header">
+          <div class="admin-section-title">Family Members</div>
+        </div>
+        <div class="admin-list" id="userList">
+          <div
+            style="
+              text-align: center;
+              color: rgba(255, 255, 255, 0.2);
+              font-size: 12px;
+              padding: 40px;
+            "
+          >
+            Users appear here when they sign in with Google
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADD INGREDIENT MODAL -->
+    <div class="modal-overlay" id="ingredientModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h2 id="ingredientModalTitle">Add Ingredient</h2>
+          <button class="modal-close" id="ingredientModalClose">✕</button>
+        </div>
+        <div class="form-group">
+          <label>Ingredient Name</label>
+          <input type="text" id="ingName" placeholder="e.g. Toor Dal" />
+        </div>
+        <div class="form-group">
+          <label>Per 100g values</label>
+        </div>
+        <div class="macro-form-grid">
+          <div class="form-group">
+            <label>Protein (g)</label>
+            <input type="number" id="ingProtein" placeholder="0" min="0" />
+          </div>
+          <div class="form-group">
+            <label>Carbs (g)</label>
+            <input type="number" id="ingCarbs" placeholder="0" min="0" />
+          </div>
+          <div class="form-group">
+            <label>Fat (g)</label>
+            <input type="number" id="ingFat" placeholder="0" min="0" />
+          </div>
+          <div class="form-group">
+            <label>Calories</label>
+            <input type="number" id="ingCalories" placeholder="0" min="0" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label
+            >Fiber (g)
+            <span style="color: rgba(255, 255, 255, 0.2); font-size: 10px"
+              >optional</span
+            ></label
+          >
+          <input type="number" id="ingFiber" placeholder="0" min="0" />
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <select id="ingCategory" class="select-input">
+            <option value="grain">Grain / Legume</option>
+            <option value="dairy">Dairy</option>
+            <option value="vegetable">Vegetable</option>
+            <option value="spice">Spice / Condiment</option>
+            <option value="oil">Oil / Fat</option>
+            <option value="fruit">Fruit</option>
+            <option value="nut">Nut / Seed</option>
+            <option value="supplement">Protein Supplement</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <button class="save-btn" id="saveIngredient">Save Ingredient</button>
+      </div>
+    </div>
+
+    <!-- ADD RECIPE MODAL -->
+    <div class="modal-overlay" id="recipeModal">
+      <div class="modal" style="max-width: 560px">
+        <div class="modal-header">
+          <h2 id="recipeModalTitle">Add Recipe</h2>
+          <button class="modal-close" id="recipeModalClose">✕</button>
+        </div>
+        <div class="form-group">
+          <label>Recipe Name</label>
+          <input type="text" id="recName" placeholder="e.g. Dal Tadka" />
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <div class="option-row">
+            <button class="option-btn" data-field="recCat" data-val="breakfast">
+              Breakfast
+            </button>
+            <button class="option-btn" data-field="recCat" data-val="lunch">
+              Lunch
+            </button>
+            <button class="option-btn" data-field="recCat" data-val="dinner">
+              Dinner
+            </button>
+            <button class="option-btn" data-field="recCat" data-val="snack">
+              Snack
+            </button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label
+            >Serving Size
+            <span style="color: rgba(255, 255, 255, 0.2); font-size: 10px"
+              >e.g. 1 bowl, 2 rotis</span
+            ></label
+          >
+          <input type="text" id="recServing" placeholder="e.g. 1 bowl" />
+        </div>
+        <div class="form-group">
+          <label>Ingredients</label>
+          <div class="ingredient-builder">
+            <input
+              type="text"
+              id="ingSearchRecipe"
+              placeholder="Search and add ingredients..."
+              class="search-input"
+              style="margin-bottom: 8px"
+            />
+            <div class="ing-search-results" id="ingSearchResults"></div>
+            <div class="added-ingredients" id="addedIngredients"></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label
+            >Total Macros
+            <span style="color: rgba(126, 217, 154, 0.5); font-size: 10px"
+              >auto-calculated</span
+            ></label
+          >
+          <div class="macro-form-grid">
+            <div class="macro-display">
+              <div class="macro-display-val" id="recProtein">0g</div>
+              <div class="macro-display-lbl">Protein</div>
+            </div>
+            <div class="macro-display">
+              <div class="macro-display-val" id="recCarbs">0g</div>
+              <div class="macro-display-lbl">Carbs</div>
+            </div>
+            <div class="macro-display">
+              <div class="macro-display-val" id="recFat">0g</div>
+              <div class="macro-display-lbl">Fat</div>
+            </div>
+            <div class="macro-display">
+              <div class="macro-display-val" id="recCalories">0</div>
+              <div class="macro-display-lbl">Cal</div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label
+            >YouTube Video ID
+            <span style="color: rgba(255, 255, 255, 0.2); font-size: 10px"
+              >optional — part after ?v=</span
+            ></label
+          >
+          <input type="text" id="recVideoId" placeholder="e.g. vcBig73ojpE" />
+        </div>
+        <button class="save-btn" id="saveRecipe">Save Recipe</button>
+      </div>
+    </div>
+
+    <!-- DELETE MODAL -->
+    <div class="modal-overlay" id="deleteModal">
+      <div class="modal" style="max-width: 360px">
+        <div class="modal-header">
+          <h2>Confirm Delete</h2>
+          <button class="modal-close" id="deleteModalClose">✕</button>
+        </div>
+        <p
+          style="
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 20px;
+          "
+          id="deleteMessage"
+        ></p>
+        <div style="display: flex; gap: 10px">
+          <button
+            class="save-btn"
+            style="
+              background: rgba(255, 100, 100, 0.1);
+              border-color: rgba(255, 100, 100, 0.4);
+              color: rgba(255, 100, 100, 0.8);
+            "
+            id="confirmDelete"
+          >
+            Delete
+          </button>
+          <button
+            class="save-btn"
+            style="
+              background: transparent;
+              border-color: rgba(255, 255, 255, 0.1);
+              color: rgba(255, 255, 255, 0.3);
+            "
+            id="cancelDelete"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="admin.js"></script>
+  </body>
+</html>

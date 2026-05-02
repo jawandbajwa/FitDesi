@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FitDesi — Ingredient Importer</title>
+    <style>
+        body { background:#0a0f0c; color:#f0f0f0; font-family:'Inter',sans-serif; padding:32px; }
+        h2 { color:#7ed99a; margin-bottom:8px; }
+        p { color:rgba(255,255,255,0.4); font-size:13px; margin-bottom:24px; }
+        .btn-row { display:flex; gap:12px; margin-bottom:24px; }
+        button { padding:12px 24px; border-radius:10px; border:0.5px solid #7ed99a; background:rgba(126,217,154,0.1); color:#7ed99a; font-size:14px; cursor:pointer; font-family:'Inter',sans-serif; }
+        button:hover { background:rgba(126,217,154,0.2); }
+        button:disabled { opacity:0.4; cursor:not-allowed; }
+        #log { background:#0d1a10; border:0.5px solid rgba(255,255,255,0.08); border-radius:12px; padding:16px; font-size:12px; font-family:monospace; white-space:pre-wrap; max-height:500px; overflow-y:auto; line-height:1.8; }
+        .ok { color:#7ed99a; }
+        .err { color:#ff6b6b; }
+    </style>
+</head>
+<body>
+    <h2>FitDesi — Ingredient Importer</h2>
+    <p>Run Indian first, then Canadian. Each ingredient uploads with full per100g macros.</p>
+    <div class="btn-row">
+        <button id="btnIndian">🇮🇳 Import Indian (77)</button>
+        <button id="btnCanadian">🇨🇦 Import Canadian (67)</button>
+    </div>
+    <div id="log">Ready. Click a button to start importing...</div>
+
+    <script type="module">
+        import { saveIngredient } from './firebase.js';
+
+        const log = document.getElementById('log');
+        function write(msg, cls='') {
+            const line = document.createElement('div');
+            if (cls) line.className = cls;
+            line.textContent = msg;
+            log.appendChild(line);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        const indian = [
+            { name:'Toor Dal', category:'grain', protein:22.3, carbs:57.6, fat:1.7, fiber:15, calories:335 },
+            { name:'Moong Dal (Yellow, split)', category:'grain', protein:24.5, carbs:56.7, fat:1.2, fiber:16.3, calories:334 },
+            { name:'Chana Dal', category:'grain', protein:20.8, carbs:59.8, fat:5.3, fiber:11.4, calories:360 },
+            { name:'Urad Dal', category:'grain', protein:24, carbs:59.6, fat:1.2, fiber:18.3, calories:347 },
+            { name:'Masoor Dal (Red Lentil)', category:'grain', protein:25.1, carbs:59, fat:0.7, fiber:11.7, calories:343 },
+            { name:'Rajma (Kidney Beans)', category:'grain', protein:22.9, carbs:60.6, fat:1.3, fiber:15.2, calories:346 },
+            { name:'Kabuli Chana (Chickpeas)', category:'grain', protein:20.1, carbs:61, fat:3, fiber:17, calories:360 },
+            { name:'Soya Chunks', category:'grain', protein:52, carbs:33, fat:0.5, fiber:13, calories:345 },
+            { name:'Whole Moong (Green Gram)', category:'grain', protein:24, carbs:56.7, fat:1.3, fiber:16.3, calories:334 },
+            { name:'Lobia (Black Eyed Peas)', category:'grain', protein:23.5, carbs:57, fat:1.5, fiber:10.5, calories:342 },
+            { name:'Chana (Bengal Gram whole)', category:'grain', protein:17.1, carbs:60.9, fat:5.3, fiber:11.4, calories:360 },
+            { name:'Paneer (full fat)', category:'dairy', protein:18.3, carbs:1.2, fat:20.8, fiber:0, calories:265 },
+            { name:'Paneer (low fat)', category:'dairy', protein:18, carbs:3.5, fat:8, fiber:0, calories:160 },
+            { name:'Tofu (firm)', category:'dairy', protein:8, carbs:2, fat:4.8, fiber:0.3, calories:76 },
+            { name:'Tofu (extra firm)', category:'dairy', protein:9.5, carbs:2.3, fat:5, fiber:0.3, calories:88 },
+            { name:'Greek Yogurt (full fat)', category:'dairy', protein:10, carbs:3.6, fat:5, fiber:0, calories:97 },
+            { name:'Curd / Dahi (full fat)', category:'dairy', protein:3.1, carbs:4.7, fat:4.1, fiber:0, calories:60 },
+            { name:'Milk (cow, full fat)', category:'dairy', protein:3.2, carbs:4.7, fat:3.9, fiber:0, calories:65 },
+            { name:'Milk (buffalo)', category:'dairy', protein:4.3, carbs:5.1, fat:7, fiber:0, calories:97 },
+            { name:'Skimmed Milk Powder', category:'dairy', protein:36, carbs:52, fat:1, fiber:0, calories:362 },
+            { name:'Basmati Rice (raw)', category:'grain', protein:6.8, carbs:78.2, fat:0.6, fiber:0.4, calories:349 },
+            { name:'Brown Basmati Rice (raw)', category:'grain', protein:7.5, carbs:73, fat:2.5, fiber:3.5, calories:355 },
+            { name:'Whole Wheat Flour (Atta)', category:'grain', protein:11.8, carbs:71.2, fat:1.7, fiber:12.5, calories:341 },
+            { name:'Suji / Semolina (Rava)', category:'grain', protein:10.4, carbs:73.8, fat:0.9, fiber:3.5, calories:349 },
+            { name:'Oats (rolled)', category:'grain', protein:16.9, carbs:66.3, fat:6.9, fiber:10.6, calories:389 },
+            { name:'Poha (Flattened Rice)', category:'grain', protein:6.9, carbs:77, fat:0.9, fiber:1.2, calories:346 },
+            { name:'Quinoa (raw)', category:'grain', protein:14.1, carbs:64.2, fat:6.1, fiber:7, calories:368 },
+            { name:'Ragi / Finger Millet', category:'grain', protein:7.3, carbs:72, fat:1.3, fiber:11.5, calories:328 },
+            { name:'Bajra / Pearl Millet', category:'grain', protein:11.8, carbs:67.5, fat:5, fiber:9.3, calories:361 },
+            { name:'Besan (Chickpea Flour)', category:'grain', protein:22.5, carbs:57.6, fat:6.7, fiber:10.9, calories:387 },
+            { name:'Spinach (Palak)', category:'vegetable', protein:2.9, carbs:3.6, fat:0.7, fiber:2.2, calories:23 },
+            { name:'Onion', category:'vegetable', protein:1.2, carbs:9.3, fat:0.1, fiber:1.7, calories:42 },
+            { name:'Tomato', category:'vegetable', protein:0.9, carbs:3.9, fat:0.2, fiber:1.2, calories:18 },
+            { name:'Potato', category:'vegetable', protein:1.9, carbs:17.8, fat:0.1, fiber:2.2, calories:70 },
+            { name:'Cauliflower (Gobi)', category:'vegetable', protein:2.6, carbs:4, fat:0.4, fiber:2, calories:25 },
+            { name:'Peas (Matar, fresh)', category:'vegetable', protein:7.2, carbs:15.6, fat:0.4, fiber:5.7, calories:84 },
+            { name:'Capsicum / Bell Pepper', category:'vegetable', protein:1, carbs:6, fat:0.3, fiber:2.1, calories:26 },
+            { name:'Carrot (Gajar)', category:'vegetable', protein:0.9, carbs:9.6, fat:0.2, fiber:2.8, calories:41 },
+            { name:'Brinjal / Eggplant (Baingan)', category:'vegetable', protein:1.4, carbs:5.7, fat:0.3, fiber:3, calories:25 },
+            { name:'Bitter Gourd (Karela)', category:'vegetable', protein:2.1, carbs:4.2, fat:0.2, fiber:2.6, calories:17 },
+            { name:'Bottle Gourd (Lauki)', category:'vegetable', protein:0.5, carbs:2.5, fat:0.1, fiber:0.5, calories:14 },
+            { name:'Fenugreek Leaves (Methi)', category:'vegetable', protein:4.4, carbs:6, fat:0.9, fiber:1.1, calories:49 },
+            { name:'Ginger (Adrak)', category:'spice', protein:1.8, carbs:17, fat:0.8, fiber:2, calories:80 },
+            { name:'Garlic (Lehsun)', category:'spice', protein:6.3, carbs:29, fat:0.5, fiber:2.1, calories:149 },
+            { name:'Mushroom (Button)', category:'vegetable', protein:3.1, carbs:3.3, fat:0.3, fiber:1, calories:22 },
+            { name:'Cucumber (Kheera)', category:'vegetable', protein:0.7, carbs:2.2, fat:0.1, fiber:0.7, calories:13 },
+            { name:'Sweet Corn (fresh)', category:'vegetable', protein:3.2, carbs:19, fat:1.2, fiber:2, calories:96 },
+            { name:'Green Chilli', category:'spice', protein:2.9, carbs:9.3, fat:0.6, fiber:3, calories:40 },
+            { name:'Ghee', category:'oil', protein:0, carbs:0, fat:100, fiber:0, calories:900 },
+            { name:'Mustard Oil', category:'oil', protein:0, carbs:0, fat:100, fiber:0, calories:884 },
+            { name:'Sunflower Oil', category:'oil', protein:0, carbs:0, fat:100, fiber:0, calories:884 },
+            { name:'Coconut Oil', category:'oil', protein:0, carbs:0, fat:100, fiber:0, calories:884 },
+            { name:'Almonds (Badam)', category:'nut', protein:21.2, carbs:21.7, fat:49.4, fiber:12.5, calories:579 },
+            { name:'Cashews (Kaju)', category:'nut', protein:18.2, carbs:30.2, fat:43.8, fiber:3.3, calories:553 },
+            { name:'Peanuts / Groundnuts', category:'nut', protein:25.8, carbs:16.1, fat:49.2, fiber:8.5, calories:567 },
+            { name:'Peanut Butter (natural)', category:'nut', protein:22, carbs:20, fat:50, fiber:6, calories:588 },
+            { name:'Walnuts (Akhrot)', category:'nut', protein:15.2, carbs:13.7, fat:65.2, fiber:6.7, calories:654 },
+            { name:'Flaxseeds (Alsi)', category:'nut', protein:18.3, carbs:28.9, fat:42.2, fiber:27.3, calories:534 },
+            { name:'Chia Seeds', category:'nut', protein:16.5, carbs:42.1, fat:30.7, fiber:34.4, calories:486 },
+            { name:'Pumpkin Seeds', category:'nut', protein:30.2, carbs:10.7, fat:49.1, fiber:6, calories:559 },
+            { name:'Sesame Seeds (Til)', category:'nut', protein:17.7, carbs:23.5, fat:49.7, fiber:11.8, calories:573 },
+            { name:'Turmeric Powder (Haldi)', category:'spice', protein:9.7, carbs:67.1, fat:3.3, fiber:22.7, calories:312 },
+            { name:'Cumin Seeds (Jeera)', category:'spice', protein:17.8, carbs:44.2, fat:22.3, fiber:10.5, calories:375 },
+            { name:'Red Chilli Powder', category:'spice', protein:12, carbs:49.7, fat:13.5, fiber:34.9, calories:282 },
+            { name:'Garam Masala', category:'spice', protein:13, carbs:50, fat:15, fiber:33, calories:360 },
+            { name:'Salt', category:'spice', protein:0, carbs:0, fat:0, fiber:0, calories:0 },
+            { name:'Curry Leaves', category:'spice', protein:6.1, carbs:18.7, fat:1, fiber:6.4, calories:108 },
+            { name:'Coriander Leaves (Dhania)', category:'spice', protein:3.3, carbs:6.3, fat:0.6, fiber:2.8, calories:44 },
+            { name:'Jaggery (Gur)', category:'other', protein:0.4, carbs:98, fat:0.1, fiber:0, calories:383 },
+            { name:'Banana (ripe)', category:'fruit', protein:1.1, carbs:22.8, fat:0.3, fiber:2.6, calories:89 },
+            { name:'Apple', category:'fruit', protein:0.3, carbs:13.8, fat:0.2, fiber:2.4, calories:52 },
+            { name:'Mango (ripe)', category:'fruit', protein:0.6, carbs:16.9, fat:0.4, fiber:1.6, calories:65 },
+            { name:'Dates (Khajoor, dry)', category:'fruit', protein:2.5, carbs:75, fat:0.4, fiber:8, calories:282 },
+            { name:'Diesel NZ Whey Isolate', category:'supplement', protein:90, carbs:1.7, fat:0.3, fiber:0, calories:370 },
+            { name:'Sattu (Roasted Chana Flour)', category:'grain', protein:20.6, carbs:65.2, fat:6.2, fiber:4, calories:408 },
+        ];
+
+        const canadian = [
+            { name:'Black Beans (dry)', category:'grain', protein:21.6, carbs:62.4, fat:0.9, fiber:15.5, calories:341 },
+            { name:'Black Beans (canned, drained)', category:'grain', protein:8.9, carbs:16.6, fat:0.5, fiber:7.5, calories:109 },
+            { name:'Chickpeas (canned, drained)', category:'grain', protein:8.9, carbs:27.4, fat:2.6, fiber:7.6, calories:164 },
+            { name:'Red Lentils (dry)', category:'grain', protein:25.1, carbs:59, fat:0.7, fiber:11.7, calories:343 },
+            { name:'Green Lentils (dry)', category:'grain', protein:25.8, carbs:60.1, fat:0.8, fiber:30.5, calories:352 },
+            { name:'Kidney Beans (canned, drained)', category:'grain', protein:8.7, carbs:22.8, fat:0.5, fiber:6.4, calories:127 },
+            { name:'Edamame (frozen, shelled)', category:'grain', protein:11.9, carbs:8.9, fat:5.2, fiber:5.2, calories:121 },
+            { name:'Split Yellow Peas (dry)', category:'grain', protein:25, carbs:60.4, fat:1.1, fiber:16.3, calories:341 },
+            { name:'Hummus (store-bought)', category:'grain', protein:7.9, carbs:14.3, fat:9.6, fiber:6, calories:177 },
+            { name:'Cottage Cheese (2% fat)', category:'dairy', protein:12.4, carbs:3.4, fat:2.3, fiber:0, calories:84 },
+            { name:'Greek Yogurt (plain, 0% fat)', category:'dairy', protein:10.2, carbs:3.6, fat:0.4, fiber:0, calories:59 },
+            { name:'Greek Yogurt (plain, 2% fat)', category:'dairy', protein:10, carbs:3.8, fat:2, fiber:0, calories:73 },
+            { name:'Milk (2% fat, pasteurized)', category:'dairy', protein:3.4, carbs:5, fat:2, fiber:0, calories:52 },
+            { name:'Cheddar Cheese (mild)', category:'dairy', protein:25, carbs:1.3, fat:33.1, fiber:0, calories:403 },
+            { name:'Oat Milk (unsweetened)', category:'other', protein:1, carbs:6.6, fat:1.5, fiber:0.2, calories:44 },
+            { name:'Soy Milk (unsweetened)', category:'other', protein:3.3, carbs:2.4, fat:1.8, fiber:0.3, calories:39 },
+            { name:'Almond Milk (unsweetened)', category:'other', protein:0.4, carbs:0.5, fat:1, fiber:0.2, calories:13 },
+            { name:'Rolled Oats (large flake)', category:'grain', protein:16.9, carbs:66.3, fat:6.9, fiber:10.6, calories:389 },
+            { name:'Quick Oats (instant)', category:'grain', protein:16.9, carbs:66.3, fat:6.9, fiber:10.6, calories:389 },
+            { name:'Quinoa (dry)', category:'grain', protein:14.1, carbs:64.2, fat:6.1, fiber:7, calories:368 },
+            { name:'Brown Rice (dry)', category:'grain', protein:7.9, carbs:77.2, fat:2.9, fiber:3.5, calories:370 },
+            { name:'Whole Wheat Bread', category:'grain', protein:9, carbs:43, fat:3.5, fiber:6.9, calories:247 },
+            { name:'Whole Wheat Tortilla (large)', category:'grain', protein:9.8, carbs:49.3, fat:7, fiber:7, calories:300 },
+            { name:'Whole Wheat Pasta (dry)', category:'grain', protein:14.6, carbs:73.5, fat:2.5, fiber:8.7, calories:348 },
+            { name:'All-Purpose Flour', category:'grain', protein:10.3, carbs:76.3, fat:1, fiber:2.7, calories:364 },
+            { name:'Oat Flour', category:'grain', protein:15.3, carbs:65.7, fat:7, fiber:10, calories:404 },
+            { name:'Spinach (fresh)', category:'vegetable', protein:2.9, carbs:3.6, fat:0.4, fiber:2.2, calories:23 },
+            { name:'Kale (fresh)', category:'vegetable', protein:4.3, carbs:8.8, fat:0.9, fiber:3.6, calories:49 },
+            { name:'Broccoli (fresh)', category:'vegetable', protein:2.8, carbs:7, fat:0.4, fiber:2.6, calories:34 },
+            { name:'Sweet Potato', category:'vegetable', protein:1.6, carbs:20.1, fat:0.1, fiber:3, calories:86 },
+            { name:'Bell Pepper (red)', category:'vegetable', protein:1, carbs:6, fat:0.3, fiber:2.1, calories:31 },
+            { name:'Mushrooms (cremini)', category:'vegetable', protein:3.3, carbs:4.7, fat:0.4, fiber:1.3, calories:28 },
+            { name:'Zucchini', category:'vegetable', protein:1.2, carbs:3.1, fat:0.3, fiber:1, calories:17 },
+            { name:'Frozen Mixed Vegetables', category:'vegetable', protein:3.3, carbs:13.7, fat:0.3, fiber:4, calories:65 },
+            { name:'Canned Tomatoes (diced)', category:'vegetable', protein:1, carbs:4, fat:0.2, fiber:1.3, calories:20 },
+            { name:'Avocado', category:'fruit', protein:2, carbs:8.5, fat:14.7, fiber:6.7, calories:160 },
+            { name:'Celery', category:'vegetable', protein:0.7, carbs:3, fat:0.2, fiber:1.6, calories:16 },
+            { name:'Blueberries (fresh or frozen)', category:'fruit', protein:0.7, carbs:14.5, fat:0.3, fiber:2.4, calories:57 },
+            { name:'Strawberries (fresh or frozen)', category:'fruit', protein:0.7, carbs:7.7, fat:0.3, fiber:2, calories:32 },
+            { name:'Banana (ripe)', category:'fruit', protein:1.1, carbs:22.8, fat:0.3, fiber:2.6, calories:89 },
+            { name:'Apple', category:'fruit', protein:0.3, carbs:13.8, fat:0.2, fiber:2.4, calories:52 },
+            { name:'Mixed Berries (frozen)', category:'fruit', protein:0.7, carbs:12, fat:0.3, fiber:3.5, calories:50 },
+            { name:'Hemp Hearts (shelled hemp seeds)', category:'nut', protein:31.6, carbs:8.7, fat:48.8, fiber:4, calories:553 },
+            { name:'Chia Seeds', category:'nut', protein:16.5, carbs:42.1, fat:30.7, fiber:34.4, calories:486 },
+            { name:'Flaxseeds (ground)', category:'nut', protein:18.3, carbs:28.9, fat:42.2, fiber:27.3, calories:534 },
+            { name:'Pumpkin Seeds (raw)', category:'nut', protein:30.2, carbs:10.7, fat:49.1, fiber:6, calories:559 },
+            { name:'Almonds (raw)', category:'nut', protein:21.2, carbs:21.7, fat:49.4, fiber:12.5, calories:579 },
+            { name:'Peanut Butter (natural, no sugar)', category:'nut', protein:22, carbs:20, fat:50, fiber:6, calories:588 },
+            { name:'Almond Butter (natural)', category:'nut', protein:21, carbs:18.8, fat:59, fiber:7, calories:634 },
+            { name:'Walnuts', category:'nut', protein:15.2, carbs:13.7, fat:65.2, fiber:6.7, calories:654 },
+            { name:'Olive Oil (extra virgin)', category:'oil', protein:0, carbs:0, fat:100, fiber:0, calories:884 },
+            { name:'Coconut Oil', category:'oil', protein:0, carbs:0, fat:100, fiber:0, calories:892 },
+            { name:'Butter (unsalted)', category:'oil', protein:0.9, carbs:0.1, fat:81.1, fiber:0, calories:717 },
+            { name:'Maple Syrup (pure)', category:'other', protein:0, carbs:67, fat:0.1, fiber:0, calories:260 },
+            { name:'Tahini (sesame paste)', category:'nut', protein:17, carbs:21.2, fat:53.8, fiber:9.3, calories:595 },
+            { name:'Soy Sauce (low sodium)', category:'spice', protein:8.1, carbs:8, fat:0.1, fiber:0.4, calories:60 },
+            { name:'Nutritional Yeast', category:'other', protein:50, carbs:31, fat:3, fiber:6, calories:325 },
+            { name:'Sriracha Hot Sauce', category:'spice', protein:1.3, carbs:18.3, fat:0.5, fiber:0, calories:93 },
+            { name:'Baking Powder', category:'other', protein:0, carbs:25, fat:0, fiber:0, calories:100 },
+            { name:'Vanilla Extract (pure)', category:'other', protein:0.1, carbs:12.7, fat:0.1, fiber:0, calories:288 },
+            { name:'Cinnamon (ground)', category:'spice', protein:3.9, carbs:80.6, fat:1.2, fiber:53.1, calories:261 },
+            { name:'Curry Powder', category:'spice', protein:12.7, carbs:55.8, fat:14, fiber:33.2, calories:325 },
+            { name:'Smoked Paprika', category:'spice', protein:14.1, carbs:53.9, fat:12.9, fiber:34.9, calories:282 },
+            { name:'Vegetable Broth (low sodium)', category:'other', protein:0.2, carbs:0.8, fat:0, fiber:0, calories:4 },
+            { name:'Coconut Milk (canned, full fat)', category:'other', protein:2.3, carbs:6, fat:21.3, fiber:0, calories:230 },
+            { name:'Apple Cider Vinegar', category:'other', protein:0, carbs:0.9, fat:0, fiber:0, calories:21 },
+            { name:'Diesel NZ Whey Isolate', category:'supplement', protein:90, carbs:1.7, fat:0.3, fiber:0, calories:370 },
+        ];
+
+        async function importAll(list, label) {
+            log.textContent = '';
+            write(`Starting ${label} ingredient import (${list.length} items)...`);
+            let ok = 0, fail = 0;
+            for (const ing of list) {
+                try {
+                    await saveIngredient(ing);
+                    write(`✓ ${ing.name}`, 'ok');
+                    ok++;
+                } catch (e) {
+                    write(`✗ ${ing.name} — ${e.message}`, 'err');
+                    fail++;
+                }
+            }
+            write(`\nDone! ${ok} imported, ${fail} failed.`, ok > 0 ? 'ok' : 'err');
+        }
+
+        document.getElementById('btnIndian').addEventListener('click', async function() {
+            this.disabled = true;
+            await importAll(indian, 'Indian');
+            this.disabled = false;
+        });
+
+        document.getElementById('btnCanadian').addEventListener('click', async function() {
+            this.disabled = true;
+            await importAll(canadian, 'Canadian');
+            this.disabled = false;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitDesi — Protein Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="tracker.css">
+</head>
+<body>
+
+    <div class="glow-1"></div>
+    <div class="glow-2"></div>
+
+    <nav>
+        <a href="index.html" class="back-btn">← Back</a>
+        <div class="logo">FitDesi <span>personal</span></div>
+        <div class="nav-right">
+            <div class="nav-date" id="currentDate"></div>
+        </div>
+    </nav>
+
+    <!-- ONBOARDING -->
+    <div class="onboarding" id="onboarding">
+        <div class="onboarding-card">
+
+            <div class="onboarding-step" id="step1">
+                <h2>Let's set up your <em>profile</em></h2>
+                <p>Answer a few questions so your coach can personalize everything for you</p>
+                <div class="form-group">
+                    <label>Your Name</label>
+                    <input type="text" id="userName" placeholder="What should I call you?">
+                </div>
+                <div class="form-group">
+                    <label>Age</label>
+                    <input type="number" id="userAge" placeholder="Years" min="0">
+                </div>
+                <div class="form-group">
+                    <label>Gender</label>
+                    <div class="option-row">
+                        <button class="option-btn" data-field="gender" data-val="male">Male</button>
+                        <button class="option-btn" data-field="gender" data-val="female">Female</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Weight</label>
+                    <div class="height-toggle">
+                        <button class="toggle-btn active" id="weightKg">kg</button>
+                        <button class="toggle-btn" id="weightLbs">lbs</button>
+                    </div>
+                    <div class="input-row" id="weightKgInput">
+                        <input type="number" id="userWeight" placeholder="e.g. 70" min="0">
+                        <span class="unit">kg</span>
+                    </div>
+                    <div class="input-row hidden" id="weightLbsInput">
+                        <input type="number" id="userWeightLbs" placeholder="e.g. 154" min="0">
+                        <span class="unit">lbs</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Height</label>
+                    <div class="height-toggle">
+                        <button class="toggle-btn active" id="heightCm">cm</button>
+                        <button class="toggle-btn" id="heightFt">ft / in</button>
+                    </div>
+                    <div class="input-row" id="heightCmInput">
+                        <input type="number" id="userHeight" placeholder="e.g. 175" min="0">
+                        <span class="unit">cm</span>
+                    </div>
+                    <div class="input-row hidden" id="heightFtInput">
+                        <input type="number" id="userHeightFt" placeholder="5" min="0">
+                        <span class="unit">ft</span>
+                        <input type="number" id="userHeightIn" placeholder="9" min="0">
+                        <span class="unit">in</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Neck circumference</label>
+                    <div class="input-row">
+                        <input type="number" id="userNeck" placeholder="e.g. 37" min="0">
+                        <span class="unit">cm</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Waist circumference <span style="color:rgba(255,255,255,0.2);font-size:10px">(at navel)</span></label>
+                    <div class="input-row">
+                        <input type="number" id="userWaist" placeholder="e.g. 82" min="0">
+                        <span class="unit">cm</span>
+                    </div>
+                </div>
+                <div class="form-group" id="hipGroup">
+                    <label>Hip circumference <span style="color:rgba(255,255,255,0.2);font-size:10px">(females only)</span></label>
+                    <div class="input-row">
+                        <input type="number" id="userHip" placeholder="e.g. 95" min="0">
+                        <span class="unit">cm</span>
+                    </div>
+                </div>
+                <button class="next-btn" id="toStep2">Continue →</button>
+            </div>
+
+            <div class="onboarding-step hidden" id="step2">
+                <h2>Your <em>goal</em></h2>
+                <p>What are you training for?</p>
+                <div class="goal-options">
+                    <button class="goal-btn" data-val="recomp">
+                        <span class="goal-icon">⚡</span>
+                        <div>
+                            <span class="goal-title">Body Recomposition</span>
+                            <span class="goal-desc">Lose fat & build muscle simultaneously</span>
+                        </div>
+                    </button>
+                    <button class="goal-btn" data-val="muscle">
+                        <span class="goal-icon">💪</span>
+                        <div>
+                            <span class="goal-title">Muscle Gain</span>
+                            <span class="goal-desc">Build maximum muscle, slight surplus</span>
+                        </div>
+                    </button>
+                    <button class="goal-btn" data-val="fatloss">
+                        <span class="goal-icon">🔥</span>
+                        <div>
+                            <span class="goal-title">Fat Loss</span>
+                            <span class="goal-desc">Lose fat while preserving muscle</span>
+                        </div>
+                    </button>
+                </div>
+                <div class="form-group" style="margin-top:20px">
+                    <label>Activity Level
+                        <button class="info-btn" id="activityInfo">?</button>
+                    </label>
+                    <div class="info-box hidden" id="activityInfoBox">
+                        <div class="info-item">
+                            <span class="info-title">Sedentary</span>
+                            <span class="info-desc">Desk job, little movement outside gym. Sitting most of the day.</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-title">Lightly Active</span>
+                            <span class="info-desc">Gym 2-3x per week, some walking daily but mostly sitting.</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-title">Moderate</span>
+                            <span class="info-desc">Gym 4-5x per week with daily cardio. Best for most gym beginners.</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-title">Very Active</span>
+                            <span class="info-desc">Hard training 6-7x per week or physically demanding job.</span>
+                        </div>
+                    </div>
+                    <div class="activity-options">
+                        <button class="option-btn" data-field="activity" data-val="sedentary">Sedentary</button>
+                        <button class="option-btn" data-field="activity" data-val="light">Lightly Active</button>
+                        <button class="option-btn" data-field="activity" data-val="moderate">Moderate</button>
+                        <button class="option-btn" data-field="activity" data-val="active">Very Active</button>
+                    </div>
+                </div>
+                <div class="btn-row">
+                    <button class="back-step-btn" id="toStep1">← Back</button>
+                    <button class="next-btn" id="toStep3">Continue →</button>
+                </div>
+            </div>
+
+            <div class="onboarding-step hidden" id="step3">
+                <h2>Your <em>results</em></h2>
+                <p id="coachIntro"></p>
+                <div class="macro-results" id="macroResults"></div>
+                <div class="coach-message" id="coachMessage"></div>
+                <div class="btn-row">
+                    <button class="back-step-btn" id="toStep2b">← Back</button>
+                    <button class="next-btn" id="saveProfile">Start Tracking →</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MAIN TRACKER -->
+    <div class="tracker-main hidden" id="trackerMain">
+
+        <div class="coach-bar" id="coachBar">
+            <div class="coach-avatar">🤖</div>
+            <div class="coach-text" id="coachDailyMessage">Loading your coach...</div>
+        </div>
+
+        <div class="edit-profile-bar">
+            <span class="edit-profile-text">Want to update your stats?</span>
+            <button class="edit-profile-btn" id="editProfileBtn">✏️ Edit Profile</button>
+        </div>
+
+        <div id="bodyStatsSection"></div>
+
+        <!-- PLAN MY DAY BUTTON -->
+        <div class="plan-btn-wrapper">
+            <button class="plan-my-day-btn" id="planMyDayBtn">🗓️ Plan My Day</button>
+        </div>
+
+        <div class="macro-rings" id="macroRings"></div>
+
+        <div class="section-label">Today's Meals</div>
+
+        <div class="meals-container">
+            <div class="meal-section">
+                <div class="meal-header">
+                    <span class="meal-icon">🌅</span>
+                    <span class="meal-name">Breakfast</span>
+                    <span class="meal-total" id="breakfastTotal">0g protein</span>
+                    <button class="add-meal-btn" data-meal="breakfast">+ Add</button>
+                </div>
+                <div class="meal-items" id="breakfastItems"></div>
+            </div>
+
+            <div class="meal-section">
+                <div class="meal-header">
+                    <span class="meal-icon">☀️</span>
+                    <span class="meal-name">Lunch</span>
+                    <span class="meal-total" id="lunchTotal">0g protein</span>
+                    <button class="add-meal-btn" data-meal="lunch">+ Add</button>
+                </div>
+                <div class="meal-items" id="lunchItems"></div>
+            </div>
+
+            <div class="meal-section">
+                <div class="meal-header">
+                    <span class="meal-icon">🍎</span>
+                    <span class="meal-name">Snacks</span>
+                    <span class="meal-total" id="snackTotal">0g protein</span>
+                    <button class="add-meal-btn" data-meal="snack">+ Add</button>
+                </div>
+                <div class="meal-items" id="snackItems"></div>
+            </div>
+
+            <div class="meal-section">
+                <div class="meal-header">
+                    <span class="meal-icon">🌙</span>
+                    <span class="meal-name">Dinner</span>
+                    <span class="meal-total" id="dinnerTotal">0g protein</span>
+                    <button class="add-meal-btn" data-meal="dinner">+ Add</button>
+                </div>
+                <div class="meal-items" id="dinnerItems"></div>
+            </div>
+        </div>
+
+        <div class="section-label" style="margin-top:24px">Settings</div>
+        <div class="settings-card">
+            <div class="settings-row">
+                <span>Breakfast Notification</span>
+                <input type="time" id="notifBreakfast" value="08:00" class="time-input">
+            </div>
+            <div class="settings-row">
+                <span>Lunch Notification</span>
+                <input type="time" id="notifLunch" value="13:00" class="time-input">
+            </div>
+            <div class="settings-row">
+                <span>Dinner Notification</span>
+                <input type="time" id="notifDinner" value="20:00" class="time-input">
+            </div>
+            <button class="save-notif-btn" id="saveNotifications">Save Notifications</button>
+            <button class="reset-btn" id="resetProfile">Reset Profile</button>
+        </div>
+
+    </div>
+
+    <!-- ADD FOOD MODAL -->
+    <div class="modal-overlay" id="foodModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Add Food</h2>
+                <button class="modal-close" id="foodModalClose">✕</button>
+            </div>
+            <input type="text" id="foodSearch" placeholder="Search your recipes..." class="search-input" style="margin-bottom:12px">
+            <div class="food-list" id="foodList"></div>
+            <div class="modal-divider">— or add manually —</div>
+            <div class="form-group">
+                <label>Food name</label>
+                <input type="text" id="manualName" placeholder="e.g. Paneer Tikka">
+            </div>
+            <div class="manual-macros">
+                <div class="form-group">
+                    <label>Protein (g)</label>
+                    <input type="number" id="manualProtein" placeholder="0" min="0">
+                </div>
+                <div class="form-group">
+                    <label>Carbs (g)</label>
+                    <input type="number" id="manualCarbs" placeholder="0" min="0">
+                </div>
+                <div class="form-group">
+                    <label>Fat (g)</label>
+                    <input type="number" id="manualFat" placeholder="0" min="0">
+                </div>
+                <div class="form-group">
+                    <label>Calories</label>
+                    <input type="number" id="manualCalories" placeholder="0" min="0">
+                </div>
+            </div>
+            <button class="save-btn" id="addManualFood">Add Food</button>
+        </div>
+    </div>
+
+    <!-- EDIT PROFILE MODAL -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal" style="max-width:520px">
+            <div class="modal-header">
+                <h2>Edit Profile</h2>
+                <button class="modal-close" id="editModalClose">✕</button>
+            </div>
+            <div class="form-group">
+                <label>Your Name</label>
+                <input type="text" id="editName" placeholder="What should I call you?">
+            </div>
+            <div class="form-group">
+                <label>Age</label>
+                <input type="number" id="editAge" placeholder="Years" min="0">
+            </div>
+            <div class="form-group">
+                <label>Gender</label>
+                <div class="option-row">
+                    <button class="option-btn" data-field="editGender" data-val="male">Male</button>
+                    <button class="option-btn" data-field="editGender" data-val="female">Female</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Weight</label>
+                <div class="height-toggle">
+                    <button class="toggle-btn active" id="editWeightKg">kg</button>
+                    <button class="toggle-btn" id="editWeightLbs">lbs</button>
+                </div>
+                <div class="input-row" id="editWeightKgInput">
+                    <input type="number" id="editWeight" placeholder="e.g. 70" min="0">
+                    <span class="unit">kg</span>
+                </div>
+                <div class="input-row hidden" id="editWeightLbsInput">
+                    <input type="number" id="editWeightLbsVal" placeholder="e.g. 154" min="0">
+                    <span class="unit">lbs</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Height</label>
+                <div class="height-toggle">
+                    <button class="toggle-btn active" id="editHeightCm">cm</button>
+                    <button class="toggle-btn" id="editHeightFt">ft / in</button>
+                </div>
+                <div class="input-row" id="editHeightCmInput">
+                    <input type="number" id="editHeight" placeholder="e.g. 175" min="0">
+                    <span class="unit">cm</span>
+                </div>
+                <div class="input-row hidden" id="editHeightFtInput">
+                    <input type="number" id="editHeightFtVal" placeholder="5" min="0">
+                    <span class="unit">ft</span>
+                    <input type="number" id="editHeightInVal" placeholder="9" min="0">
+                    <span class="unit">in</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Neck circumference</label>
+                <div class="input-row">
+                    <input type="number" id="editNeck" placeholder="e.g. 37" min="0">
+                    <span class="unit">cm</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Waist circumference</label>
+                <div class="input-row">
+                    <input type="number" id="editWaist" placeholder="e.g. 82" min="0">
+                    <span class="unit">cm</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Hip circumference <span style="color:rgba(255,255,255,0.2);font-size:10px">(females only)</span></label>
+                <div class="input-row">
+                    <input type="number" id="editHip" placeholder="e.g. 95" min="0">
+                    <span class="unit">cm</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Goal</label>
+                <div class="goal-options">
+                    <button class="goal-btn" data-field="editGoal" data-val="recomp">
+                        <span class="goal-icon">⚡</span>
+                        <div>
+                            <span class="goal-title">Body Recomposition</span>
+                            <span class="goal-desc">Lose fat & build muscle simultaneously</span>
+                        </div>
+                    </button>
+                    <button class="goal-btn" data-field="editGoal" data-val="muscle">
+                        <span class="goal-icon">💪</span>
+                        <div>
+                            <span class="goal-title">Muscle Gain</span>
+                            <span class="goal-desc">Build maximum muscle, slight surplus</span>
+                        </div>
+                    </button>
+                    <button class="goal-btn" data-field="editGoal" data-val="fatloss">
+                        <span class="goal-icon">🔥</span>
+                        <div>
+                            <span class="goal-title">Fat Loss</span>
+                            <span class="goal-desc">Lose fat while preserving muscle</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Activity Level</label>
+                <div class="activity-options">
+                    <button class="option-btn" data-field="editActivity" data-val="sedentary">Sedentary</button>
+                    <button class="option-btn" data-field="editActivity" data-val="light">Lightly Active</button>
+                    <button class="option-btn" data-field="editActivity" data-val="moderate">Moderate</button>
+                    <button class="option-btn" data-field="editActivity" data-val="active">Very Active</button>
+                </div>
+            </div>
+            <button class="save-btn" id="saveEditProfile">Save Changes</button>
+        </div>
+    </div>
+
+    <!-- MEAL PLANNER MODAL -->
+    <div class="modal-overlay" id="plannerModal">
+        <div class="modal" style="max-width:520px">
+            <div class="modal-header">
+                <h2>🗓️ Meal Planner</h2>
+                <button class="modal-close" id="plannerClose">✕</button>
+            </div>
+
+            <div class="planner-mode-toggle">
+                <button class="planner-mode-btn active" data-mode="full">Plan Full Day</button>
+                <button class="planner-mode-btn" data-mode="remaining">Fill Remaining</button>
+            </div>
+
+            <div class="planner-cuisine-toggle">
+                <button class="planner-cuisine-btn active" data-cuisine="indian">🇮🇳 Indian</button>
+                <button class="planner-cuisine-btn" data-cuisine="canadian">🇨🇦 Canadian</button>
+            </div>
+
+            <div class="planner-targets" id="plannerTargets"></div>
+
+            <button class="planner-generate-btn" id="generatePlanBtn">✨ Generate Plan</button>
+
+            <div class="planner-results hidden" id="plannerResults">
+                <div class="planner-meals" id="plannerMeals"></div>
+                <div class="planner-totals" id="plannerTotals"></div>
+                <button class="save-btn" id="confirmPlanBtn">✓ Add to Today's Log</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SWAP MODAL -->
+    <div class="modal-overlay" id="swapModal">
+        <div class="modal" style="max-width:420px">
+            <div class="modal-header">
+                <h2>Swap Meal</h2>
+                <button class="modal-close" id="swapModalClose">✕</button>
+            </div>
+            <p style="font-size:12px;color:rgba(255,255,255,0.3);margin-bottom:12px" id="swapModalLabel"></p>
+            <div class="swap-list" id="swapList"></div>
+        </div>
+    </div>
+
+    <script type="module" src="tracker.js"></script>
+</body>
+</html>
