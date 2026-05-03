@@ -27,6 +27,12 @@ body {
   color: var(--text);
   overflow-x: hidden;
   padding-bottom: var(--nav-h);
+  /* iOS & Android: kill the blue tap flash */
+  -webkit-tap-highlight-color: transparent;
+  /* Prevent page-level overscroll bounce on both platforms */
+  overscroll-behavior: none;
+  /* Stop iOS from auto-adjusting font sizes in landscape */
+  -webkit-text-size-adjust: 100%;
 }
 
 /* ─── TOP HEADER ─────────────────────────────────────────────── */
@@ -1981,4 +1987,45 @@ a.quick-btn:active            { transform: scale(0.96); transition: transform 0.
 .toast.show {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
+}
+
+/* ─── CROSS-PLATFORM MOBILE (iOS + Android) ──────────────────
+   Applied globally so every page behaves consistently whether
+   the app is opened from browser or home-screen bookmark.      */
+
+/* Remove 300 ms tap delay on Android Chrome & old iOS Safari.
+   "manipulation" allows pinch-zoom but kills double-tap delay. */
+a, button, input, select, textarea, label,
+.nav-item, .nav-tab, .recipe-item, .exercise-card,
+.meal-sel-btn, .cat-btn, .cuisine-btn, .seg-btn, .muscle-btn,
+.settings-row, .goal-btn, .option-btn, .split-pill {
+  touch-action: manipulation;
+}
+
+/* Prevent text selection on interactive UI chrome (nav, buttons).
+   Stops the "select text" magnifier from popping up on long-press. */
+.bottom-nav, .app-header, .cuisine-switcher, .category-scroll,
+.seg-control, .muscle-container, .meal-selector-grid {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* iOS input zoom fix — Safari zooms in when an input's font-size
+   is below 16 px.  Setting it globally prevents that jump.       */
+input, select, textarea {
+  font-size: 16px;
+}
+
+/* Smooth momentum scrolling for horizontal/vertical scroll areas
+   on iOS (Android ignores this and already scrolls smoothly).    */
+.category-scroll, .muscle-scroll, .split-scroll,
+.macro-rings, .week-grid, .profile-scroll {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Safe-area bottom padding for notch / Dynamic Island / Android
+   gesture-nav bar — ensures nav never overlaps system UI.
+   env() is supported on iOS 11.2+ and Chrome 69+.               */
+.bottom-nav {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 8px);
 }

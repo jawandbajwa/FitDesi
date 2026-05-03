@@ -60,26 +60,23 @@ setPersistence(auth, indexedDBLocalPersistence).catch(() => {});
 const ADMIN_EMAIL = "jawandbajwa@gmail.com"; // Replace with your actual Gmail
 
 // ─── AUTH FUNCTIONS ──────────────────────────────────────────
-// Detect if running as an installed PWA (home screen bookmark)
+// Detect if running as an installed PWA on ANY platform (iOS or Android)
 function isStandalonePWA() {
   return (
-    window.navigator.standalone === true || // iOS home screen
-    window.matchMedia("(display-mode: standalone)").matches // Android / Chrome install
+    window.navigator.standalone === true || // iOS "Add to Home Screen"
+    window.matchMedia("(display-mode: standalone)").matches // Android "Install App"
   );
-}
-
-function isIOS() {
-  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 }
 
 async function signInWithGoogle() {
   try {
-    // On iOS standalone (home screen icon), signInWithPopup is blocked by the OS.
-    // Use signInWithRedirect instead — it opens Safari, authenticates, then
-    // returns to the app. The result is captured via getRedirectResult() on load.
-    if (isIOS() && isStandalonePWA()) {
+    // In standalone PWA mode on BOTH iOS and Android, use signInWithRedirect.
+    // - iOS: signInWithPopup is blocked by the OS in standalone WKWebView
+    // - Android: redirect is more reliable and avoids popup-blocker edge cases
+    // In normal browser mode, signInWithPopup gives a better UX (stays on page).
+    if (isStandalonePWA()) {
       await signInWithRedirect(auth, provider);
-      return null; // page will redirect; result handled in login.html
+      return null; // page will navigate; result handled via getRedirectResult()
     }
     const result = await signInWithPopup(auth, provider);
     return result.user;

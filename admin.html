@@ -1,9 +1,9 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FitDesi — Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>FitDesi â€” Admin</title>
     <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#7ed99a" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -17,16 +17,16 @@
     <div class="glow-2"></div>
 
     <header class="app-header">
-      <a href="profile.html" class="back-btn">← Back</a>
+      <a href="profile.html" class="back-btn">â† Back</a>
       <div class="app-header-title">Admin Panel</div>
-      <div class="admin-badge">⚙️</div>
+      <div class="admin-badge">âš™ï¸</div>
     </header>
 
     <div class="access-denied hidden" id="accessDenied">
-      <div class="access-icon">🔒</div>
+      <div class="access-icon">ðŸ”’</div>
       <div class="access-title">Admin Access Only</div>
       <div class="access-desc">You don't have permission to view this page</div>
-      <a href="index.html" class="access-back">← Go Back</a>
+      <a href="index.html" class="access-back">â† Go Back</a>
     </div>
 
     <div class="admin-content hidden" id="adminContent">
@@ -47,10 +47,10 @@
 
       <div class="tab-bar">
         <button class="tab-btn active" data-tab="ingredients">
-          🥬 Ingredients
+          ðŸ¥¬ Ingredients
         </button>
-        <button class="tab-btn" data-tab="recipes">🍛 Recipes</button>
-        <button class="tab-btn" data-tab="users">👥 Users</button>
+        <button class="tab-btn" data-tab="recipes">ðŸ› Recipes</button>
+        <button class="tab-btn" data-tab="users">ðŸ‘¥ Users</button>
       </div>
 
       <!-- INGREDIENTS TAB -->
@@ -80,10 +80,10 @@
         </div>
         <div class="cuisine-toggle">
           <button class="cuisine-tab active" data-cuisine="indian">
-            🇮🇳 Indian
+            ðŸ‡®ðŸ‡³ Indian
           </button>
           <button class="cuisine-tab" data-cuisine="canadian">
-            🇨🇦 Canadian
+            ðŸ‡¨ðŸ‡¦ Canadian
           </button>
         </div>
         <div class="admin-search-bar">
@@ -122,7 +122,7 @@
       <div class="modal">
         <div class="modal-header">
           <h2 id="ingredientModalTitle">Add Ingredient</h2>
-          <button class="modal-close" id="ingredientModalClose">✕</button>
+          <button class="modal-close" id="ingredientModalClose">âœ•</button>
         </div>
         <div class="form-group">
           <label>Ingredient Name</label>
@@ -181,7 +181,7 @@
       <div class="modal" style="max-width: 560px">
         <div class="modal-header">
           <h2 id="recipeModalTitle">Add Recipe</h2>
-          <button class="modal-close" id="recipeModalClose">✕</button>
+          <button class="modal-close" id="recipeModalClose">âœ•</button>
         </div>
         <div class="form-group">
           <label>Recipe Name</label>
@@ -257,7 +257,7 @@
           <label
             >YouTube Video ID
             <span style="color: rgba(255, 255, 255, 0.2); font-size: 10px"
-              >optional — part after ?v=</span
+              >optional â€” part after ?v=</span
             ></label
           >
           <input type="text" id="recVideoId" placeholder="e.g. vcBig73ojpE" />
@@ -271,7 +271,7 @@
       <div class="modal" style="max-width: 360px">
         <div class="modal-header">
           <h2>Confirm Delete</h2>
-          <button class="modal-close" id="deleteModalClose">✕</button>
+          <button class="modal-close" id="deleteModalClose">âœ•</button>
         </div>
         <p
           style="
