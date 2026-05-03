@@ -1872,12 +1872,13 @@ body {
 .coach-text { font-size: 13px; color: var(--text-dim); line-height: 1.6; }
 
 /* ─── ANIMATIONS & MICRO-INTERACTIONS ───────────────────────── */
+/* Page fade-in — opacity only (no transform on body; transform breaks position:fixed) */
 @keyframes pageIn {
-  from { opacity: 0; transform: translateY(7px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
-body { animation: pageIn 0.2s ease both; }
+body { animation: pageIn 0.18s ease both; }
 
 /* Active tab top-bar indicator */
 .nav-tab.active::before,
