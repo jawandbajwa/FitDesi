@@ -16,10 +16,8 @@
 
     <!-- Top header -->
     <header class="app-header">
-      <div class="app-logo">Nutrition</div>
-      <div class="header-right">
-        <div class="header-date" id="currentDate"></div>
-      </div>
+      <div class="app-header-title">Nutrition</div>
+      <div class="header-date" id="currentDate"></div>
     </header>
 
     <!-- ONBOARDING (unchanged IDs, restyled via CSS) -->
@@ -538,5 +536,16 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="module" src="tracker.js"></script>
+    <script>
+      /* Nav protein ring — reads from localStorage set by tracker.js */
+      (function() {
+        const goal = parseInt(localStorage.getItem("proteinGoal") || "0");
+        if (!goal) return;
+        const data = JSON.parse(localStorage.getItem("proteinData") || "{}");
+        const protein = data[new Date().toDateString()] || 0;
+        const ring = document.getElementById("navProteinRing");
+        if (ring) ring.setAttribute("stroke-dashoffset", (138.2 * (1 - Math.min(protein / goal, 1))).toFixed(1));
+      })();
+    </script>
   </body>
 </html>

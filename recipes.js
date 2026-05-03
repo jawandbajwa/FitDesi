@@ -14,6 +14,20 @@ let searchQuery = "";
 let currentRecipe = null;
 let selectedMeal = "";
 
+// ─── TOAST ───────────────────────────────────────────────────
+function showToast(msg) {
+  let el = document.getElementById("appToast");
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "appToast";
+    el.className = "toast";
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.classList.add("show");
+  setTimeout(() => el.classList.remove("show"), 2500);
+}
+
 // ─── EMOJI MAPPING ───────────────────────────────────────────
 function getRecipeEmoji(name, category) {
   const n = name.toLowerCase();
@@ -204,7 +218,7 @@ async function addRecipeToMeal(meal) {
   });
   await saveDailyLog(currentUser.uid, dateKey, log);
   document.getElementById("mealSelectorModal").classList.remove("open");
-  alert(`${currentRecipe.name} added to ${meal}! ✓`);
+  showToast(`✓ ${currentRecipe.name} added to ${meal}`);
 }
 
 // ─── LOAD RECIPES ────────────────────────────────────────────

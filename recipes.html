@@ -151,5 +151,16 @@
     </nav>
 
     <script type="module" src="recipes.js"></script>
+    <script>
+      /* Nav protein ring */
+      (function() {
+        const goal = parseInt(localStorage.getItem("proteinGoal") || "0");
+        if (!goal) return;
+        const data = JSON.parse(localStorage.getItem("proteinData") || "{}");
+        const protein = data[new Date().toDateString()] || 0;
+        const ring = document.getElementById("navProteinRing");
+        if (ring) ring.setAttribute("stroke-dashoffset", (138.2 * (1 - Math.min(protein / goal, 1))).toFixed(1));
+      })();
+    </script>
   </body>
 </html>

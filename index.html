@@ -474,7 +474,7 @@
     </script>
 
     <script type="module">
-      import { onAuthStateChanged, auth, isAdmin, getWorkoutCycle, getUserProfile } from "./firebase.js";
+      import { onAuthStateChanged, auth, isAdmin, getWorkoutCycle, getUserProfile, getDailyLog } from "./firebase.js";
 
       const PROTEIN_CIRC = 339.3;
       const MINI_CIRC = 87.96;
@@ -599,14 +599,36 @@
             document.getElementById("fatGoalLabel").textContent = "of " + macros.fat + "g";
             document.getElementById("calGoalLabel").textContent = "of " + macros.calories;
 
-            // Read today's log from localStorage
-            const logs = JSON.parse(localStorage.getItem("fitdesiLogs") || "{}");
-            const todayKey = new Date().toDateString();
-            const todayLog = logs[todayKey] || { protein: 0, carbs: 0, fat: 0, calories: 0 };
-            const protein = todayLog.protein || 0;
-            const carbs = todayLog.carbs || 0;
-            const fat = todayLog.fat || 0;
-            const calories = todayLog.calories || 0;
+            // Fetch today's log from Firebase (fall back to localStorage cache)
+            let protein = 0, carbs = 0, fat = 0, calories = 0;
+            try {
+              const todayLog = await getDailyLog(user.uid, new Date().toDateString());
+              ["breakfast","lunch","snack","dinner"].forEach(meal => {
+                (todayLog[meal] || []).forEach(item => {
+                  protein  += item.protein  || 0;
+                  carbs    += item.carbs    || 0;
+                  fat      += item.fat      || 0;
+                  calories += item.calories || 0;
+                });
+              });
+              protein  = Math.round(protein);
+              carbs    = Math.round(carbs);
+              fat      = Math.round(fat);
+              calories = Math.round(calories);
+              // Keep localStorage cache in sync
+              const todayStr = new Date().toDateString();
+              const cached = JSON.parse(localStorage.getItem("fitdesiLogs") || "{}");
+              cached[todayStr] = { protein, carbs, fat, calories };
+              localStorage.setItem("fitdesiLogs", JSON.stringify(cached));
+            } catch (_) {
+              // Fallback to localStorage cache
+              const cached = JSON.parse(localStorage.getItem("fitdesiLogs") || "{}");
+              const day    = cached[new Date().toDateString()] || {};
+              protein  = day.protein  || 0;
+              carbs    = day.carbs    || 0;
+              fat      = day.fat      || 0;
+              calories = day.calories || 0;
+            }
 
             document.getElementById("proteinToday").textContent = protein + "g";
             document.getElementById("carbsToday").textContent = carbs + "g";
@@ -620,11 +642,6 @@
             setRing("calRingArc", MINI_CIRC, macros.calories > 0 ? calories / macros.calories : 0);
             setRing("navProteinRing", 138.2, protein / macros.protein);
           } else {
-            // Fallback: protein from localStorage (old format)
-            const proteinData = JSON.parse(localStorage.getItem("proteinData") || "{}");
-            const todayProtein = proteinData[new Date().toDateString()] || 0;
-            document.getElementById("proteinToday").textContent = todayProtein + "g";
-          }
 
           // Workouts this week from Firebase
           try {

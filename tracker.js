@@ -417,9 +417,20 @@ async function refreshTracker() {
     generateCoachMessage(profile, macros, consumed, recipes);
 
   localStorage.setItem("proteinGoal", macros.protein);
+  const todayStr = new Date().toDateString();
   const proteinData = JSON.parse(localStorage.getItem("proteinData") || "{}");
-  proteinData[new Date().toDateString()] = Math.round(consumed.protein);
+  proteinData[todayStr] = Math.round(consumed.protein);
   localStorage.setItem("proteinData", JSON.stringify(proteinData));
+
+  // Sync full macro totals to fitdesiLogs so home page rings stay accurate
+  const fitdesiLogs = JSON.parse(localStorage.getItem("fitdesiLogs") || "{}");
+  fitdesiLogs[todayStr] = {
+    protein: Math.round(consumed.protein),
+    carbs:   Math.round(consumed.carbs),
+    fat:     Math.round(consumed.fat),
+    calories: Math.round(consumed.calories),
+  };
+  localStorage.setItem("fitdesiLogs", JSON.stringify(fitdesiLogs));
 }
 
 // ─── FOOD MODAL ──────────────────────────────────────────────

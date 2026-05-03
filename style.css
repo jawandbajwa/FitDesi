@@ -1957,3 +1957,27 @@ a.quick-btn:active            { transform: scale(0.96); transition: transform 0.
 }
 
 .back-btn:hover { color: var(--text); }
+
+/* ─── TOAST NOTIFICATION ─────────────────────────────────── */
+.toast {
+  position: fixed;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: #1e3a26;
+  border: 1px solid var(--green);
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 20px;
+  border-radius: 24px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  z-index: 9999;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}

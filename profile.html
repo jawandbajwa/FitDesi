@@ -201,17 +201,16 @@
       } from "./firebase.js";
 
       const GOAL_LABELS = {
-        bulk: "Build Muscle",
-        cut: "Lose Fat",
-        maintain: "Maintain",
+        recomp:  "Body Recomp",
+        muscle:  "Muscle Gain",
+        fatloss: "Fat Loss",
       };
 
       const ACTIVITY_LABELS = {
         sedentary: "Sedentary",
-        light: "Light",
-        moderate: "Moderate",
-        active: "Active",
-        veryactive: "Very Active",
+        light:     "Lightly Active",
+        moderate:  "Moderate",
+        active:    "Very Active",
       };
 
       onAuthStateChanged(auth, async (user) => {
@@ -268,6 +267,16 @@
         el.checked = localStorage.getItem(id) === "true";
         el.addEventListener("change", () => localStorage.setItem(id, el.checked));
       });
+
+      /* Nav protein ring */
+      (function() {
+        const goal = parseInt(localStorage.getItem("proteinGoal") || "0");
+        if (!goal) return;
+        const data = JSON.parse(localStorage.getItem("proteinData") || "{}");
+        const protein = data[new Date().toDateString()] || 0;
+        const ring = document.getElementById("navProteinRing");
+        if (ring) ring.setAttribute("stroke-dashoffset", (138.2 * (1 - Math.min(protein / goal, 1))).toFixed(1));
+      })();
     </script>
   </body>
 </html>
