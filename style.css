@@ -142,7 +142,9 @@ body {
 
 .home-tab-icon {
   font-size: 20px;
-  position: relative;
+  position: relative !important;
+  top: 0 !important;
+  left: 0 !important;
   z-index: 1;
   line-height: 1;
 }
@@ -1870,6 +1872,80 @@ body {
 .coach-avatar { font-size: 20px; min-width: 24px; }
 .coach-text { font-size: 13px; color: var(--text-dim); line-height: 1.6; }
 
+/* ─── ANIMATIONS & MICRO-INTERACTIONS ───────────────────────── */
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(7px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+body { animation: pageIn 0.2s ease both; }
+
+/* Active tab top-bar indicator */
+.nav-tab.active::before,
+.nav-item.active::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 22px;
+  height: 2px;
+  background: var(--green);
+  border-radius: 0 0 3px 3px;
+}
+
+/* Home tab — no top bar (ring serves that purpose) */
+.nav-home-tab::before,
+.home-tab::before { display: none !important; }
+
+/* Tap / press feedback */
+button:not(:disabled):active { transform: scale(0.96); transition: transform 0.08s ease; }
+a.quick-btn:active            { transform: scale(0.96); transition: transform 0.08s ease; }
+.recipe-item:active           { transform: scale(0.98); transition: transform 0.08s ease; }
+.meal-section:active          { transform: scale(0.99); transition: transform 0.08s ease; }
+.seg-btn:active               { transform: scale(0.97); transition: transform 0.08s ease; }
+.cat-btn:active, .muscle-btn:active, .split-pill:active {
+  transform: scale(0.95); transition: transform 0.08s ease;
+}
+
+/* Card top sheen — 1px gradient highlight on every card surface */
+.card,
+.mini-ring-card,
+.streak-card,
+.today-workout-card,
+.quick-btn,
+.settings-group,
+.stat-pill,
+.recipe-item,
+.workout-ex-card,
+.exercise-card {
+  position: relative;
+}
+
+.card::before,
+.mini-ring-card::before,
+.streak-card::before,
+.today-workout-card::before,
+.quick-btn::before,
+.settings-group::before,
+.stat-pill::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(160deg, rgba(255,255,255,0.055) 0%, transparent 55%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Ensure card children stay above the sheen */
+.mini-ring-card > *,
+.streak-card > *,
+.today-workout-card > *,
+.quick-btn > *,
+.stat-pill > * { position: relative; z-index: 1; }
+
+/* ─── BACK BTN ───────────────────────────────────────────────── */
 /* Back btn (carried over) */
 .back-btn {
   font-size: 13px;
