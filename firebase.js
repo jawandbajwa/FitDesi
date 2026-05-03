@@ -187,19 +187,20 @@ async function getRecipes(cuisine = "indian") {
       const col =
         cuisine === "canadian" ? "recipes_canadian" : "recipes_indian";
       const snap = await getDocs(collection(db, "shared", col, "items"));
-      const recipes = snap.docs.map((d) => d.data());
-      // Cache for offline
-      await cacheRecipes(recipes);
+      // Tag each recipe with its cuisine so the cache stays separated
+      const recipes = snap.docs.map((d) => ({ ...d.data(), _cuisine: cuisine }));
+      // Cache for offline (keyed by cuisine)
+      await cacheRecipes(recipes, cuisine);
       return recipes;
     } else {
-      // Offline: use cached data
-      return await getCachedRecipes();
+      // Offline: use cached data filtered to the requested cuisine
+      return await getCachedRecipes(cuisine);
     }
   } catch (error) {
     console.error("Error getting recipes:", error);
     // Fallback to cache
     try {
-      return await getCachedRecipes();
+      return await getCachedRecipes(cuisine);
     } catch (cacheError) {
       console.error("Cache error:", cacheError);
       throw error;

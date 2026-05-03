@@ -71,14 +71,34 @@ async function getAllFromStore(storeName) {
 }
 
 // Specific functions
-async function cacheRecipes(recipes) {
+async function cacheRecipes(recipes, cuisine) {
+  // If a cuisine is specified, first remove any stale entries for that cuisine
+  // so switching cuisines never leaves old mixed data behind.
+  if (cuisine) {
+    const all = await getAllFromStore("recipes");
+    const stale = all.filter(r => (r._cuisine || "indian") === cuisine);
+    if (stale.length > 0) {
+      const db = await openDB();
+      await new Promise((resolve, reject) => {
+        const tx = db.transaction(["recipes"], "readwrite");
+        const store = tx.objectStore("recipes");
+        stale.forEach(r => store.delete(r.id));
+        tx.oncomplete = resolve;
+        tx.onerror = () => reject(tx.error);
+      });
+    }
+  }
   for (const recipe of recipes) {
     await putInStore("recipes", recipe);
   }
 }
 
-async function getCachedRecipes() {
-  return await getAllFromStore("recipes");
+async function getCachedRecipes(cuisine) {
+  const all = await getAllFromStore("recipes");
+  if (!cuisine) return all;
+  // Return only recipes that match the requested cuisine.
+  // Fall back to "indian" for legacy cached entries that have no _cuisine tag.
+  return all.filter(r => (r._cuisine || "indian") === cuisine);
 }
 
 async function cacheIngredients(ingredients) {

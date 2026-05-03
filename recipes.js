@@ -76,11 +76,11 @@ function renderRecipes() {
   const empty = document.getElementById("emptyState");
 
   let filtered = allRecipes.filter((r) => {
+    // Guard: only show recipes that belong to the active cuisine
+    const cuisineMatch = !r._cuisine || r._cuisine === activeCuisine;
     const catMatch = activeCategory === "all" || r.category === activeCategory;
-    const searchMatch = r.name
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
-    return catMatch && searchMatch;
+    const searchMatch = r.name.toLowerCase().includes(searchQuery.toLowerCase());
+    return cuisineMatch && catMatch && searchMatch;
   });
 
   if (filtered.length === 0) {
