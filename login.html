@@ -214,39 +214,60 @@
         signInWithGoogle,
         onAuthStateChanged,
         auth,
+        getRedirectResult,
       } from "./firebase.js";
 
-      // If already signed in go straight to app
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          window.location.href = "index.html";
+      const btn     = document.getElementById("googleSignIn");
+      const btnText = document.getElementById("btnText");
+      const spinner = document.getElementById("spinner");
+      const errorEl = document.getElementById("loginError");
+
+      function setLoading(on) {
+        btn.disabled = on;
+        btnText.textContent = on ? "Signing in…" : "Continue with Google";
+        spinner.style.display = on ? "block" : "none";
+      }
+
+      // ── Handle iOS redirect result ──────────────────────────
+      // After signInWithRedirect() on iOS standalone, Google bounces
+      // back here — getRedirectResult() captures the credential.
+      (async () => {
+        try {
+          setLoading(true);
+          const result = await getRedirectResult(auth);
+          if (result && result.user) {
+            window.location.href = "index.html";
+            return;
+          }
+        } catch (e) {
+          // No redirect in flight — normal first load
         }
+        setLoading(false);
+      })();
+
+      // ── Already signed in → go straight to app ─────────────
+      onAuthStateChanged(auth, (user) => {
+        if (user) window.location.href = "index.html";
       });
 
-      document
-        .getElementById("googleSignIn")
-        .addEventListener("click", async () => {
-          const btn = document.getElementById("googleSignIn");
-          const btnText = document.getElementById("btnText");
-          const spinner = document.getElementById("spinner");
-          const errorEl = document.getElementById("loginError");
-
-          btn.disabled = true;
-          btnText.textContent = "Signing in...";
-          spinner.style.display = "block";
-          errorEl.style.display = "none";
-
-          try {
-            await signInWithGoogle();
-            window.location.href = "index.html";
-          } catch (error) {
-            btn.disabled = false;
-            btnText.textContent = "Continue with Google";
-            spinner.style.display = "none";
-            errorEl.style.display = "block";
-            errorEl.textContent = "Sign in failed. Please try again.";
-          }
-        });
+      // ── Sign-in button ──────────────────────────────────────
+      btn.addEventListener("click", async () => {
+        setLoading(true);
+        errorEl.style.display = "none";
+        try {
+          const user = await signInWithGoogle();
+          // On iOS standalone, signInWithGoogle triggers a redirect and
+          // returns null — result is handled above by getRedirectResult.
+          if (user) window.location.href = "index.html";
+        } catch (error) {
+          setLoading(false);
+          errorEl.style.display = "block";
+          errorEl.textContent =
+            error.code === "auth/popup-blocked"
+              ? "Popup blocked. Please allow popups or try a different browser."
+              : "Sign in failed. Please try again.";
+        }
+      });
     </script>
   </body>
 </html>

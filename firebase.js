@@ -4,6 +4,10 @@ import {
   getAuth,
   GoogleAuthProvider,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
+  setPersistence,
+  indexedDBLocalPersistence,
   signOut,
   onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -47,12 +51,36 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
 
+// Use IndexedDB persistence — survives cookie clears, "Sign out of browser",
+// and is isolated per origin in true PWA standalone installs.
+// Falls back silently if IndexedDB is unavailable (e.g. private browsing).
+setPersistence(auth, indexedDBLocalPersistence).catch(() => {});
+
 // ─── ADMIN EMAIL ─────────────────────────────────────────────
 const ADMIN_EMAIL = "jawandbajwa@gmail.com"; // Replace with your actual Gmail
 
 // ─── AUTH FUNCTIONS ──────────────────────────────────────────
+// Detect if running as an installed PWA (home screen bookmark)
+function isStandalonePWA() {
+  return (
+    window.navigator.standalone === true || // iOS home screen
+    window.matchMedia("(display-mode: standalone)").matches // Android / Chrome install
+  );
+}
+
+function isIOS() {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+}
+
 async function signInWithGoogle() {
   try {
+    // On iOS standalone (home screen icon), signInWithPopup is blocked by the OS.
+    // Use signInWithRedirect instead — it opens Safari, authenticates, then
+    // returns to the app. The result is captured via getRedirectResult() on load.
+    if (isIOS() && isStandalonePWA()) {
+      await signInWithRedirect(auth, provider);
+      return null; // page will redirect; result handled in login.html
+    }
     const result = await signInWithPopup(auth, provider);
     return result.user;
   } catch (error) {
@@ -383,6 +411,8 @@ export {
   signInWithGoogle,
   signOutUser,
   isAdmin,
+  isStandalonePWA,
+  getRedirectResult,
   saveUserProfile,
   getUserProfile,
   saveDailyLog,
