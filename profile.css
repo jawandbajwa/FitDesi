@@ -1,0 +1,209 @@
+/* profile.css */
+
+.profile-scroll {
+  padding: 8px 16px 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* USER CARD */
+.user-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: linear-gradient(160deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+  border: 0.5px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius, 14px);
+  padding: 18px 16px;
+}
+
+.user-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(126,217,154,0.3);
+  flex-shrink: 0;
+}
+
+.user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #f0f0f0;
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-email {
+  font-size: 12px;
+  color: rgba(255,255,255,0.3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-badge {
+  background: rgba(126,217,154,0.12);
+  border: 0.5px solid rgba(126,217,154,0.4);
+  color: #7ed99a;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 20px;
+  flex-shrink: 0;
+}
+
+/* STATS ROW */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.stat-pill {
+  background: rgba(255,255,255,0.03);
+  border: 0.5px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 14px 8px;
+  text-align: center;
+}
+
+.stat-val {
+  font-size: 18px;
+  font-weight: 600;
+  color: #7ed99a;
+  margin-bottom: 4px;
+  line-height: 1;
+}
+
+.stat-lbl {
+  font-size: 10px;
+  color: rgba(255,255,255,0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* SETTINGS SECTIONS */
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.settings-section-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 0 4px;
+}
+
+.settings-section.green .settings-section-label { color: #7ed99a; }
+.settings-section.blue  .settings-section-label { color: #5bc8f5; }
+.settings-section.orange .settings-section-label { color: #f5a623; }
+.settings-section.purple .settings-section-label { color: #a78bfa; }
+
+.settings-group {
+  background: rgba(255,255,255,0.03);
+  border: 0.5px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 16px;
+  border-bottom: 0.5px solid rgba(255,255,255,0.06);
+  gap: 12px;
+}
+
+.settings-row.last { border-bottom: none; }
+
+.settings-row-label {
+  font-size: 14px;
+  color: rgba(255,255,255,0.75);
+}
+
+.settings-row-value {
+  font-size: 13px;
+  color: rgba(255,255,255,0.35);
+  text-align: right;
+}
+
+/* Section-colored border accents */
+.settings-section.green .settings-group { border-color: rgba(126,217,154,0.12); }
+.settings-section.blue  .settings-group { border-color: rgba(91,200,245,0.12); }
+.settings-section.orange .settings-group { border-color: rgba(245,166,35,0.12); }
+.settings-section.purple .settings-group { border-color: rgba(167,139,250,0.12); }
+
+/* ACTION BUTTON */
+.settings-action-btn {
+  display: block;
+  text-align: center;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.green-btn {
+  background: rgba(126,217,154,0.08);
+  border: 0.5px solid rgba(126,217,154,0.25);
+  color: #7ed99a;
+}
+
+.green-btn:hover { background: rgba(126,217,154,0.14); }
+
+/* iOS TOGGLE — styles inherited from style.css */
+
+/* ADMIN LINK */
+.admin-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: rgba(167,139,250,0.06);
+  border: 0.5px solid rgba(167,139,250,0.2);
+  border-radius: 14px;
+  color: #a78bfa;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.admin-link:hover { background: rgba(167,139,250,0.12); }
+.admin-arrow { opacity: 0.5; }
+
+/* SIGN OUT */
+.signout-btn {
+  width: 100%;
+  padding: 15px;
+  background: rgba(224,92,92,0.08);
+  border: 0.5px solid rgba(224,92,92,0.3);
+  border-radius: 14px;
+  color: #e05c5c;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: "Inter", sans-serif;
+  transition: background 0.2s;
+}
+
+.signout-btn:hover { background: rgba(224,92,92,0.15); }
+
+.hidden { display: none !important; }

@@ -2,7 +2,8 @@
   "name": "FitDesi - Personal Fitness Tracker",
   "short_name": "FitDesi",
   "description": "Indian vegetarian fitness app with meal tracking and workout routines",
-  "start_url": "/",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#080c0a",
   "theme_color": "#7ed99a",
@@ -24,12 +25,5 @@
       "purpose": "any maskable"
     }
   ],
-  "screenshots": [
-    {
-      "src": "screenshot-mobile.png",
-      "sizes": "390x844",
-      "type": "image/png",
-      "form_factor": "narrow"
-    }
-  ]
+  "screenshots": []
 }

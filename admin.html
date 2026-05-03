@@ -4,6 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FitDesi — Admin</title>
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#7ed99a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="apple-touch-icon" href="icon-192.png" />
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="admin.css" />
   </head>
@@ -11,13 +16,11 @@
     <div class="glow-1"></div>
     <div class="glow-2"></div>
 
-    <nav>
-      <a href="index.html" class="back-btn">← Back</a>
-      <div class="logo">FitDesi <span>admin</span></div>
-      <div class="nav-right">
-        <div class="admin-badge">⚙️ Admin Panel</div>
-      </div>
-    </nav>
+    <header class="app-header">
+      <a href="profile.html" class="back-btn">← Back</a>
+      <div class="app-header-title">Admin Panel</div>
+      <div class="admin-badge">⚙️</div>
+    </header>
 
     <div class="access-denied hidden" id="accessDenied">
       <div class="access-icon">🔒</div>

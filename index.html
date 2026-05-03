@@ -5,112 +5,472 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FitDesi</title>
     <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#7ed99a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="apple-touch-icon" href="icon-192.png" />
     <link rel="stylesheet" href="style.css" />
+    <style>
+      /* ─── HOME PAGE SPECIFIC ────────────────────────────── */
+      .greeting-line {
+        font-size: 13px;
+        color: rgba(126,217,154,0.6);
+        padding: 18px 20px 2px;
+        letter-spacing: 0.3px;
+      }
+
+      .home-hero {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 12px 20px 16px;
+      }
+
+      /* Big protein ring */
+      .protein-ring-wrap {
+        position: relative;
+        width: 130px;
+        height: 130px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .protein-ring-wrap svg {
+        position: absolute;
+        top: 0; left: 0;
+      }
+
+      .ring-center {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+      }
+
+      .ring-val {
+        font-size: 26px;
+        font-weight: 700;
+        color: #f0f0f0;
+        line-height: 1;
+      }
+
+      .ring-lbl {
+        font-size: 10px;
+        color: rgba(126,217,154,0.6);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 2px;
+      }
+
+      .ring-goal {
+        font-size: 11px;
+        color: rgba(255,255,255,0.3);
+        margin-top: 3px;
+      }
+
+      /* Mini rings column */
+      .mini-rings {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        flex: 1;
+      }
+
+      .mini-ring-card {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #111a13;
+        border: 1px solid #1a2e1e;
+        border-radius: 10px;
+        padding: 8px 12px;
+      }
+
+      .mini-ring-svg-wrap {
+        position: relative;
+        width: 36px;
+        height: 36px;
+        flex-shrink: 0;
+      }
+
+      .mini-ring-svg-wrap svg {
+        position: absolute;
+        top: 0; left: 0;
+      }
+
+      .mini-ring-info {
+        flex: 1;
+      }
+
+      .mini-ring-name {
+        font-size: 10px;
+        color: rgba(255,255,255,0.35);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .mini-ring-val {
+        font-size: 14px;
+        font-weight: 600;
+        color: #f0f0f0;
+        line-height: 1.2;
+      }
+
+      .mini-ring-goal {
+        font-size: 10px;
+        color: rgba(255,255,255,0.25);
+      }
+
+      /* Streak card */
+      .streak-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 0 16px 12px;
+        background: #111a13;
+        border: 1px solid #1a2e1e;
+        border-radius: 14px;
+        padding: 14px 16px;
+      }
+
+      .streak-flame { font-size: 28px; }
+
+      .streak-info { flex: 1; }
+
+      .streak-num {
+        font-size: 24px;
+        font-weight: 700;
+        color: #f5a623;
+        line-height: 1;
+      }
+
+      .streak-label {
+        font-size: 11px;
+        color: rgba(255,255,255,0.35);
+        margin-top: 2px;
+      }
+
+      .streak-dots {
+        display: flex;
+        gap: 5px;
+      }
+
+      .streak-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: rgba(245,166,35,0.2);
+        border: 1px solid rgba(245,166,35,0.3);
+        transition: background 0.2s;
+      }
+
+      .streak-dot.filled {
+        background: #f5a623;
+        border-color: #f5a623;
+      }
+
+      /* Workout card */
+      .today-workout-card {
+        margin: 0 16px 12px;
+        background: #111a13;
+        border: 1px solid rgba(126,217,154,0.2);
+        border-radius: 14px;
+        padding: 14px 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .workout-label {
+        font-size: 10px;
+        color: rgba(126,217,154,0.5);
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        margin-bottom: 4px;
+      }
+
+      .workout-name {
+        font-size: 16px;
+        font-weight: 600;
+        color: #f0f0f0;
+      }
+
+      .workout-name.empty {
+        font-size: 13px;
+        font-weight: 400;
+        color: rgba(255,255,255,0.3);
+      }
+
+      .workout-card-info { flex: 1; }
+
+      .workout-start-btn {
+        background: #7ed99a;
+        color: #0a0f0c;
+        border: none;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 700;
+        padding: 9px 18px;
+        cursor: pointer;
+        font-family: "Inter", sans-serif;
+        flex-shrink: 0;
+        transition: opacity 0.15s;
+      }
+
+      .workout-start-btn:hover { opacity: 0.85; }
+
+      /* Quick actions */
+      .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        margin: 0 16px 14px;
+      }
+
+      .quick-btn {
+        background: #111a13;
+        border: 1px solid #1a2e1e;
+        border-radius: 12px;
+        color: rgba(255,255,255,0.7);
+        font-size: 12px;
+        font-weight: 500;
+        padding: 14px 8px;
+        cursor: pointer;
+        font-family: "Inter", sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.15s;
+        text-decoration: none;
+      }
+
+      .quick-btn:hover {
+        border-color: rgba(126,217,154,0.3);
+        color: #7ed99a;
+      }
+
+      .quick-btn-icon { font-size: 20px; }
+
+      /* Coach message */
+      .coach-msg-home {
+        margin: 0 16px 16px;
+        background: rgba(126,217,154,0.05);
+        border: 1px solid rgba(126,217,154,0.12);
+        border-left: 3px solid rgba(126,217,154,0.35);
+        border-radius: 10px;
+        padding: 12px 14px;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .coach-msg-icon { font-size: 18px; flex-shrink: 0; }
+
+      .coach-msg-text {
+        font-size: 12px;
+        color: rgba(255,255,255,0.45);
+        line-height: 1.6;
+      }
+    </style>
   </head>
   <body>
-    <div class="glow-1"></div>
-    <div class="glow-2"></div>
-
-    <nav>
-      <div class="logo">FitDesi <span>personal</span></div>
-      <div class="nav-right">
-        <div class="nav-date" id="currentDate"></div>
+    <!-- Top header -->
+    <header class="app-header">
+      <div class="app-logo">FitDesi</div>
+      <div class="header-right">
+        <div class="header-date" id="currentDate"></div>
+        <div class="nav-right"></div>
       </div>
+    </header>
+
+    <!-- Greeting -->
+    <div class="greeting-line" id="greeting">Good morning</div>
+
+    <!-- Macro hero: protein ring + mini rings -->
+    <div class="home-hero">
+      <!-- Large protein ring -->
+      <div class="protein-ring-wrap">
+        <svg width="130" height="130" viewBox="0 0 130 130">
+          <circle cx="65" cy="65" r="54" fill="none" stroke="#1a2e1e" stroke-width="10"/>
+          <circle cx="65" cy="65" r="54" fill="none" stroke="#7ed99a" stroke-width="10"
+            stroke-dasharray="339.3" stroke-dashoffset="339.3"
+            stroke-linecap="round" transform="rotate(-90 65 65)"
+            id="proteinRingArc" style="transition: stroke-dashoffset 0.6s ease;"/>
+        </svg>
+        <div class="ring-center">
+          <div class="ring-val" id="proteinToday">0g</div>
+          <div class="ring-lbl">Protein</div>
+          <div class="ring-goal">of <span id="proteinGoal">—</span></div>
+        </div>
+      </div>
+
+      <!-- Mini rings: Carbs, Fat, Calories -->
+      <div class="mini-rings">
+        <div class="mini-ring-card">
+          <div class="mini-ring-svg-wrap">
+            <svg width="36" height="36" viewBox="0 0 36 36">
+              <circle cx="18" cy="18" r="14" fill="none" stroke="#1a2e1e" stroke-width="4"/>
+              <circle cx="18" cy="18" r="14" fill="none" stroke="#5bc8f5" stroke-width="4"
+                stroke-dasharray="87.96" stroke-dashoffset="87.96"
+                stroke-linecap="round" transform="rotate(-90 18 18)"
+                id="carbsRingArc" style="transition: stroke-dashoffset 0.6s ease;"/>
+            </svg>
+          </div>
+          <div class="mini-ring-info">
+            <div class="mini-ring-name">Carbs</div>
+            <div class="mini-ring-val" id="carbsToday">0g</div>
+            <div class="mini-ring-goal" id="carbsGoalLabel"></div>
+          </div>
+        </div>
+
+        <div class="mini-ring-card">
+          <div class="mini-ring-svg-wrap">
+            <svg width="36" height="36" viewBox="0 0 36 36">
+              <circle cx="18" cy="18" r="14" fill="none" stroke="#1a2e1e" stroke-width="4"/>
+              <circle cx="18" cy="18" r="14" fill="none" stroke="#f5a623" stroke-width="4"
+                stroke-dasharray="87.96" stroke-dashoffset="87.96"
+                stroke-linecap="round" transform="rotate(-90 18 18)"
+                id="fatRingArc" style="transition: stroke-dashoffset 0.6s ease;"/>
+            </svg>
+          </div>
+          <div class="mini-ring-info">
+            <div class="mini-ring-name">Fat</div>
+            <div class="mini-ring-val" id="fatToday">0g</div>
+            <div class="mini-ring-goal" id="fatGoalLabel"></div>
+          </div>
+        </div>
+
+        <div class="mini-ring-card">
+          <div class="mini-ring-svg-wrap">
+            <svg width="36" height="36" viewBox="0 0 36 36">
+              <circle cx="18" cy="18" r="14" fill="none" stroke="#1a2e1e" stroke-width="4"/>
+              <circle cx="18" cy="18" r="14" fill="none" stroke="#e05c5c" stroke-width="4"
+                stroke-dasharray="87.96" stroke-dashoffset="87.96"
+                stroke-linecap="round" transform="rotate(-90 18 18)"
+                id="calRingArc" style="transition: stroke-dashoffset 0.6s ease;"/>
+            </svg>
+          </div>
+          <div class="mini-ring-info">
+            <div class="mini-ring-name">Calories</div>
+            <div class="mini-ring-val" id="caloriesToday">0</div>
+            <div class="mini-ring-goal" id="calGoalLabel"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Streak card -->
+    <div class="streak-card">
+      <div class="streak-flame">🔥</div>
+      <div class="streak-info">
+        <div class="streak-num" id="workoutsDone">0</div>
+        <div class="streak-label">Workouts this week</div>
+      </div>
+      <div class="streak-dots" id="streakDots">
+        <div class="streak-dot"></div>
+        <div class="streak-dot"></div>
+        <div class="streak-dot"></div>
+        <div class="streak-dot"></div>
+        <div class="streak-dot"></div>
+        <div class="streak-dot"></div>
+        <div class="streak-dot"></div>
+      </div>
+    </div>
+
+    <!-- Today's workout -->
+    <div class="today-workout-card" id="todayWorkout">
+      <div class="workout-card-info">
+        <div class="workout-label">Today's Workout</div>
+        <div class="workout-name empty">Set up your cycle in the Workout page</div>
+      </div>
+      <button class="workout-start-btn" onclick="location.href='exercise.html'">Start →</button>
+    </div>
+
+    <!-- Quick actions -->
+    <div class="quick-actions">
+      <a href="tracker.html" class="quick-btn">
+        <span class="quick-btn-icon">🍽️</span>
+        Log Meal
+      </a>
+      <a href="exercise.html" class="quick-btn">
+        <span class="quick-btn-icon">💪</span>
+        Workout
+      </a>
+      <a href="tracker.html" class="quick-btn" id="planDayBtn">
+        <span class="quick-btn-icon">🗓️</span>
+        Plan Day
+      </a>
+    </div>
+
+    <!-- AI Coach message -->
+    <div class="coach-msg-home">
+      <div class="coach-msg-icon">🤖</div>
+      <div class="coach-msg-text" id="dailyTip">Loading your daily tip...</div>
+    </div>
+
+    <!-- Bottom nav -->
+    <nav class="bottom-nav">
+      <a href="recipes.html" class="nav-tab" data-page="recipes">
+        <span class="nav-icon-wrap">🍛</span>
+        <span class="nav-label">Recipes</span>
+      </a>
+      <a href="tracker.html" class="nav-tab" data-page="nutrition">
+        <span class="nav-icon-wrap">📊</span>
+        <span class="nav-label">Nutrition</span>
+      </a>
+      <a href="index.html" class="nav-tab nav-home-tab active" data-page="home">
+        <div class="home-tab-ring">
+          <svg width="58" height="58" viewBox="0 0 58 58">
+            <circle cx="29" cy="29" r="22" fill="none" stroke="#1a2e1e" stroke-width="4"/>
+            <circle cx="29" cy="29" r="22" fill="none" stroke="#7ed99a" stroke-width="4"
+              stroke-dasharray="138.2" stroke-dashoffset="138.2"
+              stroke-linecap="round" transform="rotate(-90 29 29)"
+              id="navProteinRing" class="nav-protein-ring"/>
+          </svg>
+          <span class="home-tab-icon">⌂</span>
+        </div>
+        <span class="nav-label">Home</span>
+      </a>
+      <a href="exercise.html" class="nav-tab" data-page="workout">
+        <span class="nav-icon-wrap">💪</span>
+        <span class="nav-label">Workout</span>
+      </a>
+      <a href="profile.html" class="nav-tab" data-page="profile">
+        <span class="nav-icon-wrap">👤</span>
+        <span class="nav-label">Profile</span>
+      </a>
     </nav>
 
-    <div class="hero">
-      <div class="greeting" id="greeting"></div>
-      <h1>Stay consistent,<br />stay <em>strong</em></h1>
-      <p>Indian vegetarian · Beginner friendly · All in one place</p>
-    </div>
-
-    <div class="today-workout" id="todayWorkout">
-      <span class="workout-day">Today</span>
-      <span class="workout-muscles empty"
-        >Set up your cycle in the Exercise page</span
-      >
-    </div>
-
-    <div class="stats">
-      <div class="stat">
-        <div class="val" id="proteinToday">0g</div>
-        <div class="lbl">Protein today</div>
-      </div>
-      <div class="stat">
-        <div class="val" id="workoutsDone">0</div>
-        <div class="lbl">Workouts done</div>
-      </div>
-      <div class="stat">
-        <div class="val" id="proteinGoal">—</div>
-        <div class="lbl">Daily goal</div>
-      </div>
-    </div>
-
-    <div class="divider">— quick access —</div>
-
-    <div class="card-container">
-      <a href="exercise.html" class="card">
-        <div class="icon">💪</div>
-        <h2>Exercise</h2>
-        <p>Workouts built for your routine</p>
-        <div class="arrow">→</div>
-      </a>
-      <a href="tracker.html" class="card">
-        <div class="icon">📊</div>
-        <h2>Protein Tracker</h2>
-        <p>Daily macros & meal check-ins</p>
-        <div class="arrow">→</div>
-      </a>
-      <a href="recipes.html" class="card">
-        <div class="icon">🍛</div>
-        <h2>Recipes</h2>
-        <p>Indian veg cookbook with macros</p>
-        <div class="arrow">→</div>
-      </a>
-    </div>
-
-    <div class="tip-box">
-      <div class="tip-label">💡 Daily tip</div>
-      <div class="tip-text" id="dailyTip"></div>
-    </div>
-
-    <footer>Fitdesi · Personal use only</footer>
-
-    <!-- Loading Overlay -->
+    <!-- Loading + Error (JS uses these) -->
     <div class="loading-overlay hidden" id="loadingOverlay">
       <div class="spinner"></div>
       <span>Loading...</span>
     </div>
-
-    <!-- Error Message -->
-    <div id="errorMessage" class="error-message" style="display: none"></div>
+    <div id="errorMessage" class="error-message" style="display:none"></div>
 
     <script src="app.js"></script>
 
-    <!-- Register Service Worker -->
+    <!-- Service Worker -->
     <script>
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
-          navigator.serviceWorker
-            .register("/sw.js")
-            .then((registration) => {
-              console.log("SW registered: ", registration);
-            })
-            .catch((registrationError) => {
-              console.log("SW registration failed: ", registrationError);
-            });
+          navigator.serviceWorker.register("./sw.js").catch(() => {});
         });
       }
     </script>
 
     <script type="module">
-      import {
-        onAuthStateChanged,
-        auth,
-        isAdmin,
-        getWorkoutCycle,
-      } from "./firebase.js";
-      import { getUserProfile } from "./firebase.js";
+      import { onAuthStateChanged, auth, isAdmin, getWorkoutCycle, getUserProfile } from "./firebase.js";
+
+      const PROTEIN_CIRC = 339.3;
+      const MINI_CIRC = 87.96;
+
+      function setRing(id, circ, pct) {
+        const el = document.getElementById(id);
+        if (el) el.setAttribute("stroke-dashoffset", circ * (1 - Math.min(pct, 1)));
+      }
 
       function getTimeOfDay() {
         const h = new Date().getHours();
@@ -129,177 +489,170 @@
 
       const STANDARD_SPLITS = {
         mysplit: MY_SPLIT,
-        ppl: [
-          { name: "Push Day", icon: "💪" },
-          { name: "Pull Day", icon: "🏋️" },
-          { name: "Leg Day", icon: "🦵" },
-        ],
-        upperlower: [
-          { name: "Upper Body", icon: "💪" },
-          { name: "Lower Body", icon: "🦵" },
-        ],
+        ppl: [{ name: "Push Day", icon: "💪" }, { name: "Pull Day", icon: "🏋️" }, { name: "Leg Day", icon: "🦵" }],
+        upperlower: [{ name: "Upper Body", icon: "💪" }, { name: "Lower Body", icon: "🦵" }],
         fullbody: [{ name: "Full Body", icon: "🔥" }],
-        brosplit: [
-          { name: "Chest Day", icon: "💪" },
-          { name: "Back Day", icon: "🏋️" },
-          { name: "Shoulder Day", icon: "🏔️" },
-          { name: "Arm Day", icon: "💪" },
-          { name: "Leg Day", icon: "🦵" },
-        ],
-        arnold: [
-          { name: "Chest + Back", icon: "🏋️" },
-          { name: "Shoulders + Arms", icon: "💪" },
-          { name: "Legs", icon: "🦵" },
-        ],
-        ppl6: [
-          { name: "Push Day A", icon: "💪" },
-          { name: "Pull Day A", icon: "🏋️" },
-          { name: "Leg Day A", icon: "🦵" },
-          { name: "Push Day B", icon: "💪" },
-          { name: "Pull Day B", icon: "🏋️" },
-          { name: "Leg Day B", icon: "🦵" },
-        ],
-        ul4: [
-          { name: "Upper A", icon: "💪" },
-          { name: "Lower A", icon: "🦵" },
-          { name: "Upper B", icon: "💪" },
-          { name: "Lower B", icon: "🦵" },
-        ],
+        brosplit: [{ name: "Chest Day", icon: "💪" }, { name: "Back Day", icon: "🏋️" }, { name: "Shoulder Day", icon: "🏔️" }, { name: "Arm Day", icon: "💪" }, { name: "Leg Day", icon: "🦵" }],
+        arnold: [{ name: "Chest + Back", icon: "🏋️" }, { name: "Shoulders + Arms", icon: "💪" }, { name: "Legs", icon: "🦵" }],
+        ppl6: [{ name: "Push Day A", icon: "💪" }, { name: "Pull Day A", icon: "🏋️" }, { name: "Leg Day A", icon: "🦵" }, { name: "Push Day B", icon: "💪" }, { name: "Pull Day B", icon: "🏋️" }, { name: "Leg Day B", icon: "🦵" }],
+        ul4: [{ name: "Upper A", icon: "💪" }, { name: "Lower A", icon: "🦵" }, { name: "Upper B", icon: "💪" }, { name: "Lower B", icon: "🦵" }],
       };
 
       function getTodayWorkout(cycleData) {
         if (!cycleData || !cycleData.startDate) return null;
         const splitKey = cycleData.activeSplit || "mysplit";
         let splitDays;
-
         if (splitKey === "custom" && cycleData.customSplitDays) {
           splitDays = cycleData.customSplitDays.map((day, idx) => ({
             name: `Day ${idx + 1} — ${day.muscles.join(", ") || "Rest"}`,
             icon: day.muscles.includes("Cardio") ? "🏃" : "💪",
-            isCardio:
-              day.muscles.includes("Cardio") || day.muscles.includes("Rest"),
+            isCardio: day.muscles.includes("Cardio") || day.muscles.includes("Rest"),
           }));
         } else {
           splitDays = STANDARD_SPLITS[splitKey] || MY_SPLIT;
         }
-
         const start = new Date(cycleData.startDate);
         const today = new Date();
         start.setHours(0, 0, 0, 0);
         today.setHours(0, 0, 0, 0);
         const diffDays = Math.floor((today - start) / (1000 * 60 * 60 * 24));
-        const dayIdx = diffDays % splitDays.length;
-        return splitDays[dayIdx];
+        return splitDays[diffDays % splitDays.length];
       }
 
       function calculateMacros(profile) {
         const { weight, height, age, gender, activity, goal } = profile;
-        let bmr =
-          gender === "male"
-            ? 10 * weight + 6.25 * height - 5 * age + 5
-            : 10 * weight + 6.25 * height - 5 * age - 161;
-        const multipliers = {
-          sedentary: 1.2,
-          light: 1.375,
-          moderate: 1.55,
-          active: 1.725,
-        };
+        let bmr = gender === "male"
+          ? 10 * weight + 6.25 * height - 5 * age + 5
+          : 10 * weight + 6.25 * height - 5 * age - 161;
+        const multipliers = { sedentary: 1.2, light: 1.375, moderate: 1.55, active: 1.725 };
         let tdee = bmr * (multipliers[activity] || 1.55);
-        let protein;
-        if (goal === "recomp") protein = Math.round(weight * 2.2);
-        else if (goal === "muscle") protein = Math.round(weight * 2.0);
-        else protein = Math.round(weight * 2.4);
-        return { protein };
+        let calTarget = goal === "recomp" ? tdee * 0.95 : goal === "muscle" ? tdee * 1.1 : tdee * 0.85;
+        let protein = goal === "recomp" ? Math.round(weight * 2.2) : goal === "muscle" ? Math.round(weight * 2.0) : Math.round(weight * 2.4);
+        let fat = Math.round((calTarget * 0.25) / 9);
+        let carbs = Math.round((calTarget - protein * 4 - fat * 9) / 4);
+        return { protein, carbs, fat, calories: Math.round(calTarget) };
       }
 
+      // Set date
+      document.getElementById("currentDate").textContent = new Date().toLocaleDateString("en-US", { weekday: "short", day: "numeric", month: "short" });
+
       onAuthStateChanged(auth, async (user) => {
-        if (!user) {
-          window.location.href = "login.html";
-          return;
-        }
+        if (!user) { window.location.href = "login.html"; return; }
 
         try {
           // Greeting
-          const firstName = user.displayName
-            ? user.displayName.split(" ")[0]
-            : "there";
-          document.getElementById("greeting").textContent =
-            `Good ${getTimeOfDay()}, ${firstName}`;
+          const firstName = user.displayName ? user.displayName.split(" ")[0] : "there";
+          document.getElementById("greeting").textContent = `Good ${getTimeOfDay()}, ${firstName}`;
 
           // Admin badge
           if (isAdmin(user)) {
             const adminBadge = document.createElement("a");
             adminBadge.href = "admin.html";
-            adminBadge.style.cssText = `font-size:10px;color:#f0a050;background:rgba(240,160,80,0.1);border:0.5px solid rgba(240,160,80,0.2);padding:4px 10px;border-radius:20px;text-decoration:none;margin-left:8px;`;
+            adminBadge.style.cssText = `font-size:10px;color:#f0a050;background:rgba(240,160,80,0.1);border:0.5px solid rgba(240,160,80,0.2);padding:4px 10px;border-radius:20px;text-decoration:none;`;
             adminBadge.textContent = "⚙️ Admin";
             document.querySelector(".nav-right").prepend(adminBadge);
           }
 
-          // Sign out button
+          // Sign out button (small, in header)
           const signOutBtn = document.createElement("button");
-          signOutBtn.textContent = "Sign Out";
-          signOutBtn.style.cssText = `font-size:11px;color:rgba(255,255,255,0.3);background:none;border:0.5px solid rgba(255,255,255,0.1);padding:4px 10px;border-radius:20px;cursor:pointer;font-family:Inter,sans-serif;`;
+          signOutBtn.textContent = "Out";
+          signOutBtn.style.cssText = `font-size:11px;color:rgba(255,255,255,0.25);background:none;border:0.5px solid rgba(255,255,255,0.08);padding:4px 10px;border-radius:20px;cursor:pointer;font-family:Inter,sans-serif;`;
           signOutBtn.addEventListener("click", async () => {
-            try {
-              const { signOutUser } = await import("./firebase.js");
-              await signOutUser();
-              window.location.href = "login.html";
-            } catch (error) {
-              console.error("Sign out error:", error);
-              showError("Failed to sign out. Please try again.");
-            }
+            try { const { signOutUser } = await import("./firebase.js"); await signOutUser(); window.location.href = "login.html"; } catch (e) {}
           });
           document.querySelector(".nav-right").appendChild(signOutBtn);
 
-          // Today's workout from Firebase
-          showLoading();
+          // Today's workout
+          document.getElementById("loadingOverlay").classList.remove("hidden");
           const cycleData = await getWorkoutCycle(user.uid);
-          hideLoading();
-          const todayWorkout = getTodayWorkout(cycleData);
-          const workoutEl = document.getElementById("todayWorkout");
+          document.getElementById("loadingOverlay").classList.add("hidden");
 
-          if (workoutEl) {
-            if (todayWorkout) {
-              if (todayWorkout.isCardio) {
-                workoutEl.innerHTML = `
-                            <span class="workout-day">Today</span>
-                            <span class="workout-muscles cardio">${todayWorkout.icon} ${todayWorkout.name}</span>
-                        `;
-              } else {
-                workoutEl.innerHTML = `
-                            <span class="workout-day">Today's Workout</span>
-                            <span class="workout-muscles">${todayWorkout.icon} ${todayWorkout.name}</span>
-                        `;
-              }
-            } else {
-              workoutEl.innerHTML = `
-                        <span class="workout-day">Today</span>
-                        <span class="workout-muscles empty">Set up your cycle in the Exercise page</span>
-                    `;
-            }
+          const todayWorkout = getTodayWorkout(cycleData);
+          const wEl = document.getElementById("todayWorkout");
+          if (wEl && todayWorkout) {
+            wEl.innerHTML = `
+              <div class="workout-card-info">
+                <div class="workout-label">${todayWorkout.isCardio ? "Active Recovery" : "Today's Workout"}</div>
+                <div class="workout-name${todayWorkout.isCardio ? " cardio-day" : ""}">${todayWorkout.icon} ${todayWorkout.name}</div>
+              </div>
+              <button class="workout-start-btn" onclick="location.href='exercise.html'">Start →</button>`;
           }
 
-          // Protein goal from Firebase profile
+          // Profile & macros
+          const profile = await getUserProfile(user.uid);
+          if (profile) {
+            const macros = calculateMacros(profile);
+            document.getElementById("proteinGoal").textContent = macros.protein + "g";
+            document.getElementById("carbsGoalLabel").textContent = "of " + macros.carbs + "g";
+            document.getElementById("fatGoalLabel").textContent = "of " + macros.fat + "g";
+            document.getElementById("calGoalLabel").textContent = "of " + macros.calories;
+
+            // Read today's log from localStorage
+            const logs = JSON.parse(localStorage.getItem("fitdesiLogs") || "{}");
+            const todayKey = new Date().toDateString();
+            const todayLog = logs[todayKey] || { protein: 0, carbs: 0, fat: 0, calories: 0 };
+            const protein = todayLog.protein || 0;
+            const carbs = todayLog.carbs || 0;
+            const fat = todayLog.fat || 0;
+            const calories = todayLog.calories || 0;
+
+            document.getElementById("proteinToday").textContent = protein + "g";
+            document.getElementById("carbsToday").textContent = carbs + "g";
+            document.getElementById("fatToday").textContent = fat + "g";
+            document.getElementById("caloriesToday").textContent = calories;
+
+            // Update rings
+            setRing("proteinRingArc", PROTEIN_CIRC, protein / macros.protein);
+            setRing("carbsRingArc", MINI_CIRC, macros.carbs > 0 ? carbs / macros.carbs : 0);
+            setRing("fatRingArc", MINI_CIRC, macros.fat > 0 ? fat / macros.fat : 0);
+            setRing("calRingArc", MINI_CIRC, macros.calories > 0 ? calories / macros.calories : 0);
+            setRing("navProteinRing", 138.2, protein / macros.protein);
+          } else {
+            // Fallback: protein from localStorage (old format)
+            const proteinData = JSON.parse(localStorage.getItem("proteinData") || "{}");
+            const todayProtein = proteinData[new Date().toDateString()] || 0;
+            document.getElementById("proteinToday").textContent = todayProtein + "g";
+          }
+
+          // Workouts this week from Firebase
           try {
-            const profile = await getUserProfile(user.uid);
-            if (profile) {
-              const macros = calculateMacros(profile);
-              document.getElementById("proteinGoal").textContent =
-                macros.protein + "g";
+            const { getDocs, collection, db } = await import("./firebase.js");
+            const workoutsSnap = await getDocs(collection(db, "users", user.uid, "workouts"));
+            const today = new Date(); today.setHours(0,0,0,0);
+            const weekAgo = new Date(today); weekAgo.setDate(today.getDate() - 7);
+            let weekCount = 0;
+            const doneDays = [];
+            workoutsSnap.forEach((doc) => {
+              const d = new Date(doc.id);
+              if (!isNaN(d) && d >= weekAgo) { weekCount++; doneDays.push(d); }
+            });
+            document.getElementById("workoutsDone").textContent = weekCount;
+            // Fill streak dots
+            const dots = document.querySelectorAll(".streak-dot");
+            const dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+            for (let i = 6; i >= 0; i--) {
+              const day = new Date(today); day.setDate(today.getDate() - i);
+              const dayStr = day.toDateString();
+              const done = doneDays.some(d => d.toDateString() === dayStr);
+              if (done) dots[6 - i].classList.add("filled");
             }
           } catch (e) {}
 
-          // Protein consumed today
-          const proteinData = JSON.parse(
-            localStorage.getItem("proteinData") || "{}",
-          );
-          const todayProtein = proteinData[new Date().toDateString()] || 0;
-          document.getElementById("proteinToday").textContent =
-            todayProtein + "g";
+          // Daily tip
+          const tips = [
+            "Combine dal with rice for a complete amino acid profile.",
+            "Paneer gives ~18g protein per 100g — stack it.",
+            "Eat your biggest meal within 2 hours post-workout.",
+            "Soaked chana has more bioavailable protein — prep the night before.",
+            "Greek yogurt + fruit = perfect high-protein snack.",
+            "Tofu absorbs spices well and packs 8g per 100g.",
+            "Drink 3+ litres on workout days for best recovery.",
+          ];
+          document.getElementById("dailyTip").textContent = tips[new Date().getDay() % tips.length];
+
         } catch (error) {
-          console.error("Error loading user data:", error);
-          hideLoading();
-          showError("Failed to load user data. Please refresh the page.");
+          console.error("Error loading:", error);
+          document.getElementById("loadingOverlay").classList.add("hidden");
         }
       });
     </script>

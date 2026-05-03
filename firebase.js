@@ -8,11 +8,6 @@ import {
   onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import {
-  getMessaging,
-  getToken,
-  onMessage,
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";
-import {
   getFirestore,
   doc,
   setDoc,
@@ -50,7 +45,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const messaging = getMessaging(app);
 const provider = new GoogleAuthProvider();
 
 // ─── ADMIN EMAIL ─────────────────────────────────────────────
@@ -378,51 +372,10 @@ async function getProgressHistory(userId) {
   }
 }
 
-// ─── PUSH NOTIFICATIONS ──────────────────────────────────────
-async function requestNotificationPermission() {
-  try {
-    const permission = await Notification.requestPermission();
-    if (permission === "granted") {
-      console.log("Notification permission granted.");
-      return true;
-    } else {
-      console.log("Notification permission denied.");
-      return false;
-    }
-  } catch (error) {
-    console.error("Error requesting notification permission:", error);
-    return false;
-  }
-}
-
-async function getMessagingToken() {
-  try {
-    const token = await getToken(messaging, {
-      vapidKey: "YOUR_VAPID_KEY_HERE",
-    }); // Replace with actual VAPID key
-    return token;
-  } catch (error) {
-    console.error("Error getting messaging token:", error);
-    return null;
-  }
-}
-
-function onMessageListener() {
-  onMessage(messaging, (payload) => {
-    console.log("Message received. ", payload);
-    // Show notification
-    new Notification(payload.notification.title, {
-      body: payload.notification.body,
-      icon: "/icon-192.png",
-    });
-  });
-}
-
 // ─── EXPORT ──────────────────────────────────────────────────
 export {
   auth,
   db,
-  messaging,
   provider,
   ADMIN_EMAIL,
   onAuthStateChanged,
@@ -449,7 +402,4 @@ export {
   getWorkoutLog,
   saveProgressEntry,
   getProgressHistory,
-  requestNotificationPermission,
-  getMessagingToken,
-  onMessageListener,
 };

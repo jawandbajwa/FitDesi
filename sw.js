@@ -1,23 +1,23 @@
 // Service Worker for FitDesi PWA
 const CACHE_NAME = "fitdesi-v1";
 const urlsToCache = [
-  "/",
-  "/index.html",
-  "/style.css",
-  "/app.js",
-  "/firebase.js",
-  "/manifest.json",
-  // Add other pages
-  "/exercise.html",
-  "/exercise.css",
-  "/exercise.js",
-  "/tracker.html",
-  "/tracker.css",
-  "/tracker.js",
-  "/recipes.html",
-  "/recipes.css",
-  "/recipes.js",
-  "/login.html",
+  "./",
+  "./index.html",
+  "./style.css",
+  "./app.js",
+  "./firebase.js",
+  "./manifest.json",
+  "./exercise.html",
+  "./exercise.css",
+  "./exercise.js",
+  "./tracker.html",
+  "./tracker.css",
+  "./tracker.js",
+  "./recipes.html",
+  "./recipes.css",
+  "./recipes.js",
+  "./login.html",
+  "./db.js",
 ];
 
 // Install event - cache resources
