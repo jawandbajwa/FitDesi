@@ -175,12 +175,6 @@
           <div class="coach-text" id="coachDailyMessage">Loading your coach...</div>
         </div>
 
-        <!-- Edit profile -->
-        <div class="edit-profile-bar">
-          <span class="edit-profile-text">Want to update your stats?</span>
-          <button class="edit-profile-btn" id="editProfileBtn">✏️ Edit Profile</button>
-        </div>
-
         <!-- Body stats -->
         <div id="bodyStatsSection"></div>
 
@@ -337,102 +331,6 @@
           </div>
         </div>
         <button class="save-btn" id="addManualFood">Add Food</button>
-      </div>
-    </div>
-
-    <!-- EDIT PROFILE MODAL -->
-    <div class="modal-overlay" id="editModal">
-      <div class="modal">
-        <div class="modal-header">
-          <h2>Edit Profile</h2>
-          <button class="modal-close" id="editModalClose">✕</button>
-        </div>
-        <div class="form-group">
-          <label>Your Name</label>
-          <input type="text" id="editName" placeholder="What should I call you?" />
-        </div>
-        <div class="form-group">
-          <label>Age</label>
-          <input type="number" id="editAge" placeholder="Years" min="0" />
-        </div>
-        <div class="form-group">
-          <label>Gender</label>
-          <div class="option-row">
-            <button class="option-btn" data-field="editGender" data-val="male">Male</button>
-            <button class="option-btn" data-field="editGender" data-val="female">Female</button>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Weight</label>
-          <div class="height-toggle">
-            <button class="toggle-btn active" id="editWeightKg">kg</button>
-            <button class="toggle-btn" id="editWeightLbs">lbs</button>
-          </div>
-          <div class="input-row" id="editWeightKgInput">
-            <input type="number" id="editWeight" placeholder="e.g. 70" min="0" />
-            <span class="unit">kg</span>
-          </div>
-          <div class="input-row hidden" id="editWeightLbsInput">
-            <input type="number" id="editWeightLbsVal" placeholder="e.g. 154" min="0" />
-            <span class="unit">lbs</span>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Height</label>
-          <div class="height-toggle">
-            <button class="toggle-btn active" id="editHeightCm">cm</button>
-            <button class="toggle-btn" id="editHeightFt">ft / in</button>
-          </div>
-          <div class="input-row" id="editHeightCmInput">
-            <input type="number" id="editHeight" placeholder="e.g. 175" min="0" />
-            <span class="unit">cm</span>
-          </div>
-          <div class="input-row hidden" id="editHeightFtInput">
-            <input type="number" id="editHeightFtVal" placeholder="5" min="0" />
-            <span class="unit">ft</span>
-            <input type="number" id="editHeightInVal" placeholder="9" min="0" />
-            <span class="unit">in</span>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Neck circumference</label>
-          <div class="input-row">
-            <input type="number" id="editNeck" placeholder="e.g. 37" min="0" />
-            <span class="unit">cm</span>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Waist circumference</label>
-          <div class="input-row">
-            <input type="number" id="editWaist" placeholder="e.g. 82" min="0" />
-            <span class="unit">cm</span>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Hip circumference <span style="color:rgba(255,255,255,0.2);font-size:10px">(females only)</span></label>
-          <div class="input-row">
-            <input type="number" id="editHip" placeholder="e.g. 95" min="0" />
-            <span class="unit">cm</span>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Goal</label>
-          <div class="goal-options">
-            <button class="goal-btn" data-field="editGoal" data-val="recomp"><span class="goal-icon">⚡</span><div><span class="goal-title">Body Recomposition</span><span class="goal-desc">Lose fat &amp; build muscle simultaneously</span></div></button>
-            <button class="goal-btn" data-field="editGoal" data-val="muscle"><span class="goal-icon">💪</span><div><span class="goal-title">Muscle Gain</span><span class="goal-desc">Build maximum muscle, slight surplus</span></div></button>
-            <button class="goal-btn" data-field="editGoal" data-val="fatloss"><span class="goal-icon">🔥</span><div><span class="goal-title">Fat Loss</span><span class="goal-desc">Lose fat while preserving muscle</span></div></button>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Activity Level</label>
-          <div class="activity-options">
-            <button class="option-btn" data-field="editActivity" data-val="sedentary">Sedentary</button>
-            <button class="option-btn" data-field="editActivity" data-val="light">Lightly Active</button>
-            <button class="option-btn" data-field="editActivity" data-val="moderate">Moderate</button>
-            <button class="option-btn" data-field="editActivity" data-val="active">Very Active</button>
-          </div>
-        </div>
-        <button class="save-btn" id="saveEditProfile">Save Changes</button>
       </div>
     </div>
 

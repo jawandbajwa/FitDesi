@@ -75,7 +75,7 @@
             <span class="settings-row-value" id="displayActivity">—</span>
           </div>
         </div>
-        <a href="tracker.html" class="settings-action-btn green-btn">Edit Profile &amp; Recalculate →</a>
+        <button class="settings-action-btn green-btn" id="editProfileBtn" style="cursor:pointer;font-family:inherit;font-size:13px;width:100%;border:none">✏️ Edit Profile &amp; Recalculate</button>
       </div>
 
       <!-- SECTION: DISPLAY & UNITS -->
@@ -144,6 +144,106 @@
 
     </div><!-- end profile-scroll -->
 
+    <!-- ── EDIT PROFILE BOTTOM SHEET ─────────────────────── -->
+    <div class="ep-overlay" id="epOverlay">
+      <div class="ep-sheet">
+        <div class="ep-handle"></div>
+        <div class="ep-header">
+          <span class="ep-title">Edit Profile</span>
+          <button class="ep-close" id="epClose">✕</button>
+        </div>
+        <div class="ep-body">
+          <div class="ep-group">
+            <label>Your Name</label>
+            <input class="ep-input" id="epName" type="text" placeholder="What should I call you?" />
+          </div>
+          <div class="ep-group">
+            <label>Age</label>
+            <input class="ep-input" id="epAge" type="number" placeholder="Years" min="10" max="99" />
+          </div>
+          <div class="ep-group">
+            <label>Gender</label>
+            <div class="ep-option-row">
+              <button class="ep-option-btn" data-ep-field="gender" data-ep-val="male">Male</button>
+              <button class="ep-option-btn" data-ep-field="gender" data-ep-val="female">Female</button>
+            </div>
+          </div>
+          <div class="ep-group">
+            <label>Weight</label>
+            <div class="ep-unit-toggle">
+              <button class="ep-unit-btn active" id="epWtKg">kg</button>
+              <button class="ep-unit-btn" id="epWtLbs">lbs</button>
+            </div>
+            <div class="ep-input-row" id="epWtKgRow">
+              <input class="ep-input" id="epWeight" type="number" placeholder="e.g. 70" min="30" />
+              <span class="ep-unit-lbl">kg</span>
+            </div>
+            <div class="ep-input-row hidden" id="epWtLbsRow">
+              <input class="ep-input" id="epWeightLbs" type="number" placeholder="e.g. 154" min="66" />
+              <span class="ep-unit-lbl">lbs</span>
+            </div>
+          </div>
+          <div class="ep-group">
+            <label>Height</label>
+            <div class="ep-unit-toggle">
+              <button class="ep-unit-btn active" id="epHtCm">cm</button>
+              <button class="ep-unit-btn" id="epHtFt">ft / in</button>
+            </div>
+            <div class="ep-input-row" id="epHtCmRow">
+              <input class="ep-input" id="epHeight" type="number" placeholder="e.g. 175" min="100" />
+              <span class="ep-unit-lbl">cm</span>
+            </div>
+            <div class="ep-input-row hidden" id="epHtFtRow">
+              <input class="ep-input" id="epHeightFt" type="number" placeholder="5" min="3" style="max-width:80px" />
+              <span class="ep-unit-lbl">ft</span>
+              <input class="ep-input" id="epHeightIn" type="number" placeholder="9" min="0" max="11" style="max-width:80px" />
+              <span class="ep-unit-lbl">in</span>
+            </div>
+          </div>
+          <div class="ep-group">
+            <label>Neck circumference (cm)</label>
+            <input class="ep-input" id="epNeck" type="number" placeholder="e.g. 37" min="0" />
+          </div>
+          <div class="ep-group">
+            <label>Waist circumference (cm) — at navel</label>
+            <input class="ep-input" id="epWaist" type="number" placeholder="e.g. 82" min="0" />
+          </div>
+          <div class="ep-group">
+            <label>Hip circumference (cm) — females only</label>
+            <input class="ep-input" id="epHip" type="number" placeholder="e.g. 95" min="0" />
+          </div>
+          <div class="ep-group">
+            <label>Fitness Goal</label>
+            <div class="ep-goal-grid">
+              <button class="ep-goal-btn" data-ep-field="goal" data-ep-val="recomp">
+                <span class="ep-goal-icon">⚡</span>
+                <div><span class="ep-goal-title">Body Recomposition</span><span class="ep-goal-desc">Lose fat &amp; build muscle simultaneously</span></div>
+              </button>
+              <button class="ep-goal-btn" data-ep-field="goal" data-ep-val="muscle">
+                <span class="ep-goal-icon">💪</span>
+                <div><span class="ep-goal-title">Muscle Gain</span><span class="ep-goal-desc">Build maximum muscle, slight surplus</span></div>
+              </button>
+              <button class="ep-goal-btn" data-ep-field="goal" data-ep-val="fatloss">
+                <span class="ep-goal-icon">🔥</span>
+                <div><span class="ep-goal-title">Fat Loss</span><span class="ep-goal-desc">Lose fat while preserving muscle</span></div>
+              </button>
+            </div>
+          </div>
+          <div class="ep-group">
+            <label>Activity Level</label>
+            <div class="ep-option-row">
+              <button class="ep-option-btn" data-ep-field="activity" data-ep-val="sedentary">Sedentary</button>
+              <button class="ep-option-btn" data-ep-field="activity" data-ep-val="light">Lightly Active</button>
+              <button class="ep-option-btn" data-ep-field="activity" data-ep-val="moderate">Moderate</button>
+              <button class="ep-option-btn" data-ep-field="activity" data-ep-val="active">Very Active</button>
+            </div>
+          </div>
+          <button class="ep-save-btn" id="epSave">Save &amp; Recalculate</button>
+        </div>
+      </div>
+    </div>
+    <div class="ep-toast" id="epToast"></div>
+
     <!-- BOTTOM NAV -->
     <nav class="bottom-nav">
       <a href="recipes.html" class="nav-item" data-page="recipes">
@@ -196,16 +296,16 @@
         onAuthStateChanged,
         signOutUser,
         getUserProfile,
+        saveUserProfile,
         isAdmin,
-        ADMIN_EMAIL,
       } from "./firebase.js";
 
+      // ── Label maps ───────────────────────────────────────────
       const GOAL_LABELS = {
         recomp:  "Body Recomp",
         muscle:  "Muscle Gain",
         fatloss: "Fat Loss",
       };
-
       const ACTIVITY_LABELS = {
         sedentary: "Sedentary",
         light:     "Lightly Active",
@@ -213,21 +313,216 @@
         active:    "Very Active",
       };
 
-      onAuthStateChanged(auth, async (user) => {
-        if (!user) {
-          window.location.href = "login.html";
+      // ── State ────────────────────────────────────────────────
+      let currentUser = null;
+      let epGender = "", epGoal = "", epActivity = "";
+
+      // ── Macro calculator (mirrors tracker.js) ────────────────
+      function calculateMacros(p) {
+        let bmr = p.gender === "male"
+          ? 10*p.weight + 6.25*p.height - 5*p.age + 5
+          : 10*p.weight + 6.25*p.height - 5*p.age - 161;
+        const mult = { sedentary:1.2, light:1.375, moderate:1.55, active:1.725 };
+        const tdee = bmr * (mult[p.activity] || 1.55);
+        let calories, protein, carbs, fat;
+        if (p.goal === "recomp") {
+          calories = Math.round(tdee*0.95); protein = Math.round(p.weight*2.2);
+          fat = Math.round(calories*0.25/9); carbs = Math.round((calories - protein*4 - fat*9)/4);
+        } else if (p.goal === "muscle") {
+          calories = Math.round(tdee*1.1); protein = Math.round(p.weight*2.0);
+          fat = Math.round(calories*0.28/9); carbs = Math.round((calories - protein*4 - fat*9)/4);
+        } else {
+          calories = Math.round(tdee*0.85); protein = Math.round(p.weight*2.4);
+          fat = Math.round(calories*0.25/9); carbs = Math.round((calories - protein*4 - fat*9)/4);
+        }
+        return { calories, protein, carbs, fat };
+      }
+
+      // ── Toast ────────────────────────────────────────────────
+      function showToast(msg) {
+        const el = document.getElementById("epToast");
+        el.textContent = msg;
+        el.classList.add("show");
+        setTimeout(() => el.classList.remove("show"), 2800);
+      }
+
+      // ── Refresh displayed profile values ─────────────────────
+      function displayProfile(profile) {
+        if (!profile) return;
+        const macros = calculateMacros(profile);
+        document.getElementById("statProtein").textContent   = macros.protein + "g";
+        document.getElementById("statWeight").textContent    = (profile.weight || "—") + (profile.weight ? "kg" : "");
+        document.getElementById("statGoal").textContent      = GOAL_LABELS[profile.goal] || profile.goal || "—";
+        document.getElementById("displayName").textContent   = profile.name     || "—";
+        document.getElementById("displayWeight").textContent = profile.weight   ? profile.weight + " kg"  : "—";
+        document.getElementById("displayHeight").textContent = profile.height   ? profile.height + " cm"  : "—";
+        document.getElementById("displayAge").textContent    = profile.age      ? profile.age    + " yrs" : "—";
+        document.getElementById("displayGoal").textContent   = GOAL_LABELS[profile.goal]     || profile.goal     || "—";
+        document.getElementById("displayActivity").textContent = ACTIVITY_LABELS[profile.activity] || profile.activity || "—";
+      }
+
+      // ── Weight / height getters ───────────────────────────────
+      function getEpWeightKg() {
+        if (document.getElementById("epWtKg").classList.contains("active"))
+          return parseFloat(document.getElementById("epWeight").value) || 0;
+        return Math.round((parseFloat(document.getElementById("epWeightLbs").value)||0) * 0.453592 * 10) / 10;
+      }
+      function getEpHeightCm() {
+        if (document.getElementById("epHtCm").classList.contains("active"))
+          return parseFloat(document.getElementById("epHeight").value) || 0;
+        const ft = parseFloat(document.getElementById("epHeightFt").value) || 0;
+        const inches = parseFloat(document.getElementById("epHeightIn").value) || 0;
+        return Math.round(ft * 30.48 + inches * 2.54);
+      }
+
+      // ── Open modal ───────────────────────────────────────────
+      async function openEditModal() {
+        if (!currentUser) return;
+        const profile = await getUserProfile(currentUser.uid);
+        if (!profile) {
+          showToast("Complete your profile in the Nutrition tab first");
+          return;
+        }
+        epGender   = profile.gender   || "";
+        epGoal     = profile.goal     || "";
+        epActivity = profile.activity || "";
+
+        document.getElementById("epName").value   = profile.name   || "";
+        document.getElementById("epAge").value    = profile.age    || "";
+        document.getElementById("epWeight").value = profile.weight || "";
+        document.getElementById("epHeight").value = profile.height || "";
+        document.getElementById("epNeck").value   = profile.neck   || "";
+        document.getElementById("epWaist").value  = profile.waist  || "";
+        document.getElementById("epHip").value    = profile.hip    || "";
+
+        document.querySelectorAll(".ep-option-btn[data-ep-field='gender']")
+          .forEach(b => b.classList.toggle("active", b.dataset.epVal === epGender));
+        document.querySelectorAll(".ep-option-btn[data-ep-field='activity']")
+          .forEach(b => b.classList.toggle("active", b.dataset.epVal === epActivity));
+        document.querySelectorAll(".ep-goal-btn[data-ep-field='goal']")
+          .forEach(b => b.classList.toggle("active", b.dataset.epVal === epGoal));
+
+        document.getElementById("epOverlay").classList.add("open");
+        document.body.style.overflow = "hidden";
+      }
+
+      function closeEditModal() {
+        document.getElementById("epOverlay").classList.remove("open");
+        document.body.style.overflow = "";
+      }
+
+      // ── Save ────────────────────────────────────────────────
+      async function saveEditProfile() {
+        const name   = document.getElementById("epName").value.trim();
+        const age    = parseInt(document.getElementById("epAge").value);
+        const weight = getEpWeightKg();
+        const height = getEpHeightCm();
+
+        if (!name || !age || !weight || !height || !epGender || !epGoal || !epActivity) {
+          showToast("⚠️ Please fill in all required fields");
           return;
         }
 
-        // Fill user card
-        const avatarEl = document.getElementById("userAvatar");
-        if (user.photoURL) {
-          avatarEl.src = user.photoURL;
-          avatarEl.style.display = "block";
-        } else {
-          avatarEl.style.display = "none";
+        const btn = document.getElementById("epSave");
+        btn.disabled = true;
+        btn.textContent = "Saving…";
+
+        const profile = {
+          name, age, gender: epGender, weight, height,
+          neck:  parseFloat(document.getElementById("epNeck").value)  || 0,
+          waist: parseFloat(document.getElementById("epWaist").value) || 0,
+          hip:   parseFloat(document.getElementById("epHip").value)   || 0,
+          goal: epGoal, activity: epActivity,
+        };
+
+        try {
+          await saveUserProfile(currentUser.uid, profile);
+
+          // Push recalculated macros to localStorage so Nutrition + Home ring update
+          const macros = calculateMacros(profile);
+          localStorage.setItem("proteinGoal",  macros.protein);
+          localStorage.setItem("caloriesGoal", macros.calories);
+          localStorage.setItem("carbsGoal",    macros.carbs);
+          localStorage.setItem("fatGoal",      macros.fat);
+
+          displayProfile(profile);
+          closeEditModal();
+          showToast("✓ Profile updated — macros recalculated");
+        } catch (e) {
+          console.error(e);
+          showToast("❌ Save failed — check connection");
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "Save & Recalculate";
         }
-        document.getElementById("userName").textContent = user.displayName || "—";
+      }
+
+      // ── Modal events ─────────────────────────────────────────
+      document.getElementById("editProfileBtn").addEventListener("click", openEditModal);
+      document.getElementById("epClose").addEventListener("click", closeEditModal);
+      document.getElementById("epOverlay").addEventListener("click", e => {
+        if (e.target === document.getElementById("epOverlay")) closeEditModal();
+      });
+      document.getElementById("epSave").addEventListener("click", saveEditProfile);
+
+      // Option buttons (gender / activity)
+      document.querySelectorAll(".ep-option-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const field = btn.dataset.epField;
+          document.querySelectorAll(`.ep-option-btn[data-ep-field="${field}"]`)
+            .forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          if (field === "gender")   epGender   = btn.dataset.epVal;
+          if (field === "activity") epActivity = btn.dataset.epVal;
+        });
+      });
+
+      // Goal buttons
+      document.querySelectorAll(".ep-goal-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".ep-goal-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          epGoal = btn.dataset.epVal;
+        });
+      });
+
+      // Weight unit toggle
+      document.getElementById("epWtKg").addEventListener("click", () => {
+        document.getElementById("epWtKg").classList.add("active");
+        document.getElementById("epWtLbs").classList.remove("active");
+        document.getElementById("epWtKgRow").classList.remove("hidden");
+        document.getElementById("epWtLbsRow").classList.add("hidden");
+      });
+      document.getElementById("epWtLbs").addEventListener("click", () => {
+        document.getElementById("epWtLbs").classList.add("active");
+        document.getElementById("epWtKg").classList.remove("active");
+        document.getElementById("epWtLbsRow").classList.remove("hidden");
+        document.getElementById("epWtKgRow").classList.add("hidden");
+      });
+
+      // Height unit toggle
+      document.getElementById("epHtCm").addEventListener("click", () => {
+        document.getElementById("epHtCm").classList.add("active");
+        document.getElementById("epHtFt").classList.remove("active");
+        document.getElementById("epHtCmRow").classList.remove("hidden");
+        document.getElementById("epHtFtRow").classList.add("hidden");
+      });
+      document.getElementById("epHtFt").addEventListener("click", () => {
+        document.getElementById("epHtFt").classList.add("active");
+        document.getElementById("epHtCm").classList.remove("active");
+        document.getElementById("epHtFtRow").classList.remove("hidden");
+        document.getElementById("epHtCmRow").classList.add("hidden");
+      });
+
+      // ── Auth & initial load ───────────────────────────────────
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) { window.location.href = "login.html"; return; }
+        currentUser = user;
+
+        const avatarEl = document.getElementById("userAvatar");
+        if (user.photoURL) { avatarEl.src = user.photoURL; avatarEl.style.display = "block"; }
+        else { avatarEl.style.display = "none"; }
+        document.getElementById("userName").textContent  = user.displayName || "—";
         document.getElementById("userEmail").textContent = user.email || "—";
 
         if (isAdmin(user)) {
@@ -235,47 +530,34 @@
           document.getElementById("adminLink").classList.remove("hidden");
         }
 
-        // Load Firestore profile
         try {
           const profile = await getUserProfile(user.uid);
-          if (profile) {
-            const proteinGoal = localStorage.getItem("proteinGoal");
-            document.getElementById("statProtein").textContent = proteinGoal ? proteinGoal + "g" : "—";
-            document.getElementById("statWeight").textContent = profile.weight ? profile.weight + "kg" : "—";
-            document.getElementById("statGoal").textContent = GOAL_LABELS[profile.goal] || profile.goal || "—";
-
-            document.getElementById("displayName").textContent = profile.name || user.displayName || "—";
-            document.getElementById("displayWeight").textContent = profile.weight ? profile.weight + " kg" : "—";
-            document.getElementById("displayHeight").textContent = profile.height ? profile.height + " cm" : "—";
-            document.getElementById("displayAge").textContent = profile.age ? profile.age + " yrs" : "—";
-            document.getElementById("displayGoal").textContent = GOAL_LABELS[profile.goal] || profile.goal || "—";
-            document.getElementById("displayActivity").textContent = ACTIVITY_LABELS[profile.activity] || profile.activity || "—";
-          }
-        } catch (e) {
-          console.error("Profile load error:", e);
-        }
+          displayProfile(profile);
+        } catch (e) { console.error("Profile load error:", e); }
       });
 
+      // Sign out
       document.getElementById("signOutBtn").addEventListener("click", async () => {
         await signOutUser();
         window.location.href = "login.html";
       });
 
-      // Persist toggle states in localStorage
-      ["toggleMealReminders", "toggleWorkoutReminders"].forEach((id) => {
+      // Notification toggles
+      ["toggleMealReminders", "toggleWorkoutReminders"].forEach(id => {
         const el = document.getElementById(id);
         el.checked = localStorage.getItem(id) === "true";
         el.addEventListener("change", () => localStorage.setItem(id, el.checked));
       });
 
-      /* Nav protein ring */
+      // Nav protein ring
       (function() {
         const goal = parseInt(localStorage.getItem("proteinGoal") || "0");
         if (!goal) return;
         const data = JSON.parse(localStorage.getItem("proteinData") || "{}");
         const protein = data[new Date().toDateString()] || 0;
         const ring = document.getElementById("navProteinRing");
-        if (ring) ring.setAttribute("stroke-dashoffset", (138.2 * (1 - Math.min(protein / goal, 1))).toFixed(1));
+        if (ring) ring.setAttribute("stroke-dashoffset",
+          (138.2 * (1 - Math.min(protein / goal, 1))).toFixed(1));
       })();
     </script>
   </body>

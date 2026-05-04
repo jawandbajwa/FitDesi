@@ -22,9 +22,6 @@ let selectedGoal = "";
 let selectedGender = "";
 let selectedActivity = "";
 let currentMeal = "";
-let editGender = "";
-let editGoal = "";
-let editActivity = "";
 
 // Planner state
 let plannerMode = "full";
@@ -99,34 +96,6 @@ function getWeightInKg() {
   } else {
     const lbs = parseFloat(document.getElementById("userWeightLbs").value) || 0;
     return Math.round(lbs * 0.453592 * 10) / 10;
-  }
-}
-
-function getEditWeightInKg() {
-  const isKg = document
-    .getElementById("editWeightKg")
-    .classList.contains("active");
-  if (isKg) {
-    return parseFloat(document.getElementById("editWeight").value) || 0;
-  } else {
-    const lbs =
-      parseFloat(document.getElementById("editWeightLbsVal").value) || 0;
-    return Math.round(lbs * 0.453592 * 10) / 10;
-  }
-}
-
-function getEditHeightInCm() {
-  const isCm = document
-    .getElementById("editHeightCm")
-    .classList.contains("active");
-  if (isCm) {
-    return parseFloat(document.getElementById("editHeight").value) || 0;
-  } else {
-    const ft =
-      parseFloat(document.getElementById("editHeightFtVal").value) || 0;
-    const inches =
-      parseFloat(document.getElementById("editHeightInVal").value) || 0;
-    return Math.round(ft * 30.48 + inches * 2.54);
   }
 }
 
@@ -936,26 +905,15 @@ document.addEventListener("click", async function (e) {
     e.target.classList.add("selected");
     if (field === "gender") selectedGender = e.target.dataset.val;
     if (field === "activity") selectedActivity = e.target.dataset.val;
-    if (field === "editGender") editGender = e.target.dataset.val;
-    if (field === "editActivity") editActivity = e.target.dataset.val;
   }
 
   if (e.target.closest(".goal-btn")) {
     const btn = e.target.closest(".goal-btn");
-    const field = btn.dataset.field;
-    if (field === "editGoal") {
-      document
-        .querySelectorAll('.goal-btn[data-field="editGoal"]')
-        .forEach((b) => b.classList.remove("selected"));
-      btn.classList.add("selected");
-      editGoal = btn.dataset.val;
-    } else {
-      document
-        .querySelectorAll(".goal-btn:not([data-field])")
-        .forEach((b) => b.classList.remove("selected"));
-      btn.classList.add("selected");
-      selectedGoal = btn.dataset.val;
-    }
+    document
+      .querySelectorAll(".goal-btn:not([data-field])")
+      .forEach((b) => b.classList.remove("selected"));
+    btn.classList.add("selected");
+    selectedGoal = btn.dataset.val;
   }
 
   if (e.target.id === "activityInfo") {
@@ -1128,101 +1086,6 @@ document.addEventListener("click", async function (e) {
     }
   }
 
-  if (e.target.id === "editProfileBtn") {
-    const profile = await getProfile();
-    if (!profile) return;
-    editGender = profile.gender || "";
-    editGoal = profile.goal || "";
-    editActivity = profile.activity || "";
-    document.getElementById("editName").value = profile.name || "";
-    document.getElementById("editAge").value = profile.age || "";
-    document.getElementById("editWeight").value = profile.weight || "";
-    document.getElementById("editHeight").value = profile.height || "";
-    document.getElementById("editNeck").value = profile.neck || "";
-    document.getElementById("editWaist").value = profile.waist || "";
-    document.getElementById("editHip").value = profile.hip || "";
-    document
-      .querySelectorAll('.option-btn[data-field="editGender"]')
-      .forEach((b) => {
-        b.classList.toggle("selected", b.dataset.val === profile.gender);
-      });
-    document
-      .querySelectorAll('.option-btn[data-field="editActivity"]')
-      .forEach((b) => {
-        b.classList.toggle("selected", b.dataset.val === profile.activity);
-      });
-    document
-      .querySelectorAll('.goal-btn[data-field="editGoal"]')
-      .forEach((b) => {
-        b.classList.toggle("selected", b.dataset.val === profile.goal);
-      });
-    document.getElementById("editModal").classList.add("open");
-  }
-
-  if (e.target.id === "editModalClose") {
-    document.getElementById("editModal").classList.remove("open");
-  }
-
-  if (e.target.id === "editWeightKg") {
-    document.getElementById("editWeightKg").classList.add("active");
-    document.getElementById("editWeightLbs").classList.remove("active");
-    document.getElementById("editWeightKgInput").classList.remove("hidden");
-    document.getElementById("editWeightLbsInput").classList.add("hidden");
-  }
-  if (e.target.id === "editWeightLbs") {
-    document.getElementById("editWeightLbs").classList.add("active");
-    document.getElementById("editWeightKg").classList.remove("active");
-    document.getElementById("editWeightLbsInput").classList.remove("hidden");
-    document.getElementById("editWeightKgInput").classList.add("hidden");
-  }
-
-  if (e.target.id === "editHeightCm") {
-    document.getElementById("editHeightCm").classList.add("active");
-    document.getElementById("editHeightFt").classList.remove("active");
-    document.getElementById("editHeightCmInput").classList.remove("hidden");
-    document.getElementById("editHeightFtInput").classList.add("hidden");
-  }
-  if (e.target.id === "editHeightFt") {
-    document.getElementById("editHeightFt").classList.add("active");
-    document.getElementById("editHeightCm").classList.remove("active");
-    document.getElementById("editHeightFtInput").classList.remove("hidden");
-    document.getElementById("editHeightCmInput").classList.add("hidden");
-  }
-
-  if (e.target.id === "saveEditProfile") {
-    const name = document.getElementById("editName").value.trim();
-    const age = parseInt(document.getElementById("editAge").value);
-    const weight = getEditWeightInKg();
-    const height = getEditHeightInCm();
-    if (
-      !name ||
-      !age ||
-      !weight ||
-      !height ||
-      !editGender ||
-      !editGoal ||
-      !editActivity
-    ) {
-      alert("Please fill in all fields.");
-      return;
-    }
-    const updatedProfile = {
-      name,
-      age,
-      gender: editGender,
-      weight,
-      height,
-      neck: parseFloat(document.getElementById("editNeck").value) || 0,
-      waist: parseFloat(document.getElementById("editWaist").value) || 0,
-      hip: parseFloat(document.getElementById("editHip").value) || 0,
-      goal: editGoal,
-      activity: editActivity,
-    };
-    await saveProfile(updatedProfile);
-    document.getElementById("editModal").classList.remove("open");
-    await refreshTracker();
-    alert("Profile updated!");
-  }
 });
 
 document.getElementById("foodSearch").addEventListener("input", async (e) => {
