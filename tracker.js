@@ -384,7 +384,6 @@ async function refreshTracker() {
 
   renderMacroRings(macros, consumed);
   renderMeals(log);
-  renderBodyStats(profile);
 
   document.getElementById("coachDailyMessage").textContent =
     generateCoachMessage(profile, macros, consumed, recipes);
