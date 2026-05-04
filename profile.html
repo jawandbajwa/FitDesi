@@ -1,9 +1,9 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>FitDesi â€” Profile</title>
+    <title>FitDesi — Profile</title>
     <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#7ed99a" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -24,8 +24,8 @@
       <div class="user-card">
         <img id="userAvatar" class="user-avatar" src="" alt="" />
         <div class="user-info">
-          <div class="user-name" id="userName">â€”</div>
-          <div class="user-email" id="userEmail">â€”</div>
+          <div class="user-name" id="userName">—</div>
+          <div class="user-email" id="userEmail">—</div>
         </div>
         <div class="user-badge" id="userBadge" style="display:none">Admin</div>
       </div>
@@ -33,15 +33,15 @@
       <!-- STATS ROW -->
       <div class="stats-row">
         <div class="stat-pill">
-          <div class="stat-val" id="statProtein">â€”</div>
+          <div class="stat-val" id="statProtein">—</div>
           <div class="stat-lbl">Protein Goal</div>
         </div>
         <div class="stat-pill">
-          <div class="stat-val" id="statWeight">â€”</div>
+          <div class="stat-val" id="statWeight">—</div>
           <div class="stat-lbl">Weight</div>
         </div>
         <div class="stat-pill">
-          <div class="stat-val" id="statGoal">â€”</div>
+          <div class="stat-val" id="statGoal">—</div>
           <div class="stat-lbl">Goal</div>
         </div>
       </div>
@@ -52,30 +52,30 @@
         <div class="settings-group">
           <div class="settings-row" id="rowName">
             <span class="settings-row-label">Name</span>
-            <span class="settings-row-value" id="displayName">â€”</span>
+            <span class="settings-row-value" id="displayName">—</span>
           </div>
           <div class="settings-row" id="rowWeight">
             <span class="settings-row-label">Weight</span>
-            <span class="settings-row-value" id="displayWeight">â€”</span>
+            <span class="settings-row-value" id="displayWeight">—</span>
           </div>
           <div class="settings-row" id="rowHeight">
             <span class="settings-row-label">Height</span>
-            <span class="settings-row-value" id="displayHeight">â€”</span>
+            <span class="settings-row-value" id="displayHeight">—</span>
           </div>
           <div class="settings-row" id="rowAge">
             <span class="settings-row-label">Age</span>
-            <span class="settings-row-value" id="displayAge">â€”</span>
+            <span class="settings-row-value" id="displayAge">—</span>
           </div>
           <div class="settings-row" id="rowGoal">
             <span class="settings-row-label">Fitness Goal</span>
-            <span class="settings-row-value" id="displayGoal">â€”</span>
+            <span class="settings-row-value" id="displayGoal">—</span>
           </div>
           <div class="settings-row last" id="rowActivity">
             <span class="settings-row-label">Activity Level</span>
-            <span class="settings-row-value" id="displayActivity">â€”</span>
+            <span class="settings-row-value" id="displayActivity">—</span>
           </div>
         </div>
-        <a href="tracker.html" class="settings-action-btn green-btn">Edit Profile &amp; Recalculate â†’</a>
+        <a href="tracker.html" class="settings-action-btn green-btn">Edit Profile &amp; Recalculate →</a>
       </div>
 
       <!-- SECTION: DISPLAY & UNITS -->
@@ -128,15 +128,15 @@
           </div>
           <div class="settings-row last">
             <span class="settings-row-label">Made for</span>
-            <span class="settings-row-value">South Asian Fitness ðŸ‡®ðŸ‡³</span>
+            <span class="settings-row-value">South Asian Fitness 🇮🇳</span>
           </div>
         </div>
       </div>
 
       <!-- ADMIN PANEL LINK (shown only for admin) -->
       <a href="admin.html" class="admin-link hidden" id="adminLink">
-        <span>âš™ï¸ Admin Panel</span>
-        <span class="admin-arrow">â†’</span>
+        <span>⚙️ Admin Panel</span>
+        <span class="admin-arrow">→</span>
       </a>
 
       <!-- SIGN OUT -->
@@ -227,8 +227,8 @@
         } else {
           avatarEl.style.display = "none";
         }
-        document.getElementById("userName").textContent = user.displayName || "â€”";
-        document.getElementById("userEmail").textContent = user.email || "â€”";
+        document.getElementById("userName").textContent = user.displayName || "—";
+        document.getElementById("userEmail").textContent = user.email || "—";
 
         if (isAdmin(user)) {
           document.getElementById("userBadge").style.display = "flex";
@@ -240,16 +240,16 @@
           const profile = await getUserProfile(user.uid);
           if (profile) {
             const proteinGoal = localStorage.getItem("proteinGoal");
-            document.getElementById("statProtein").textContent = proteinGoal ? proteinGoal + "g" : "â€”";
-            document.getElementById("statWeight").textContent = profile.weight ? profile.weight + "kg" : "â€”";
-            document.getElementById("statGoal").textContent = GOAL_LABELS[profile.goal] || profile.goal || "â€”";
+            document.getElementById("statProtein").textContent = proteinGoal ? proteinGoal + "g" : "—";
+            document.getElementById("statWeight").textContent = profile.weight ? profile.weight + "kg" : "—";
+            document.getElementById("statGoal").textContent = GOAL_LABELS[profile.goal] || profile.goal || "—";
 
-            document.getElementById("displayName").textContent = profile.name || user.displayName || "â€”";
-            document.getElementById("displayWeight").textContent = profile.weight ? profile.weight + " kg" : "â€”";
-            document.getElementById("displayHeight").textContent = profile.height ? profile.height + " cm" : "â€”";
-            document.getElementById("displayAge").textContent = profile.age ? profile.age + " yrs" : "â€”";
-            document.getElementById("displayGoal").textContent = GOAL_LABELS[profile.goal] || profile.goal || "â€”";
-            document.getElementById("displayActivity").textContent = ACTIVITY_LABELS[profile.activity] || profile.activity || "â€”";
+            document.getElementById("displayName").textContent = profile.name || user.displayName || "—";
+            document.getElementById("displayWeight").textContent = profile.weight ? profile.weight + " kg" : "—";
+            document.getElementById("displayHeight").textContent = profile.height ? profile.height + " cm" : "—";
+            document.getElementById("displayAge").textContent = profile.age ? profile.age + " yrs" : "—";
+            document.getElementById("displayGoal").textContent = GOAL_LABELS[profile.goal] || profile.goal || "—";
+            document.getElementById("displayActivity").textContent = ACTIVITY_LABELS[profile.activity] || profile.activity || "—";
           }
         } catch (e) {
           console.error("Profile load error:", e);

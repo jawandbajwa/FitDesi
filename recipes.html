@@ -1,9 +1,9 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>FitDesi â€” Recipes</title>
+    <title>FitDesi — Recipes</title>
     <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#7ed99a" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -21,8 +21,8 @@
 
     <!-- CUISINE TOGGLE -->
     <div class="cuisine-switcher">
-      <button class="cuisine-btn active" data-cuisine="indian">ðŸ‡®ðŸ‡³ Indian</button>
-      <button class="cuisine-btn" data-cuisine="canadian">ðŸ‡¨ðŸ‡¦ Canadian</button>
+      <button class="cuisine-btn active" data-cuisine="indian">🇮🇳 Indian</button>
+      <button class="cuisine-btn" data-cuisine="canadian">🇨🇦 Canadian</button>
     </div>
 
     <!-- CATEGORY FILTER -->
@@ -42,13 +42,13 @@
         placeholder="Search recipes..."
         class="search-input"
       />
-      <span class="search-icon">ðŸ”</span>
+      <span class="search-icon">🔍</span>
     </div>
 
     <!-- RECIPE LIST -->
     <div class="recipe-list" id="recipeList">
       <div class="empty-state" id="emptyState">
-        <div class="empty-icon">ðŸ›</div>
+        <div class="empty-icon">🍛</div>
         <div class="empty-title">No recipes yet</div>
         <div class="empty-desc">Add recipes from the admin panel</div>
       </div>
@@ -57,7 +57,7 @@
     <!-- RECIPE DETAIL PANEL -->
     <div class="detail-panel hidden" id="detailPanel">
       <div class="detail-header">
-        <button class="detail-back" id="detailBack">â† Back</button>
+        <button class="detail-back" id="detailBack">← Back</button>
         <div class="detail-icon" id="detailIcon"></div>
       </div>
       <div class="detail-body">
@@ -79,24 +79,24 @@
       <div class="modal" style="max-width: 360px">
         <div class="modal-header">
           <h2>Add to which meal?</h2>
-          <button class="modal-close" id="mealSelectorClose">âœ•</button>
+          <button class="modal-close" id="mealSelectorClose">✕</button>
         </div>
         <p style="font-size:12px; color:rgba(255,255,255,0.3); margin-bottom:16px" id="mealSelectorRecipeName"></p>
         <div class="meal-selector-grid">
           <button class="meal-sel-btn" data-meal="breakfast">
-            <span class="meal-sel-icon">ðŸŒ…</span>
+            <span class="meal-sel-icon">🌅</span>
             <span class="meal-sel-name">Breakfast</span>
           </button>
           <button class="meal-sel-btn" data-meal="lunch">
-            <span class="meal-sel-icon">â˜€ï¸</span>
+            <span class="meal-sel-icon">☀️</span>
             <span class="meal-sel-name">Lunch</span>
           </button>
           <button class="meal-sel-btn" data-meal="snack">
-            <span class="meal-sel-icon">ðŸŽ</span>
+            <span class="meal-sel-icon">🍎</span>
             <span class="meal-sel-name">Snacks</span>
           </button>
           <button class="meal-sel-btn" data-meal="dinner">
-            <span class="meal-sel-icon">ðŸŒ™</span>
+            <span class="meal-sel-icon">🌙</span>
             <span class="meal-sel-name">Dinner</span>
           </button>
         </div>
