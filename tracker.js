@@ -23,6 +23,10 @@ let selectedGender = "";
 let selectedActivity = "";
 let currentMeal = "";
 
+// Chart instances (kept to destroy before re-rendering)
+let weightChartInstance = null;
+let bodyFatChartInstance = null;
+
 // Planner state
 let plannerMode = "full";
 let plannerCuisine = "indian";
@@ -1132,95 +1136,185 @@ onAuthStateChanged(auth, async (user) => {
 // ─── PROGRESS TRACKING ──────────────────────────────────────
 async function loadProgressHistory() {
   if (!currentUser) return;
-
-  const history = await getProgressHistory(currentUser.uid);
+  const [history, profile] = await Promise.all([
+    getProgressHistory(currentUser.uid),
+    getProfile(),
+  ]);
+  if (profile) renderProgressStats(profile, history);
   renderProgressCharts(history);
 }
 
-function renderProgressCharts(history) {
-  const weightData = history
-    .filter((h) => h.weight)
-    .map((h) => ({ x: new Date(h.date), y: h.weight }));
-  const bodyFatData = history
-    .filter((h) => h.bodyFat)
-    .map((h) => ({ x: new Date(h.date), y: h.bodyFat }));
+function renderProgressStats(profile, history) {
+  const section = document.getElementById("progressStats");
+  if (!section) return;
 
-  // Weight chart
-  const weightCtx = document.getElementById("weightChart");
-  if (weightCtx) {
-    new Chart(weightCtx, {
-      type: "line",
-      data: {
-        datasets: [
-          {
-            label: "Weight (kg)",
-            data: weightData,
-            borderColor: "#7ed99a",
-            backgroundColor: "rgba(126, 217, 154, 0.1)",
-            tension: 0.4,
-            fill: true,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          x: {
-            type: "time",
-            time: { unit: "day" },
-            ticks: { color: "rgba(255,255,255,0.6)" },
-            grid: { color: "rgba(255,255,255,0.1)" },
-          },
-          y: {
-            ticks: { color: "rgba(255,255,255,0.6)" },
-            grid: { color: "rgba(255,255,255,0.1)" },
-          },
+  // Use latest logged weight if available, else fall back to profile weight
+  const latestW = history.slice().reverse().find((h) => h.weight != null);
+  const weight = latestW ? latestW.weight : profile.weight;
+
+  // Use latest logged body fat if available, else calculate from measurements
+  const latestBF = history.slice().reverse().find((h) => h.bodyFat != null);
+  const bf = latestBF ? latestBF.bodyFat : calculateBodyFat(profile);
+
+  const bmi = getBMI(weight, profile.height);
+  const ideal = calculateIdealWeight(profile.height, profile.gender);
+  const fatMass = bf !== null ? Math.round(weight * bf) / 100 : null;
+  const leanMass = fatMass !== null ? Math.round((weight - fatMass) * 10) / 10 : null;
+
+  const bmiClass = bmi.category === "Healthy" ? "good" : "warn";
+
+  section.innerHTML = `
+    <div class="prog-stat-card">
+      <div class="prog-stat-val">${bmi.value}</div>
+      <div class="prog-stat-lbl">BMI</div>
+      <div class="prog-stat-note ${bmiClass}">${bmi.category}</div>
+    </div>
+    <div class="prog-stat-card">
+      <div class="prog-stat-val">${bf !== null ? bf + "%" : "—"}</div>
+      <div class="prog-stat-lbl">Body Fat</div>
+      <div class="prog-stat-note">${bf !== null ? getBodyFatCategory(bf, profile.gender) : "Log to track"}</div>
+    </div>
+    <div class="prog-stat-card">
+      <div class="prog-stat-val">${ideal.low}–${ideal.high}</div>
+      <div class="prog-stat-lbl">Ideal (kg)</div>
+      <div class="prog-stat-note">Based on height</div>
+    </div>
+    <div class="prog-stat-card">
+      <div class="prog-stat-val">${leanMass !== null ? leanMass + "kg" : "—"}</div>
+      <div class="prog-stat-lbl">Lean Mass</div>
+      <div class="prog-stat-note">${fatMass !== null ? fatMass + "kg fat" : "Log body fat"}</div>
+    </div>
+  `;
+}
+
+function fmtDate(dateStr) {
+  return new Date(dateStr).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
+function makeGradient(ctx, r, g, b) {
+  const grad = ctx.createLinearGradient(0, 0, 0, 200);
+  grad.addColorStop(0, `rgba(${r},${g},${b},0.35)`);
+  grad.addColorStop(1, `rgba(${r},${g},${b},0)`);
+  return grad;
+}
+
+function buildChartOptions(unit) {
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: "index", intersect: false },
+    scales: {
+      x: {
+        ticks: {
+          color: "rgba(255,255,255,0.45)",
+          font: { size: 10 },
+          maxRotation: 0,
+          maxTicksLimit: 7,
         },
-        plugins: {
-          legend: { display: false },
-        },
+        grid: { color: "rgba(255,255,255,0.06)" },
+        border: { display: false },
       },
-    });
+      y: {
+        ticks: {
+          color: "rgba(255,255,255,0.45)",
+          font: { size: 10 },
+          callback: (v) => v + unit,
+        },
+        grid: { color: "rgba(255,255,255,0.06)" },
+        border: { display: false },
+      },
+    },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: "rgba(13,31,16,0.95)",
+        borderColor: "rgba(255,255,255,0.1)",
+        borderWidth: 1,
+        titleColor: "rgba(255,255,255,0.5)",
+        bodyColor: "#f0f0f0",
+        padding: 10,
+        callbacks: { label: (c) => " " + c.parsed.y + unit },
+      },
+    },
+  };
+}
+
+function renderProgressCharts(history) {
+  // Destroy existing instances before re-creating
+  if (weightChartInstance) { weightChartInstance.destroy(); weightChartInstance = null; }
+  if (bodyFatChartInstance) { bodyFatChartInstance.destroy(); bodyFatChartInstance = null; }
+
+  const sorted = [...history].sort((a, b) => new Date(a.date) - new Date(b.date));
+  const wEntries  = sorted.filter((h) => h.weight  != null);
+  const bfEntries = sorted.filter((h) => h.bodyFat != null);
+
+  function drawEmpty(canvas) {
+    const ctx = canvas.getContext("2d");
+    // Set canvas logical size so text is centered
+    canvas.height = 180;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "rgba(255,255,255,0.18)";
+    ctx.font = "13px Inter, sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("No entries yet — log your first entry above", canvas.width / 2, 90);
   }
 
-  // Body fat chart
-  const bodyFatCtx = document.getElementById("bodyFatChart");
-  if (bodyFatCtx) {
-    new Chart(bodyFatCtx, {
-      type: "line",
-      data: {
-        datasets: [
-          {
-            label: "Body Fat %",
-            data: bodyFatData,
-            borderColor: "#f0a050",
-            backgroundColor: "rgba(240, 160, 80, 0.1)",
+  // ── Weight chart ───────────────────────────────────────────
+  const weightCanvas = document.getElementById("weightChart");
+  if (weightCanvas) {
+    if (wEntries.length === 0) {
+      drawEmpty(weightCanvas);
+    } else {
+      const ctx = weightCanvas.getContext("2d");
+      weightChartInstance = new Chart(weightCanvas, {
+        type: "line",
+        data: {
+          labels: wEntries.map((h) => fmtDate(h.date)),
+          datasets: [{
+            data: wEntries.map((h) => h.weight),
+            borderColor: "#7ed99a",
+            backgroundColor: makeGradient(ctx, 126, 217, 154),
+            borderWidth: 2,
+            pointRadius: 4,
+            pointBackgroundColor: "#7ed99a",
+            pointBorderColor: "#0d1f10",
+            pointBorderWidth: 2,
             tension: 0.4,
             fill: true,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          x: {
-            type: "time",
-            time: { unit: "day" },
-            ticks: { color: "rgba(255,255,255,0.6)" },
-            grid: { color: "rgba(255,255,255,0.1)" },
-          },
-          y: {
-            ticks: { color: "rgba(255,255,255,0.6)" },
-            grid: { color: "rgba(255,255,255,0.1)" },
-          },
+          }],
         },
-        plugins: {
-          legend: { display: false },
+        options: buildChartOptions(" kg"),
+      });
+    }
+  }
+
+  // ── Body fat chart ─────────────────────────────────────────
+  const bfCanvas = document.getElementById("bodyFatChart");
+  if (bfCanvas) {
+    if (bfEntries.length === 0) {
+      drawEmpty(bfCanvas);
+    } else {
+      const ctx = bfCanvas.getContext("2d");
+      bodyFatChartInstance = new Chart(bfCanvas, {
+        type: "line",
+        data: {
+          labels: bfEntries.map((h) => fmtDate(h.date)),
+          datasets: [{
+            data: bfEntries.map((h) => h.bodyFat),
+            borderColor: "#f0a050",
+            backgroundColor: makeGradient(ctx, 240, 160, 80),
+            borderWidth: 2,
+            pointRadius: 4,
+            pointBackgroundColor: "#f0a050",
+            pointBorderColor: "#0d1f10",
+            pointBorderWidth: 2,
+            tension: 0.4,
+            fill: true,
+          }],
         },
-      },
-    });
+        options: buildChartOptions("%"),
+      });
+    }
   }
 }
 
