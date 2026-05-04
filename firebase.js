@@ -213,7 +213,7 @@ async function getRecipes(cuisine = "indian") {
         cuisine === "canadian" ? "recipes_canadian" : "recipes_indian";
       const snap = await getDocs(collection(db, "shared", col, "items"));
       // Tag each recipe with its cuisine so the cache stays separated
-      const recipes = snap.docs.map((d) => ({ ...d.data(), _cuisine: cuisine }));
+      const recipes = snap.docs.map((d) => ({ id: d.id, ...d.data(), _cuisine: cuisine }));
       // Cache for offline (keyed by cuisine)
       await cacheRecipes(recipes, cuisine);
       return recipes;
