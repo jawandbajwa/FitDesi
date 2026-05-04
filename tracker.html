@@ -32,7 +32,7 @@
           </div>
           <div class="form-group">
             <label>Age</label>
-            <input type="number" id="userAge" placeholder="Years" min="0" />
+            <input type="number" id="userAge" placeholder="Years" min="10" max="100" />
           </div>
           <div class="form-group">
             <label>Gender</label>
@@ -48,11 +48,11 @@
               <button class="toggle-btn" id="weightLbs">lbs</button>
             </div>
             <div class="input-row" id="weightKgInput">
-              <input type="number" id="userWeight" placeholder="e.g. 70" min="0" />
+              <input type="number" id="userWeight" placeholder="e.g. 70" min="20" max="400" />
               <span class="unit">kg</span>
             </div>
             <div class="input-row hidden" id="weightLbsInput">
-              <input type="number" id="userWeightLbs" placeholder="e.g. 154" min="0" />
+              <input type="number" id="userWeightLbs" placeholder="e.g. 154" min="44" max="880" />
               <span class="unit">lbs</span>
             </div>
           </div>
@@ -63,34 +63,34 @@
               <button class="toggle-btn" id="heightFt">ft / in</button>
             </div>
             <div class="input-row" id="heightCmInput">
-              <input type="number" id="userHeight" placeholder="e.g. 175" min="0" />
+              <input type="number" id="userHeight" placeholder="e.g. 175" min="100" max="250" />
               <span class="unit">cm</span>
             </div>
             <div class="input-row hidden" id="heightFtInput">
-              <input type="number" id="userHeightFt" placeholder="5" min="0" />
+              <input type="number" id="userHeightFt" placeholder="5" min="3" max="8" />
               <span class="unit">ft</span>
-              <input type="number" id="userHeightIn" placeholder="9" min="0" />
+              <input type="number" id="userHeightIn" placeholder="9" min="0" max="11" />
               <span class="unit">in</span>
             </div>
           </div>
           <div class="form-group">
             <label>Neck circumference</label>
             <div class="input-row">
-              <input type="number" id="userNeck" placeholder="e.g. 37" min="0" />
+              <input type="number" id="userNeck" placeholder="e.g. 37" min="20" max="80" />
               <span class="unit">cm</span>
             </div>
           </div>
           <div class="form-group">
             <label>Waist circumference <span style="color:rgba(255,255,255,0.2);font-size:10px">(at navel)</span></label>
             <div class="input-row">
-              <input type="number" id="userWaist" placeholder="e.g. 82" min="0" />
+              <input type="number" id="userWaist" placeholder="e.g. 82" min="40" max="250" />
               <span class="unit">cm</span>
             </div>
           </div>
           <div class="form-group" id="hipGroup">
             <label>Hip circumference <span style="color:rgba(255,255,255,0.2);font-size:10px">(females only)</span></label>
             <div class="input-row">
-              <input type="number" id="userHip" placeholder="e.g. 95" min="0" />
+              <input type="number" id="userHip" placeholder="e.g. 95" min="50" max="250" />
               <span class="unit">cm</span>
             </div>
           </div>
@@ -279,11 +279,11 @@
           <div class="progress-form">
             <div class="form-group">
               <label>Weight (kg)</label>
-              <input type="number" id="progressWeight" placeholder="e.g. 70.5" step="0.1" min="0" />
+              <input type="number" id="progressWeight" placeholder="e.g. 70.5" step="0.1" min="20" max="400" />
             </div>
             <div class="form-group">
               <label>Body Fat %</label>
-              <input type="number" id="progressBodyFat" placeholder="e.g. 15.2" step="0.1" min="0" max="50" />
+              <input type="number" id="progressBodyFat" placeholder="e.g. 15.2" step="0.1" min="2" max="60" />
             </div>
             <button class="save-btn" id="saveProgress" style="grid-column:1/-1;margin-top:0">Save Entry</button>
           </div>
@@ -330,19 +330,19 @@
         <div class="manual-macros">
           <div class="form-group">
             <label>Protein (g)</label>
-            <input type="number" id="manualProtein" placeholder="0" min="0" />
+            <input type="number" id="manualProtein" placeholder="0" min="0" max="300" />
           </div>
           <div class="form-group">
             <label>Carbs (g)</label>
-            <input type="number" id="manualCarbs" placeholder="0" min="0" />
+            <input type="number" id="manualCarbs" placeholder="0" min="0" max="500" />
           </div>
           <div class="form-group">
             <label>Fat (g)</label>
-            <input type="number" id="manualFat" placeholder="0" min="0" />
+            <input type="number" id="manualFat" placeholder="0" min="0" max="300" />
           </div>
           <div class="form-group">
             <label>Calories</label>
-            <input type="number" id="manualCalories" placeholder="0" min="0" />
+            <input type="number" id="manualCalories" placeholder="0" min="0" max="3000" />
           </div>
         </div>
         <button class="save-btn" id="addManualFood">Add Food</button>
