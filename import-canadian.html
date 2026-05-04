@@ -1,809 +1,272 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Import Canadian Recipes — FitDesi</title>
-    <link rel="stylesheet" href="style.css" />
-    <style>
-      .wrap { max-width: 600px; margin: 0 auto; padding: 32px 20px 80px; }
-      .card {
-        background: linear-gradient(160deg, rgba(255,255,255,0.06), rgba(255,255,255,0.01));
-        border: 0.5px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 28px 24px;
-      }
-      h1 { color: #7ed99a; font-size: 20px; margin-bottom: 6px; }
-      .sub { color: rgba(255,255,255,0.35); font-size: 13px; margin-bottom: 24px; line-height: 1.5; }
-      .import-btn {
-        width: 100%; padding: 15px; background: #7ed99a; color: #0a1a0f;
-        border: none; border-radius: 14px; font-size: 16px; font-weight: 700;
-        cursor: pointer; font-family: Inter, sans-serif; transition: opacity .2s;
-      }
-      .import-btn:disabled { opacity: 0.45; cursor: not-allowed; }
-      .progress-bar-wrap {
-        margin-top: 20px; background: rgba(255,255,255,0.05);
-        border-radius: 8px; overflow: hidden; height: 8px; display: none;
-      }
-      .progress-bar { height: 100%; background: #7ed99a; width: 0%; transition: width .3s; }
-      .status { margin-top: 14px; font-size: 13px; color: rgba(255,255,255,0.5); }
-      .log { margin-top: 16px; max-height: 300px; overflow-y: auto; font-size: 11px; font-family: monospace; }
-      .log-row { padding: 3px 0; border-bottom: 0.5px solid rgba(255,255,255,0.04); }
-      .ok  { color: #7ed99a; }
-      .err { color: #ff6b6b; }
-      .done-banner {
-        margin-top: 20px; padding: 14px 18px;
-        background: rgba(126,217,154,0.1); border: 0.5px solid rgba(126,217,154,0.3);
-        border-radius: 12px; color: #7ed99a; font-size: 14px;
-        font-weight: 500; display: none; text-align: center;
-      }
-      .auth-warn {
-        padding: 12px 16px; background: rgba(255,200,0,0.07);
-        border: 0.5px solid rgba(255,200,0,0.25); border-radius: 12px;
-        color: rgba(255,200,0,0.8); font-size: 13px; margin-bottom: 20px; display: none;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="glow-1"></div>
-    <div class="glow-2"></div>
-    <div class="wrap">
-      <div class="card">
-        <h1>🇨🇦 Import Canadian Recipes</h1>
-        <div class="sub">
-          Bulk-imports 37 high-protein Canadian recipes across Breakfast · Lunch · Dinner · Snacks.
-          You must be signed in as admin.
-        </div>
-        <div class="auth-warn" id="authWarn"></div>
-        <button class="import-btn" id="importBtn" disabled>Checking auth…</button>
-        <div class="progress-bar-wrap" id="barWrap">
-          <div class="progress-bar" id="bar"></div>
-        </div>
-        <div class="status" id="status"></div>
-        <div class="log" id="log"></div>
-        <div class="done-banner" id="doneBanner">
-          All 37 Canadian recipes imported!
-          <a href="recipes.html" style="color:#7ed99a;font-weight:700;margin-left:8px">Open Recipes →</a>
-        </div>
-      </div>
-    </div>
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Import Canadian Recipes</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .wrap{max-width:600px;margin:0 auto;padding:28px 16px 80px}
+    .card{background:linear-gradient(160deg,rgba(255,255,255,.06),rgba(255,255,255,.01));border:.5px solid rgba(255,255,255,.1);border-radius:20px;padding:24px}
+    h1{color:#7ed99a;font-size:19px;margin-bottom:6px}
+    .sub{color:rgba(255,255,255,.35);font-size:12px;margin-bottom:20px;line-height:1.5}
+    .btn{width:100%;padding:14px;background:#7ed99a;color:#0a1a0f;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif}
+    .btn:disabled{opacity:.4;cursor:not-allowed}
+    .bar-wrap{margin-top:16px;background:rgba(255,255,255,.05);border-radius:8px;overflow:hidden;height:7px;display:none}
+    .bar{height:100%;background:#7ed99a;width:0%;transition:width .3s}
+    .status{margin-top:12px;font-size:12px;color:rgba(255,255,255,.45)}
+    .log{margin-top:12px;max-height:260px;overflow-y:auto;font-size:10px;font-family:monospace}
+    .lr{padding:2px 0;border-bottom:.5px solid rgba(255,255,255,.04)}
+    .ok{color:#7ed99a}.er{color:#ff6b6b}
+    .done{margin-top:16px;padding:12px 16px;background:rgba(126,217,154,.1);border:.5px solid rgba(126,217,154,.3);border-radius:12px;color:#7ed99a;font-size:13px;font-weight:500;display:none;text-align:center}
+    .warn{padding:10px 14px;background:rgba(255,200,0,.07);border:.5px solid rgba(255,200,0,.25);border-radius:10px;color:rgba(255,200,0,.8);font-size:12px;margin-bottom:16px;display:none}
+  </style>
+</head>
+<body>
+<div class="glow-1"></div><div class="glow-2"></div>
+<div class="wrap"><div class="card">
+  <h1>🇨🇦 Import Canadian Recipes</h1>
+  <div class="sub">39 vegetarian recipes · No eggs · No meat · Breakfast / Lunch / Dinner / Snacks</div>
+  <div class="warn" id="warn"></div>
+  <button class="btn" id="btn" disabled>Checking auth…</button>
+  <div class="bar-wrap" id="barWrap"><div class="bar" id="bar"></div></div>
+  <div class="status" id="status"></div>
+  <div class="log" id="log"></div>
+  <div class="done" id="done">✅ All 39 Canadian recipes imported! <a href="recipes.html" style="color:#7ed99a;font-weight:700;margin-left:6px">Open Recipes →</a></div>
+</div></div>
 
-    <script type="module">
-      import { auth, onAuthStateChanged, saveRecipe, isAdmin } from "./firebase.js";
+<script type="module">
+import { auth, onAuthStateChanged, saveRecipe, isAdmin } from "./firebase.js";
 
-      const RECIPES = [
+const R = [
+// ── BREAKFAST ─────────────────────────────────────────────────
+{name:"Classic Rolled Oatmeal",category:"breakfast",servingSize:"1 bowl",prepTime:"5 min",
+ protein:20,carbs:96,fat:11,calories:543,
+ ingredients:[{name:"Rolled Oats (large flake)",amount:80,unit:"g"},{name:"Milk (2% fat)",amount:250,unit:"ml"},{name:"Banana",amount:100,unit:"g"},{name:"Cinnamon (ground)",amount:2,unit:"g"},{name:"Maple Syrup (pure)",amount:10,unit:"g"}],
+ instructions:["Bring milk to a simmer. Stir in oats and cook 5 min, stirring often.","Slice banana and stir in with cinnamon and maple syrup. Serve warm."]},
 
-        // ── BREAKFAST (10) ─────────────────────────────────────
-        {
-          name: "Protein Oatmeal",
-          category: "breakfast", servingSize: "1 bowl", prepTime: "10 min",
-          protein: 28, carbs: 48, fat: 7, calories: 375,
-          ingredients: [
-            { name: "Rolled oats", amount: 80, unit: "g" },
-            { name: "Whey protein powder", amount: 30, unit: "g" },
-            { name: "Almond milk", amount: 200, unit: "ml" },
-            { name: "Banana", amount: 60, unit: "g" },
-            { name: "Chia seeds", amount: 10, unit: "g" },
-          ],
-          instructions: [
-            "Bring almond milk to a simmer in a small pot.",
-            "Stir in rolled oats and cook 5 minutes until thick.",
-            "Remove from heat, stir in whey protein until smooth.",
-            "Top with sliced banana and chia seeds. Serve warm.",
-          ],
-        },
-        {
-          name: "Egg White Omelette",
-          category: "breakfast", servingSize: "1 omelette", prepTime: "12 min",
-          protein: 30, carbs: 5, fat: 8, calories: 212,
-          ingredients: [
-            { name: "Egg whites", amount: 240, unit: "g" },
-            { name: "Spinach", amount: 30, unit: "g" },
-            { name: "Bell pepper", amount: 50, unit: "g" },
-            { name: "Feta cheese", amount: 30, unit: "g" },
-            { name: "Olive oil", amount: 5, unit: "g" },
-          ],
-          instructions: [
-            "Heat olive oil in a non-stick pan over medium heat.",
-            "Pour in egg whites; let them set slightly at the edges.",
-            "Add spinach, diced bell pepper, and crumbled feta on one half.",
-            "Fold and cook 1–2 more minutes. Serve hot.",
-          ],
-        },
-        {
-          name: "Greek Yogurt Parfait",
-          category: "breakfast", servingSize: "1 jar", prepTime: "5 min",
-          protein: 22, carbs: 38, fat: 5, calories: 285,
-          ingredients: [
-            { name: "Plain Greek yogurt (2%)", amount: 200, unit: "g" },
-            { name: "Strawberries", amount: 80, unit: "g" },
-            { name: "Blueberries", amount: 40, unit: "g" },
-            { name: "Granola", amount: 30, unit: "g" },
-            { name: "Honey", amount: 10, unit: "g" },
-          ],
-          instructions: [
-            "Spoon half the Greek yogurt into a jar.",
-            "Add a layer of strawberries and blueberries.",
-            "Top with remaining yogurt, granola, and honey.",
-          ],
-        },
-        {
-          name: "Cottage Cheese Pancakes",
-          category: "breakfast", servingSize: "6 pancakes", prepTime: "20 min",
-          protein: 25, carbs: 35, fat: 9, calories: 321,
-          ingredients: [
-            { name: "Cottage cheese", amount: 150, unit: "g" },
-            { name: "Rolled oats", amount: 60, unit: "g" },
-            { name: "Eggs", amount: 100, unit: "g" },
-            { name: "Banana", amount: 60, unit: "g" },
-            { name: "Cinnamon", amount: 2, unit: "g" },
-          ],
-          instructions: [
-            "Blend oats into flour, then blend all ingredients until smooth.",
-            "Heat a non-stick pan over medium and lightly oil it.",
-            "Pour ¼ cup batter per pancake; cook 2–3 min each side.",
-            "Serve with fresh fruit or maple syrup.",
-          ],
-        },
-        {
-          name: "Avocado Egg Toast",
-          category: "breakfast", servingSize: "2 slices", prepTime: "10 min",
-          protein: 22, carbs: 30, fat: 20, calories: 388,
-          ingredients: [
-            { name: "Whole grain bread", amount: 70, unit: "g" },
-            { name: "Avocado", amount: 80, unit: "g" },
-            { name: "Eggs", amount: 100, unit: "g" },
-            { name: "Cherry tomatoes", amount: 50, unit: "g" },
-            { name: "Everything bagel seasoning", amount: 3, unit: "g" },
-          ],
-          instructions: [
-            "Toast bread until golden. Poach or fry eggs to your liking.",
-            "Mash avocado with a pinch of salt; spread on toast.",
-            "Top with egg, sliced tomatoes, and bagel seasoning.",
-          ],
-        },
-        {
-          name: "Protein Smoothie Bowl",
-          category: "breakfast", servingSize: "1 bowl", prepTime: "8 min",
-          protein: 28, carbs: 40, fat: 5, calories: 317,
-          ingredients: [
-            { name: "Whey protein powder", amount: 30, unit: "g" },
-            { name: "Frozen banana", amount: 80, unit: "g" },
-            { name: "Mixed frozen berries", amount: 100, unit: "g" },
-            { name: "Almond milk", amount: 80, unit: "ml" },
-            { name: "Granola", amount: 20, unit: "g" },
-          ],
-          instructions: [
-            "Blend protein, frozen banana, berries, and almond milk until thick.",
-            "Pour into a bowl — thicker than a drink.",
-            "Top with granola and fresh fruit.",
-          ],
-        },
-        {
-          name: "Overnight Oats",
-          category: "breakfast", servingSize: "1 jar", prepTime: "5 min + overnight",
-          protein: 20, carbs: 52, fat: 8, calories: 360,
-          ingredients: [
-            { name: "Rolled oats", amount: 80, unit: "g" },
-            { name: "Plain Greek yogurt", amount: 80, unit: "g" },
-            { name: "Almond milk", amount: 150, unit: "ml" },
-            { name: "Chia seeds", amount: 10, unit: "g" },
-            { name: "Maple syrup", amount: 10, unit: "ml" },
-            { name: "Mixed berries", amount: 60, unit: "g" },
-          ],
-          instructions: [
-            "Mix oats, yogurt, almond milk, chia seeds, and maple syrup in a jar.",
-            "Stir well, cover, and refrigerate overnight.",
-            "In the morning, top with berries and enjoy cold.",
-          ],
-        },
-        {
-          name: "Scrambled Eggs & Toast",
-          category: "breakfast", servingSize: "1 plate", prepTime: "10 min",
-          protein: 26, carbs: 28, fat: 16, calories: 360,
-          ingredients: [
-            { name: "Eggs", amount: 200, unit: "g" },
-            { name: "Whole grain bread", amount: 70, unit: "g" },
-            { name: "Butter", amount: 5, unit: "g" },
-            { name: "Chives", amount: 5, unit: "g" },
-            { name: "Salt & pepper", amount: 2, unit: "g" },
-          ],
-          instructions: [
-            "Whisk eggs with salt and pepper.",
-            "Melt butter in a pan over low heat; add eggs.",
-            "Stir gently and slowly until just set — slightly creamy.",
-            "Serve on toasted whole grain bread topped with chives.",
-          ],
-        },
-        {
-          name: "High-Protein Banana Muffins",
-          category: "breakfast", servingSize: "2 muffins", prepTime: "30 min",
-          protein: 20, carbs: 42, fat: 7, calories: 315,
-          ingredients: [
-            { name: "Ripe bananas", amount: 120, unit: "g" },
-            { name: "Rolled oats", amount: 80, unit: "g" },
-            { name: "Whey protein powder", amount: 30, unit: "g" },
-            { name: "Eggs", amount: 100, unit: "g" },
-            { name: "Baking powder", amount: 5, unit: "g" },
-            { name: "Honey", amount: 10, unit: "g" },
-          ],
-          instructions: [
-            "Preheat oven to 180°C. Line a muffin tin.",
-            "Blend oats into flour; mash bananas well.",
-            "Mix all ingredients together until just combined.",
-            "Divide into 6 muffin cups and bake 18–20 minutes.",
-          ],
-        },
-        {
-          name: "Smoked Salmon Bagel",
-          category: "breakfast", servingSize: "1 bagel", prepTime: "5 min",
-          protein: 28, carbs: 38, fat: 10, calories: 354,
-          ingredients: [
-            { name: "Whole grain bagel", amount: 100, unit: "g" },
-            { name: "Smoked salmon", amount: 80, unit: "g" },
-            { name: "Light cream cheese", amount: 30, unit: "g" },
-            { name: "Red onion", amount: 20, unit: "g" },
-            { name: "Capers", amount: 10, unit: "g" },
-            { name: "Lemon juice", amount: 5, unit: "ml" },
-          ],
-          instructions: [
-            "Toast the bagel until golden.",
-            "Spread cream cheese on both halves.",
-            "Layer smoked salmon, red onion slices, and capers.",
-            "Squeeze lemon juice on top and serve.",
-          ],
-        },
+{name:"High Protein Oatmeal (with Whey)",category:"breakfast",servingSize:"1 bowl",prepTime:"5 min",
+ protein:54,carbs:92,fat:25,calories:780,
+ ingredients:[{name:"Rolled Oats (large flake)",amount:80,unit:"g"},{name:"Soy Milk (unsweetened)",amount:250,unit:"ml"},{name:"Whey Protein Isolate",amount:30,unit:"g"},{name:"Banana",amount:100,unit:"g"},{name:"Peanut Butter (natural)",amount:20,unit:"g"},{name:"Chia Seeds",amount:12,unit:"g"},{name:"Cinnamon (ground)",amount:2,unit:"g"}],
+ instructions:["Cook oats in soy milk 5 min. Remove from heat.","Stir in whey protein until smooth, then mix in peanut butter and chia seeds. Top with banana slices."]},
 
-        // ── LUNCH (10) ─────────────────────────────────────────
-        {
-          name: "Grilled Chicken Salad",
-          category: "lunch", servingSize: "1 plate", prepTime: "20 min",
-          protein: 42, carbs: 10, fat: 16, calories: 356,
-          ingredients: [
-            { name: "Chicken breast", amount: 180, unit: "g" },
-            { name: "Mixed greens", amount: 80, unit: "g" },
-            { name: "Cherry tomatoes", amount: 60, unit: "g" },
-            { name: "Cucumber", amount: 60, unit: "g" },
-            { name: "Olive oil", amount: 15, unit: "g" },
-            { name: "Lemon juice", amount: 15, unit: "ml" },
-          ],
-          instructions: [
-            "Season chicken with salt, pepper, and garlic powder.",
-            "Grill 6–7 min per side until cooked through; slice thinly.",
-            "Toss greens, tomatoes, and cucumber with olive oil and lemon.",
-            "Top salad with sliced chicken and serve.",
-          ],
-        },
-        {
-          name: "Turkey Avocado Wrap",
-          category: "lunch", servingSize: "1 wrap", prepTime: "8 min",
-          protein: 32, carbs: 36, fat: 14, calories: 400,
-          ingredients: [
-            { name: "Sliced turkey breast", amount: 120, unit: "g" },
-            { name: "Whole wheat tortilla", amount: 65, unit: "g" },
-            { name: "Avocado", amount: 50, unit: "g" },
-            { name: "Romaine lettuce", amount: 30, unit: "g" },
-            { name: "Tomato", amount: 50, unit: "g" },
-            { name: "Dijon mustard", amount: 10, unit: "g" },
-          ],
-          instructions: [
-            "Warm the tortilla 20 seconds in the microwave.",
-            "Spread mashed avocado and mustard on the tortilla.",
-            "Layer turkey, lettuce, and tomato across the centre.",
-            "Roll tightly, slice in half, and serve.",
-          ],
-        },
-        {
-          name: "Tuna Rice Bowl",
-          category: "lunch", servingSize: "1 bowl", prepTime: "15 min",
-          protein: 36, carbs: 45, fat: 6, calories: 386,
-          ingredients: [
-            { name: "Canned tuna in water", amount: 150, unit: "g" },
-            { name: "Brown rice (dry)", amount: 80, unit: "g" },
-            { name: "Edamame", amount: 60, unit: "g" },
-            { name: "Shredded carrots", amount: 40, unit: "g" },
-            { name: "Soy sauce", amount: 10, unit: "ml" },
-            { name: "Sesame oil", amount: 5, unit: "ml" },
-          ],
-          instructions: [
-            "Cook brown rice according to package directions.",
-            "Drain and flake tuna; toss with soy sauce and sesame oil.",
-            "Assemble rice in bowl, top with tuna, edamame, and carrots.",
-          ],
-        },
-        {
-          name: "Chicken Quinoa Bowl",
-          category: "lunch", servingSize: "1 bowl", prepTime: "25 min",
-          protein: 40, carbs: 42, fat: 12, calories: 436,
-          ingredients: [
-            { name: "Chicken breast", amount: 160, unit: "g" },
-            { name: "Quinoa (dry)", amount: 70, unit: "g" },
-            { name: "Roasted zucchini", amount: 80, unit: "g" },
-            { name: "Cherry tomatoes", amount: 60, unit: "g" },
-            { name: "Olive oil", amount: 10, unit: "g" },
-            { name: "Lemon juice", amount: 10, unit: "ml" },
-          ],
-          instructions: [
-            "Cook quinoa in chicken broth for extra flavour.",
-            "Season and pan-fry chicken until cooked through; slice.",
-            "Toss zucchini and tomatoes with olive oil; roast 15 min at 200°C.",
-            "Bowl up quinoa, top with chicken and veggies, drizzle lemon.",
-          ],
-        },
-        {
-          name: "Turkey Lentil Soup",
-          category: "lunch", servingSize: "1 large bowl", prepTime: "35 min",
-          protein: 30, carbs: 34, fat: 5, calories: 305,
-          ingredients: [
-            { name: "Ground turkey", amount: 120, unit: "g" },
-            { name: "Red lentils (dry)", amount: 80, unit: "g" },
-            { name: "Carrots", amount: 60, unit: "g" },
-            { name: "Celery", amount: 40, unit: "g" },
-            { name: "Onion", amount: 60, unit: "g" },
-            { name: "Chicken broth", amount: 400, unit: "ml" },
-          ],
-          instructions: [
-            "Sauté diced onion, carrot, and celery in a pot over medium heat.",
-            "Add ground turkey; cook until browned.",
-            "Stir in red lentils and broth; bring to a boil.",
-            "Simmer 20 minutes until lentils are soft. Season to taste.",
-          ],
-        },
-        {
-          name: "Chicken Caesar Wrap",
-          category: "lunch", servingSize: "1 wrap", prepTime: "12 min",
-          protein: 38, carbs: 32, fat: 14, calories: 410,
-          ingredients: [
-            { name: "Grilled chicken breast", amount: 150, unit: "g" },
-            { name: "Whole wheat tortilla", amount: 65, unit: "g" },
-            { name: "Romaine lettuce", amount: 60, unit: "g" },
-            { name: "Light Caesar dressing", amount: 20, unit: "g" },
-            { name: "Parmesan cheese", amount: 15, unit: "g" },
-          ],
-          instructions: [
-            "Slice grilled chicken into strips.",
-            "Toss romaine with Caesar dressing and parmesan.",
-            "Layer chicken and salad on the tortilla and roll tightly.",
-          ],
-        },
-        {
-          name: "Black Bean Burrito Bowl",
-          category: "lunch", servingSize: "1 bowl", prepTime: "15 min",
-          protein: 22, carbs: 52, fat: 9, calories: 380,
-          ingredients: [
-            { name: "Canned black beans", amount: 120, unit: "g" },
-            { name: "Brown rice (dry)", amount: 70, unit: "g" },
-            { name: "Corn", amount: 50, unit: "g" },
-            { name: "Salsa", amount: 50, unit: "g" },
-            { name: "Plain Greek yogurt", amount: 40, unit: "g" },
-            { name: "Shredded cheese", amount: 20, unit: "g" },
-          ],
-          instructions: [
-            "Cook brown rice ahead of time.",
-            "Warm black beans with cumin, salt, and a splash of water.",
-            "Bowl up rice, top with beans, corn, salsa, cheese, and yogurt.",
-          ],
-        },
-        {
-          name: "Egg Salad Sandwich",
-          category: "lunch", servingSize: "1 sandwich", prepTime: "15 min",
-          protein: 24, carbs: 30, fat: 14, calories: 345,
-          ingredients: [
-            { name: "Hard boiled eggs", amount: 150, unit: "g" },
-            { name: "Whole grain bread", amount: 70, unit: "g" },
-            { name: "Light mayonnaise", amount: 20, unit: "g" },
-            { name: "Dijon mustard", amount: 5, unit: "g" },
-            { name: "Celery", amount: 30, unit: "g" },
-            { name: "Green onion", amount: 10, unit: "g" },
-          ],
-          instructions: [
-            "Chop hard boiled eggs; mix with mayo, mustard, celery, and green onion.",
-            "Season with salt and pepper.",
-            "Toast bread and spread egg salad generously. Serve immediately.",
-          ],
-        },
-        {
-          name: "Smoked Salmon Salad",
-          category: "lunch", servingSize: "1 plate", prepTime: "10 min",
-          protein: 30, carbs: 12, fat: 12, calories: 280,
-          ingredients: [
-            { name: "Smoked salmon", amount: 120, unit: "g" },
-            { name: "Mixed greens", amount: 80, unit: "g" },
-            { name: "Cucumber", amount: 60, unit: "g" },
-            { name: "Red onion", amount: 20, unit: "g" },
-            { name: "Capers", amount: 10, unit: "g" },
-            { name: "Olive oil & lemon dressing", amount: 15, unit: "ml" },
-          ],
-          instructions: [
-            "Arrange mixed greens on a plate.",
-            "Top with smoked salmon, sliced cucumber, and red onion.",
-            "Scatter capers and drizzle dressing. Serve chilled.",
-          ],
-        },
-        {
-          name: "Chicken Noodle Soup",
-          category: "lunch", servingSize: "1 large bowl", prepTime: "30 min",
-          protein: 32, carbs: 30, fat: 6, calories: 305,
-          ingredients: [
-            { name: "Chicken breast", amount: 150, unit: "g" },
-            { name: "Whole wheat egg noodles", amount: 60, unit: "g" },
-            { name: "Carrots", amount: 60, unit: "g" },
-            { name: "Celery", amount: 40, unit: "g" },
-            { name: "Onion", amount: 40, unit: "g" },
-            { name: "Chicken broth", amount: 500, unit: "ml" },
-          ],
-          instructions: [
-            "Simmer chicken breast in broth 15 minutes; remove and shred.",
-            "Add diced carrots, celery, and onion to broth; cook 10 minutes.",
-            "Add noodles and shredded chicken; cook 5 more minutes.",
-            "Season with salt, pepper, and parsley.",
-          ],
-        },
+{name:"Banana Oat Pancakes (No Egg)",category:"breakfast",servingSize:"4 pancakes",prepTime:"15 min",
+ protein:14,carbs:93,fat:12,calories:517,
+ ingredients:[{name:"Rolled Oats (large flake)",amount:80,unit:"g"},{name:"Banana (ripe)",amount:120,unit:"g"},{name:"Soy Milk (unsweetened)",amount:60,unit:"ml"},{name:"Cinnamon (ground)",amount:2,unit:"g"},{name:"Baking Powder",amount:4,unit:"g"},{name:"Coconut Oil",amount:5,unit:"g"},{name:"Maple Syrup (pure)",amount:15,unit:"g"}],
+ instructions:["Blend oats, banana, soy milk, cinnamon, and baking powder until smooth.","Heat coconut oil in a pan over medium. Pour batter in ¼ cup rounds; cook 2–3 min per side.","Serve with maple syrup."]},
 
-        // ── DINNER (11) ────────────────────────────────────────
-        {
-          name: "Baked Salmon",
-          category: "dinner", servingSize: "1 fillet", prepTime: "25 min",
-          protein: 45, carbs: 6, fat: 24, calories: 424,
-          ingredients: [
-            { name: "Salmon fillet", amount: 200, unit: "g" },
-            { name: "Asparagus", amount: 100, unit: "g" },
-            { name: "Lemon", amount: 20, unit: "g" },
-            { name: "Garlic", amount: 5, unit: "g" },
-            { name: "Olive oil", amount: 10, unit: "g" },
-            { name: "Fresh dill", amount: 5, unit: "g" },
-          ],
-          instructions: [
-            "Preheat oven to 200°C. Line a baking sheet with foil.",
-            "Place salmon and asparagus on the sheet; drizzle with olive oil.",
-            "Top salmon with minced garlic, lemon slices, and dill.",
-            "Bake 15–18 minutes until salmon flakes easily.",
-          ],
-        },
-        {
-          name: "Chicken Stir Fry",
-          category: "dinner", servingSize: "1 plate", prepTime: "20 min",
-          protein: 38, carbs: 32, fat: 10, calories: 370,
-          ingredients: [
-            { name: "Chicken breast", amount: 160, unit: "g" },
-            { name: "Broccoli", amount: 100, unit: "g" },
-            { name: "Bell peppers", amount: 80, unit: "g" },
-            { name: "Snap peas", amount: 60, unit: "g" },
-            { name: "Soy sauce", amount: 15, unit: "ml" },
-            { name: "Brown rice (dry)", amount: 60, unit: "g" },
-          ],
-          instructions: [
-            "Cook brown rice ahead of time.",
-            "Slice chicken; stir-fry in a hot wok 5–6 min.",
-            "Add broccoli, peppers, and snap peas; stir-fry 3–4 min.",
-            "Deglaze with soy sauce; serve over rice.",
-          ],
-        },
-        {
-          name: "Turkey Meatballs & Pasta",
-          category: "dinner", servingSize: "1 plate", prepTime: "35 min",
-          protein: 38, carbs: 50, fat: 12, calories: 464,
-          ingredients: [
-            { name: "Ground turkey", amount: 150, unit: "g" },
-            { name: "Whole wheat pasta (dry)", amount: 80, unit: "g" },
-            { name: "Tomato pasta sauce", amount: 100, unit: "g" },
-            { name: "Garlic", amount: 5, unit: "g" },
-            { name: "Parmesan cheese", amount: 20, unit: "g" },
-            { name: "Olive oil", amount: 5, unit: "g" },
-          ],
-          instructions: [
-            "Mix ground turkey with garlic, salt, and pepper; roll into balls.",
-            "Brown meatballs in olive oil 4–5 min per side.",
-            "Add tomato sauce; simmer 10 minutes.",
-            "Serve over al dente pasta, topped with parmesan.",
-          ],
-        },
-        {
-          name: "Lean Beef & Broccoli Bowl",
-          category: "dinner", servingSize: "1 bowl", prepTime: "25 min",
-          protein: 38, carbs: 34, fat: 13, calories: 413,
-          ingredients: [
-            { name: "Lean ground beef (95%)", amount: 150, unit: "g" },
-            { name: "Broccoli", amount: 150, unit: "g" },
-            { name: "Brown rice (dry)", amount: 60, unit: "g" },
-            { name: "Soy sauce", amount: 20, unit: "ml" },
-            { name: "Sesame oil", amount: 5, unit: "ml" },
-            { name: "Garlic", amount: 5, unit: "g" },
-          ],
-          instructions: [
-            "Cook brown rice ahead of time.",
-            "Brown beef in a pan; drain excess fat. Add minced garlic.",
-            "Stir in soy sauce and broccoli; cover and steam 4 minutes.",
-            "Finish with sesame oil and serve over rice.",
-          ],
-        },
-        {
-          name: "Herb Baked Chicken & Sweet Potato",
-          category: "dinner", servingSize: "1 plate", prepTime: "35 min",
-          protein: 48, carbs: 22, fat: 11, calories: 380,
-          ingredients: [
-            { name: "Chicken breast", amount: 200, unit: "g" },
-            { name: "Sweet potato", amount: 100, unit: "g" },
-            { name: "Olive oil", amount: 10, unit: "g" },
-            { name: "Paprika", amount: 2, unit: "g" },
-            { name: "Garlic powder", amount: 2, unit: "g" },
-            { name: "Mixed dried herbs", amount: 2, unit: "g" },
-          ],
-          instructions: [
-            "Preheat oven to 200°C. Cube sweet potato and toss with half the oil.",
-            "Rub chicken with remaining oil, paprika, garlic powder, and herbs.",
-            "Place on a baking sheet and bake 25–30 minutes.",
-          ],
-        },
-        {
-          name: "Shrimp & Quinoa Bowl",
-          category: "dinner", servingSize: "1 bowl", prepTime: "20 min",
-          protein: 35, carbs: 38, fat: 9, calories: 373,
-          ingredients: [
-            { name: "Shrimp (peeled)", amount: 180, unit: "g" },
-            { name: "Quinoa (dry)", amount: 70, unit: "g" },
-            { name: "Zucchini", amount: 80, unit: "g" },
-            { name: "Cherry tomatoes", amount: 60, unit: "g" },
-            { name: "Olive oil", amount: 10, unit: "g" },
-            { name: "Lemon juice", amount: 15, unit: "ml" },
-          ],
-          instructions: [
-            "Cook quinoa in vegetable broth.",
-            "Sauté shrimp in olive oil 2–3 min per side until pink.",
-            "Add zucchini and tomatoes; cook 2 more minutes.",
-            "Serve over quinoa and squeeze lemon on top.",
-          ],
-        },
-        {
-          name: "Baked Cod & Veggies",
-          category: "dinner", servingSize: "1 plate", prepTime: "25 min",
-          protein: 38, carbs: 18, fat: 8, calories: 298,
-          ingredients: [
-            { name: "Cod fillet", amount: 200, unit: "g" },
-            { name: "Green beans", amount: 100, unit: "g" },
-            { name: "Baby potatoes", amount: 100, unit: "g" },
-            { name: "Olive oil", amount: 10, unit: "g" },
-            { name: "Lemon", amount: 20, unit: "g" },
-            { name: "Paprika & herbs", amount: 3, unit: "g" },
-          ],
-          instructions: [
-            "Preheat oven to 200°C.",
-            "Halve potatoes; toss with olive oil and roast 15 minutes.",
-            "Add cod and green beans to the pan; season with paprika and herbs.",
-            "Bake 12–15 more minutes until fish flakes. Serve with lemon.",
-          ],
-        },
-        {
-          name: "Ground Turkey Tacos",
-          category: "dinner", servingSize: "3 tacos", prepTime: "20 min",
-          protein: 36, carbs: 38, fat: 14, calories: 424,
-          ingredients: [
-            { name: "Ground turkey", amount: 150, unit: "g" },
-            { name: "Corn tortillas", amount: 90, unit: "g" },
-            { name: "Shredded cabbage", amount: 60, unit: "g" },
-            { name: "Salsa", amount: 50, unit: "g" },
-            { name: "Greek yogurt (sour cream sub)", amount: 30, unit: "g" },
-            { name: "Taco seasoning", amount: 5, unit: "g" },
-          ],
-          instructions: [
-            "Cook ground turkey with taco seasoning and a splash of water.",
-            "Warm corn tortillas on a dry pan.",
-            "Fill each tortilla with turkey, cabbage, salsa, and yogurt.",
-          ],
-        },
-        {
-          name: "Pork Tenderloin & Roasted Veggies",
-          category: "dinner", servingSize: "1 plate", prepTime: "35 min",
-          protein: 40, carbs: 22, fat: 10, calories: 340,
-          ingredients: [
-            { name: "Pork tenderloin", amount: 180, unit: "g" },
-            { name: "Brussels sprouts", amount: 100, unit: "g" },
-            { name: "Baby carrots", amount: 80, unit: "g" },
-            { name: "Olive oil", amount: 10, unit: "g" },
-            { name: "Dijon mustard", amount: 15, unit: "g" },
-            { name: "Garlic powder & rosemary", amount: 3, unit: "g" },
-          ],
-          instructions: [
-            "Preheat oven to 210°C. Rub pork with mustard and seasoning.",
-            "Halve Brussels sprouts and toss with olive oil; surround the pork.",
-            "Roast 20–25 minutes until pork reaches 63°C internal temp.",
-            "Rest 5 minutes before slicing. Serve with roasted veggies.",
-          ],
-        },
-        {
-          name: "Chicken Breast & Roasted Veggies",
-          category: "dinner", servingSize: "1 plate", prepTime: "30 min",
-          protein: 44, carbs: 20, fat: 12, calories: 364,
-          ingredients: [
-            { name: "Chicken breast", amount: 200, unit: "g" },
-            { name: "Bell peppers", amount: 80, unit: "g" },
-            { name: "Zucchini", amount: 80, unit: "g" },
-            { name: "Red onion", amount: 50, unit: "g" },
-            { name: "Olive oil", amount: 12, unit: "g" },
-            { name: "Italian seasoning", amount: 3, unit: "g" },
-          ],
-          instructions: [
-            "Preheat oven to 200°C.",
-            "Toss chopped veggies with half the oil and seasoning; spread on pan.",
-            "Brush chicken with remaining oil and seasoning; place on same pan.",
-            "Roast 25–28 minutes until chicken is cooked through.",
-          ],
-        },
-        {
-          name: "Salmon Pasta",
-          category: "dinner", servingSize: "1 plate", prepTime: "25 min",
-          protein: 38, carbs: 48, fat: 14, calories: 478,
-          ingredients: [
-            { name: "Salmon fillet", amount: 150, unit: "g" },
-            { name: "Whole wheat pasta (dry)", amount: 80, unit: "g" },
-            { name: "Spinach", amount: 50, unit: "g" },
-            { name: "Light cream", amount: 40, unit: "ml" },
-            { name: "Garlic", amount: 5, unit: "g" },
-            { name: "Parmesan", amount: 15, unit: "g" },
-          ],
-          instructions: [
-            "Cook pasta to al dente; reserve ¼ cup pasta water.",
-            "Pan-fry salmon 4 min per side; flake into large chunks.",
-            "Sauté garlic, add spinach until wilted, add cream and pasta water.",
-            "Toss pasta in sauce, fold in salmon, top with parmesan.",
-          ],
-        },
+{name:"Protein Pancakes (High Protein, No Egg)",category:"breakfast",servingSize:"4 pancakes",prepTime:"15 min",
+ protein:40,carbs:66,fat:12,calories:522,
+ ingredients:[{name:"Oat Flour",amount:60,unit:"g"},{name:"Whey Protein Isolate",amount:30,unit:"g"},{name:"Banana (ripe)",amount:100,unit:"g"},{name:"Soy Milk (unsweetened)",amount:120,unit:"ml"},{name:"Baking Powder",amount:5,unit:"g"},{name:"Vanilla Extract",amount:4,unit:"ml"},{name:"Cinnamon (ground)",amount:2,unit:"g"},{name:"Coconut Oil",amount:5,unit:"g"}],
+ instructions:["Mix oat flour, protein powder, baking powder, and cinnamon. Blend in banana, soy milk, and vanilla.","Cook in coconut oil over medium heat, ¼ cup per pancake, 2–3 min per side."]},
 
-        // ── SNACKS (6) ─────────────────────────────────────────
-        {
-          name: "Protein Shake",
-          category: "snack", servingSize: "1 shake", prepTime: "3 min",
-          protein: 28, carbs: 14, fat: 3, calories: 195,
-          ingredients: [
-            { name: "Whey protein powder", amount: 30, unit: "g" },
-            { name: "Almond milk", amount: 300, unit: "ml" },
-            { name: "Banana", amount: 40, unit: "g" },
-          ],
-          instructions: [
-            "Add all ingredients to a blender.",
-            "Blend 30 seconds until smooth. Drink immediately.",
-          ],
-        },
-        {
-          name: "Cottage Cheese & Berries",
-          category: "snack", servingSize: "1 bowl", prepTime: "3 min",
-          protein: 22, carbs: 18, fat: 4, calories: 196,
-          ingredients: [
-            { name: "Cottage cheese", amount: 200, unit: "g" },
-            { name: "Mixed berries", amount: 100, unit: "g" },
-            { name: "Honey", amount: 10, unit: "g" },
-          ],
-          instructions: [
-            "Spoon cottage cheese into a bowl.",
-            "Top with fresh or thawed berries and a drizzle of honey.",
-          ],
-        },
-        {
-          name: "Hard Boiled Eggs",
-          category: "snack", servingSize: "3 eggs", prepTime: "12 min",
-          protein: 18, carbs: 1, fat: 14, calories: 210,
-          ingredients: [
-            { name: "Eggs", amount: 165, unit: "g" },
-            { name: "Salt", amount: 1, unit: "g" },
-          ],
-          instructions: [
-            "Place eggs in a pot, cover with cold water.",
-            "Bring to a boil, then cook 9–10 minutes for firm yolks.",
-            "Transfer to an ice bath for 5 minutes, then peel and enjoy.",
-          ],
-        },
-        {
-          name: "Apple & Peanut Butter",
-          category: "snack", servingSize: "1 serving", prepTime: "3 min",
-          protein: 8, carbs: 35, fat: 13, calories: 285,
-          ingredients: [
-            { name: "Apple", amount: 180, unit: "g" },
-            { name: "Natural peanut butter", amount: 30, unit: "g" },
-          ],
-          instructions: [
-            "Slice apple into wedges.",
-            "Serve with peanut butter for dipping.",
-          ],
-        },
-        {
-          name: "Turkey & Cheese Roll-Ups",
-          category: "snack", servingSize: "3 rolls", prepTime: "5 min",
-          protein: 24, carbs: 3, fat: 11, calories: 207,
-          ingredients: [
-            { name: "Sliced turkey breast", amount: 120, unit: "g" },
-            { name: "Swiss cheese", amount: 40, unit: "g" },
-            { name: "Dijon mustard", amount: 10, unit: "g" },
-            { name: "Baby spinach", amount: 20, unit: "g" },
-          ],
-          instructions: [
-            "Lay out turkey slices flat.",
-            "Add a slice of cheese, smear of mustard, and a few spinach leaves.",
-            "Roll tightly and secure with a toothpick if needed.",
-          ],
-        },
-        {
-          name: "Hummus & Veggie Sticks",
-          category: "snack", servingSize: "1 plate", prepTime: "5 min",
-          protein: 10, carbs: 22, fat: 9, calories: 205,
-          ingredients: [
-            { name: "Hummus", amount: 80, unit: "g" },
-            { name: "Carrots", amount: 80, unit: "g" },
-            { name: "Celery", amount: 60, unit: "g" },
-            { name: "Cucumber", amount: 60, unit: "g" },
-            { name: "Bell pepper", amount: 50, unit: "g" },
-          ],
-          instructions: [
-            "Cut all vegetables into sticks.",
-            "Serve with hummus for dipping.",
-          ],
-        },
-      ];
+{name:"Overnight Oats with Berries",category:"breakfast",servingSize:"1 jar",prepTime:"5 min + overnight",
+ protein:28,carbs:84,fat:13,calories:551,
+ ingredients:[{name:"Rolled Oats (large flake)",amount:80,unit:"g"},{name:"Greek Yogurt (plain, 0% fat)",amount:100,unit:"g"},{name:"Soy Milk (unsweetened)",amount:120,unit:"ml"},{name:"Chia Seeds",amount:15,unit:"g"},{name:"Mixed Berries (frozen)",amount:80,unit:"g"},{name:"Maple Syrup (pure)",amount:10,unit:"g"}],
+ instructions:["Mix oats, yogurt, soy milk, chia seeds, and maple syrup in a jar.","Stir well, top with frozen berries, seal, and refrigerate overnight. Eat cold."]},
 
-      // ── Auth & UI ─────────────────────────────────────────────
-      const btn     = document.getElementById("importBtn");
-      const status  = document.getElementById("status");
-      const log     = document.getElementById("log");
-      const bar     = document.getElementById("bar");
-      const barWrap = document.getElementById("barWrap");
-      const done    = document.getElementById("doneBanner");
-      const warn    = document.getElementById("authWarn");
+{name:"Protein Overnight Oats (with Whey)",category:"breakfast",servingSize:"1 jar",prepTime:"5 min + overnight",
+ protein:62,carbs:83,fat:21,calories:753,
+ ingredients:[{name:"Rolled Oats (large flake)",amount:80,unit:"g"},{name:"Whey Protein Isolate",amount:30,unit:"g"},{name:"Greek Yogurt (plain, 0% fat)",amount:150,unit:"g"},{name:"Soy Milk (unsweetened)",amount:100,unit:"ml"},{name:"Chia Seeds",amount:15,unit:"g"},{name:"Blueberries",amount:80,unit:"g"},{name:"Almond Butter (natural)",amount:15,unit:"g"}],
+ instructions:["Stir whey protein into soy milk until dissolved. Combine with oats, yogurt, chia seeds, and almond butter.","Pour into a jar, top with blueberries, and refrigerate overnight."]},
 
-      function addLog(text, isErr = false) {
-        const d = document.createElement("div");
-        d.className = "log-row " + (isErr ? "err" : "ok");
-        d.textContent = text;
-        log.prepend(d);
-      }
+{name:"Chia Pudding",category:"breakfast",servingSize:"1 jar",prepTime:"5 min + 4hr set",
+ protein:17,carbs:44,fat:18,calories:395,
+ ingredients:[{name:"Chia Seeds",amount:40,unit:"g"},{name:"Soy Milk (unsweetened)",amount:300,unit:"ml"},{name:"Maple Syrup (pure)",amount:15,unit:"g"},{name:"Vanilla Extract",amount:4,unit:"ml"},{name:"Mixed Berries (frozen)",amount:80,unit:"g"}],
+ instructions:["Whisk chia seeds, soy milk, maple syrup, and vanilla together in a jar.","Refrigerate at least 4 hours or overnight until thick. Top with thawed berries."]},
 
-      onAuthStateChanged(auth, (user) => {
-        if (!user) {
-          warn.style.display = "block";
-          warn.innerHTML = '⚠️ You must be signed in. <a href="login.html" style="color:inherit;font-weight:600">Sign in →</a>';
-          btn.textContent = "Sign in first";
-          btn.disabled = false;
-          btn.onclick = () => { window.location.href = "login.html"; };
-        } else if (!isAdmin(user)) {
-          warn.style.display = "block";
-          warn.textContent = "⚠️ Admin access required to import recipes.";
-          btn.textContent = "Admin only";
-          btn.disabled = true;
-        } else {
-          btn.textContent = `Import All ${RECIPES.length} Canadian Recipes`;
-          btn.disabled = false;
-          btn.onclick = runImport;
-        }
-      });
+{name:"Peanut Butter Banana Toast",category:"breakfast",servingSize:"2 slices",prepTime:"3 min",
+ protein:22,carbs:64,fat:26,calories:535,
+ ingredients:[{name:"Whole Wheat Bread",amount:70,unit:"g"},{name:"Peanut Butter (natural)",amount:32,unit:"g"},{name:"Banana (ripe)",amount:100,unit:"g"},{name:"Hemp Hearts",amount:15,unit:"g"},{name:"Cinnamon (ground)",amount:1,unit:"g"}],
+ instructions:["Toast bread until golden. Spread peanut butter generously on each slice.","Top with sliced banana, hemp hearts, and a dusting of cinnamon."]},
 
-      async function runImport() {
-        btn.disabled = true;
-        barWrap.style.display = "block";
-        done.style.display = "none";
-        log.innerHTML = "";
-        let ok = 0, fail = 0;
+{name:"Greek Yogurt Parfait",category:"breakfast",servingSize:"1 bowl",prepTime:"3 min",
+ protein:34,carbs:51,fat:20,calories:500,
+ ingredients:[{name:"Greek Yogurt (plain, 0% fat)",amount:200,unit:"g"},{name:"Rolled Oats (large flake)",amount:30,unit:"g"},{name:"Blueberries",amount:80,unit:"g"},{name:"Hemp Hearts",amount:20,unit:"g"},{name:"Almonds (raw)",amount:15,unit:"g"},{name:"Maple Syrup (pure)",amount:10,unit:"g"}],
+ instructions:["Layer yogurt, blueberries, and oats in a bowl or jar.","Top with hemp hearts, almonds, and maple syrup. Serve immediately."]},
 
-        for (let i = 0; i < RECIPES.length; i++) {
-          const r = RECIPES[i];
-          status.textContent = `Saving ${i + 1} / ${RECIPES.length}: ${r.name}…`;
-          bar.style.width = ((i + 1) / RECIPES.length * 100).toFixed(0) + "%";
-          try {
-            await saveRecipe(r, "canadian");
-            addLog(`✓ ${r.name} (${r.category})`);
-            ok++;
-          } catch (e) {
-            addLog(`✗ ${r.name}: ${e.message}`, true);
-            fail++;
-          }
-        }
+{name:"Protein Smoothie (Post Workout)",category:"breakfast",servingSize:"1 large glass",prepTime:"3 min",
+ protein:46,carbs:52,fat:21,calories:554,
+ ingredients:[{name:"Whey Protein Isolate",amount:30,unit:"g"},{name:"Banana (ripe)",amount:120,unit:"g"},{name:"Soy Milk (unsweetened)",amount:300,unit:"ml"},{name:"Peanut Butter (natural)",amount:20,unit:"g"},{name:"Mixed Berries (frozen)",amount:80,unit:"g"},{name:"Flaxseeds (ground)",amount:10,unit:"g"}],
+ instructions:["Add all ingredients to a blender.","Blend on high 30–45 seconds until completely smooth. Drink immediately."]},
 
-        status.textContent = `Done — ${ok} imported, ${fail} failed.`;
-        bar.style.width = "100%";
-        if (fail === 0) {
-          done.style.display = "block";
-          btn.textContent = "✓ Import complete";
-        } else {
-          btn.textContent = "Retry failed";
-          btn.disabled = false;
-          btn.onclick = runImport;
-        }
-      }
-    </script>
-  </body>
+{name:"Avocado Toast with Hemp Hearts",category:"breakfast",servingSize:"2 slices",prepTime:"5 min",
+ protein:21,carbs:46,fat:24,calories:446,
+ ingredients:[{name:"Whole Wheat Bread",amount:70,unit:"g"},{name:"Avocado",amount:75,unit:"g"},{name:"Hemp Hearts",amount:20,unit:"g"},{name:"Nutritional Yeast",amount:10,unit:"g"},{name:"Sriracha Hot Sauce",amount:5,unit:"g"}],
+ instructions:["Toast bread. Mash avocado with a pinch of salt and spread on toast.","Top with hemp hearts, nutritional yeast, and a drizzle of sriracha."]},
+
+// ── LUNCH ──────────────────────────────────────────────────────
+{name:"Red Lentil Dal (Canadian Style)",category:"lunch",servingSize:"1 bowl",prepTime:"25 min",
+ protein:30,carbs:77,fat:27,calories:647,
+ ingredients:[{name:"Red Lentils (dry)",amount:100,unit:"g"},{name:"Canned Tomatoes (diced)",amount:200,unit:"g"},{name:"Coconut Milk (full fat)",amount:60,unit:"ml"},{name:"Vegetable Broth (low sodium)",amount:240,unit:"ml"},{name:"Olive Oil (extra virgin)",amount:10,unit:"g"},{name:"Curry Powder",amount:5,unit:"g"},{name:"Cinnamon (ground)",amount:1,unit:"g"}],
+ instructions:["Sauté curry powder and cinnamon in olive oil 30 seconds. Add lentils, tomatoes, and broth.","Simmer 20 min until lentils are soft. Stir in coconut milk, season to taste."]},
+
+{name:"Black Bean Burrito Bowl",category:"lunch",servingSize:"1 bowl",prepTime:"20 min",
+ protein:22,carbs:100,fat:22,calories:649,
+ ingredients:[{name:"Black Beans (canned, drained)",amount:160,unit:"g"},{name:"Brown Rice (dry)",amount:60,unit:"g"},{name:"Bell Pepper (red)",amount:80,unit:"g"},{name:"Avocado",amount:75,unit:"g"},{name:"Canned Tomatoes (diced)",amount:80,unit:"g"},{name:"Olive Oil (extra virgin)",amount:8,unit:"g"},{name:"Smoked Paprika",amount:3,unit:"g"},{name:"Sriracha Hot Sauce",amount:5,unit:"g"}],
+ instructions:["Cook brown rice. Warm black beans with paprika and a splash of water.","Bowl up rice, top with beans, diced pepper, tomatoes, sliced avocado, and sriracha."]},
+
+{name:"Chickpea and Lentil Soup",category:"lunch",servingSize:"1 large bowl",prepTime:"30 min",
+ protein:36,carbs:99,fat:30,calories:787,
+ ingredients:[{name:"Red Lentils (dry)",amount:80,unit:"g"},{name:"Chickpeas (canned, drained)",amount:120,unit:"g"},{name:"Canned Tomatoes (diced)",amount:200,unit:"g"},{name:"Vegetable Broth (low sodium)",amount:400,unit:"ml"},{name:"Coconut Milk (full fat)",amount:60,unit:"ml"},{name:"Olive Oil (extra virgin)",amount:10,unit:"g"},{name:"Curry Powder",amount:5,unit:"g"},{name:"Smoked Paprika",amount:2,unit:"g"}],
+ instructions:["Sauté curry powder and paprika in olive oil 30 seconds. Add lentils, chickpeas, tomatoes, and broth.","Simmer 20 min until lentils are tender. Stir in coconut milk and season to taste."]},
+
+{name:"Quinoa Power Bowl",category:"lunch",servingSize:"1 bowl",prepTime:"20 min",
+ protein:33,carbs:90,fat:47,calories:869,
+ ingredients:[{name:"Quinoa (dry)",amount:60,unit:"g"},{name:"Chickpeas (canned, drained)",amount:120,unit:"g"},{name:"Kale (fresh)",amount:60,unit:"g"},{name:"Avocado",amount:75,unit:"g"},{name:"Hemp Hearts",amount:20,unit:"g"},{name:"Tahini",amount:20,unit:"g"},{name:"Olive Oil (extra virgin)",amount:8,unit:"g"}],
+ instructions:["Cook quinoa in salted water 15 min. Massage kale with olive oil until tender.","Bowl up quinoa with chickpeas, kale, sliced avocado. Drizzle tahini and sprinkle hemp hearts."]},
+
+{name:"Veggie Wrap with Hummus",category:"lunch",servingSize:"1 large wrap",prepTime:"10 min",
+ protein:21,carbs:68,fat:28,calories:582,
+ ingredients:[{name:"Whole Wheat Tortilla (large)",amount:45,unit:"g"},{name:"Hummus",amount:60,unit:"g"},{name:"Spinach (fresh)",amount:40,unit:"g"},{name:"Bell Pepper (red)",amount:60,unit:"g"},{name:"Avocado",amount:60,unit:"g"},{name:"Chickpeas (canned, drained)",amount:80,unit:"g"},{name:"Tahini",amount:15,unit:"g"}],
+ instructions:["Spread hummus and tahini on the tortilla. Layer spinach, sliced pepper, avocado, and chickpeas.","Roll tightly, slice in half, and serve."]},
+
+{name:"Lentil and Sweet Potato Curry",category:"lunch",servingSize:"1 bowl",prepTime:"30 min",
+ protein:27,carbs:93,fat:29,calories:720,
+ ingredients:[{name:"Red Lentils (dry)",amount:80,unit:"g"},{name:"Sweet Potato",amount:150,unit:"g"},{name:"Canned Tomatoes (diced)",amount:150,unit:"g"},{name:"Coconut Milk (full fat)",amount:80,unit:"ml"},{name:"Vegetable Broth (low sodium)",amount:200,unit:"ml"},{name:"Olive Oil (extra virgin)",amount:8,unit:"g"},{name:"Curry Powder",amount:6,unit:"g"},{name:"Smoked Paprika",amount:2,unit:"g"}],
+ instructions:["Cube sweet potato. Sauté curry powder and paprika in olive oil 30 sec.","Add lentils, sweet potato, tomatoes, and broth. Simmer 22 min. Stir in coconut milk."]},
+
+{name:"Chickpea Salad Sandwich",category:"lunch",servingSize:"1 sandwich",prepTime:"10 min",
+ protein:28,carbs:89,fat:22,calories:623,
+ ingredients:[{name:"Chickpeas (canned, drained)",amount:160,unit:"g"},{name:"Whole Wheat Bread",amount:70,unit:"g"},{name:"Avocado",amount:50,unit:"g"},{name:"Tahini",amount:15,unit:"g"},{name:"Spinach (fresh)",amount:30,unit:"g"},{name:"Bell Pepper (red)",amount:40,unit:"g"}],
+ instructions:["Mash chickpeas roughly with a fork. Mix in tahini, mashed avocado, salt, and pepper.","Pile onto bread with spinach and sliced bell pepper."]},
+
+{name:"Edamame and Quinoa Bowl",category:"lunch",servingSize:"1 bowl",prepTime:"15 min",
+ protein:37,carbs:63,fat:23,calories:569,
+ ingredients:[{name:"Quinoa (dry)",amount:60,unit:"g"},{name:"Edamame (frozen, shelled)",amount:120,unit:"g"},{name:"Kale (fresh)",amount:50,unit:"g"},{name:"Broccoli (fresh)",amount:80,unit:"g"},{name:"Soy Sauce (low sodium)",amount:15,unit:"ml"},{name:"Hemp Hearts",amount:25,unit:"g"}],
+ instructions:["Cook quinoa. Steam broccoli and edamame 4–5 min. Massage kale with a pinch of salt.","Combine everything in a bowl, drizzle with soy sauce, and top with hemp hearts."]},
+
+{name:"Three Bean Chili",category:"lunch",servingSize:"1 large bowl",prepTime:"35 min",
+ protein:36,carbs:106,fat:16,calories:686,
+ ingredients:[{name:"Black Beans (canned, drained)",amount:120,unit:"g"},{name:"Kidney Beans (canned, drained)",amount:120,unit:"g"},{name:"Chickpeas (canned, drained)",amount:120,unit:"g"},{name:"Canned Tomatoes (diced)",amount:300,unit:"g"},{name:"Vegetable Broth (low sodium)",amount:200,unit:"ml"},{name:"Olive Oil (extra virgin)",amount:10,unit:"g"},{name:"Smoked Paprika",amount:4,unit:"g"},{name:"Curry Powder",amount:3,unit:"g"}],
+ instructions:["Sauté paprika and curry powder in olive oil 30 sec. Add all beans, tomatoes, and broth.","Simmer 25 min, stirring occasionally, until thick. Season to taste."]},
+
+{name:"Whole Wheat Pasta with Chickpeas",category:"lunch",servingSize:"1 bowl",prepTime:"20 min",
+ protein:29,carbs:103,fat:16,calories:660,
+ ingredients:[{name:"Whole Wheat Pasta (dry)",amount:80,unit:"g"},{name:"Chickpeas (canned, drained)",amount:120,unit:"g"},{name:"Canned Tomatoes (diced)",amount:150,unit:"g"},{name:"Spinach (fresh)",amount:50,unit:"g"},{name:"Olive Oil (extra virgin)",amount:10,unit:"g"},{name:"Nutritional Yeast",amount:10,unit:"g"}],
+ instructions:["Cook pasta to al dente; reserve ¼ cup pasta water.","Sauté chickpeas in olive oil 3 min. Add tomatoes, spinach, and pasta water; simmer 5 min. Toss with pasta and nutritional yeast."]},
+
+// ── DINNER ─────────────────────────────────────────────────────
+{name:"Black Bean and Rice",category:"dinner",servingSize:"1 bowl",prepTime:"20 min",
+ protein:21,carbs:95,fat:11,calories:554,
+ ingredients:[{name:"Black Beans (canned, drained)",amount:160,unit:"g"},{name:"Brown Rice (dry)",amount:60,unit:"g"},{name:"Canned Tomatoes (diced)",amount:100,unit:"g"},{name:"Bell Pepper (red)",amount:80,unit:"g"},{name:"Olive Oil (extra virgin)",amount:8,unit:"g"},{name:"Smoked Paprika",amount:3,unit:"g"},{name:"Curry Powder",amount:2,unit:"g"}],
+ instructions:["Cook brown rice. Sauté diced bell pepper in olive oil 3 min. Add beans, tomatoes, paprika, and curry powder.","Simmer 8 min. Serve over rice."]},
+
+{name:"Coconut Chickpea Curry",category:"dinner",servingSize:"1 bowl",prepTime:"25 min",
+ protein:23,carbs:70,fat:45,calories:738,
+ ingredients:[{name:"Chickpeas (canned, drained)",amount:200,unit:"g"},{name:"Coconut Milk (full fat)",amount:120,unit:"ml"},{name:"Canned Tomatoes (diced)",amount:150,unit:"g"},{name:"Vegetable Broth (low sodium)",amount:100,unit:"ml"},{name:"Olive Oil (extra virgin)",amount:10,unit:"g"},{name:"Curry Powder",amount:8,unit:"g"},{name:"Smoked Paprika",amount:2,unit:"g"}],
+ instructions:["Sauté curry powder and paprika in olive oil 30 sec. Add chickpeas, tomatoes, and broth.","Simmer 12 min, then stir in coconut milk and simmer 5 more min. Serve with rice or bread."]},
+
+{name:"Lentil Bolognese with Pasta",category:"dinner",servingSize:"1 bowl",prepTime:"30 min",
+ protein:38,carbs:121,fat:14,calories:758,
+ ingredients:[{name:"Green Lentils (dry)",amount:80,unit:"g"},{name:"Whole Wheat Pasta (dry)",amount:80,unit:"g"},{name:"Canned Tomatoes (diced)",amount:200,unit:"g"},{name:"Vegetable Broth (low sodium)",amount:150,unit:"ml"},{name:"Olive Oil (extra virgin)",amount:10,unit:"g"},{name:"Nutritional Yeast",amount:10,unit:"g"},{name:"Smoked Paprika",amount:2,unit:"g"}],
+ instructions:["Simmer lentils in broth 20 min until tender. Add tomatoes and paprika; cook 10 more min.","Cook pasta al dente. Toss with lentil sauce and finish with nutritional yeast."]},
+
+{name:"Buddha Bowl with Tahini Dressing",category:"dinner",servingSize:"1 bowl",prepTime:"30 min",
+ protein:35,carbs:115,fat:37,calories:885,
+ ingredients:[{name:"Quinoa (dry)",amount:60,unit:"g"},{name:"Chickpeas (canned, drained)",amount:120,unit:"g"},{name:"Sweet Potato",amount:130,unit:"g"},{name:"Broccoli (fresh)",amount:80,unit:"g"},{name:"Kale (fresh)",amount:50,unit:"g"},{name:"Tahini",amount:25,unit:"g"},{name:"Olive Oil (extra virgin)",amount:8,unit:"g"},{name:"Hemp Hearts",amount:15,unit:"g"}],
+ instructions:["Cube sweet potato; toss with olive oil and roast at 200°C for 20 min. Steam broccoli 5 min.","Cook quinoa. Massage kale. Bowl up all components; drizzle with tahini thinned with lemon juice and water, top with hemp hearts."]},
+
+{name:"Split Pea Soup",category:"dinner",servingSize:"1 large bowl",prepTime:"45 min",
+ protein:27,carbs:86,fat:10,calories:538,
+ ingredients:[{name:"Split Yellow Peas (dry)",amount:100,unit:"g"},{name:"Vegetable Broth (low sodium)",amount:500,unit:"ml"},{name:"Sweet Potato",amount:100,unit:"g"},{name:"Olive Oil (extra virgin)",amount:8,unit:"g"},{name:"Smoked Paprika",amount:3,unit:"g"},{name:"Cinnamon (ground)",amount:1,unit:"g"}],
+ instructions:["Rinse peas. Cube sweet potato. Combine all ingredients in a pot and bring to a boil.","Reduce heat and simmer 35–40 min until peas are completely soft. Blend partially for creaminess."]},
+
+{name:"Tofu Stir Fry with Brown Rice",category:"dinner",servingSize:"1 plate",prepTime:"20 min",
+ protein:27,carbs:73,fat:22,calories:565,
+ ingredients:[{name:"Brown Rice (dry)",amount:60,unit:"g"},{name:"Edamame (frozen, shelled)",amount:80,unit:"g"},{name:"Broccoli (fresh)",amount:100,unit:"g"},{name:"Bell Pepper (red)",amount:80,unit:"g"},{name:"Mushrooms (cremini)",amount:80,unit:"g"},{name:"Soy Sauce (low sodium)",amount:20,unit:"ml"},{name:"Coconut Oil",amount:8,unit:"g"},{name:"Hemp Hearts",amount:15,unit:"g"}],
+ instructions:["Cook brown rice. Heat coconut oil in a wok over high heat.","Stir-fry broccoli, pepper, mushrooms, and edamame 5–6 min. Add soy sauce; toss to coat. Serve over rice, top with hemp hearts."]},
+
+{name:"Lentil Chickpea Stew",category:"dinner",servingSize:"1 bowl",prepTime:"30 min",
+ protein:40,carbs:95,fat:33,calories:805,
+ ingredients:[{name:"Red Lentils (dry)",amount:70,unit:"g"},{name:"Chickpeas (canned, drained)",amount:120,unit:"g"},{name:"Canned Tomatoes (diced)",amount:150,unit:"g"},{name:"Coconut Milk (full fat)",amount:80,unit:"ml"},{name:"Spinach (fresh)",amount:60,unit:"g"},{name:"Vegetable Broth (low sodium)",amount:200,unit:"ml"},{name:"Olive Oil (extra virgin)",amount:8,unit:"g"},{name:"Curry Powder",amount:5,unit:"g"},{name:"Nutritional Yeast",amount:10,unit:"g"}],
+ instructions:["Sauté curry powder in olive oil 30 sec. Add lentils, chickpeas, tomatoes, and broth.","Simmer 20 min. Stir in coconut milk, spinach, and nutritional yeast; cook 3 more min."]},
+
+{name:"Black Bean Tacos",category:"dinner",servingSize:"2 tacos",prepTime:"15 min",
+ protein:27,carbs:90,fat:16,calories:599,
+ ingredients:[{name:"Black Beans (canned, drained)",amount:160,unit:"g"},{name:"Whole Wheat Tortilla (large)",amount:70,unit:"g"},{name:"Avocado",amount:75,unit:"g"},{name:"Bell Pepper (red)",amount:60,unit:"g"},{name:"Canned Tomatoes (diced)",amount:80,unit:"g"},{name:"Smoked Paprika",amount:3,unit:"g"},{name:"Sriracha Hot Sauce",amount:5,unit:"g"},{name:"Greek Yogurt (plain, 0% fat)",amount:40,unit:"g"}],
+ instructions:["Warm beans with paprika and a splash of water 3–4 min. Warm tortillas in a dry pan.","Fill tortillas with beans, sliced pepper, tomatoes, avocado, a dollop of yogurt, and sriracha."]},
+
+{name:"Quinoa Vegetable Bake",category:"dinner",servingSize:"1 serving",prepTime:"40 min",
+ protein:27,carbs:112,fat:31,calories:802,
+ ingredients:[{name:"Quinoa (dry)",amount:70,unit:"g"},{name:"Chickpeas (canned, drained)",amount:120,unit:"g"},{name:"Sweet Potato",amount:100,unit:"g"},{name:"Broccoli (fresh)",amount:80,unit:"g"},{name:"Canned Tomatoes (diced)",amount:100,unit:"g"},{name:"Coconut Milk (full fat)",amount:60,unit:"ml"},{name:"Olive Oil (extra virgin)",amount:8,unit:"g"},{name:"Curry Powder",amount:6,unit:"g"}],
+ instructions:["Preheat oven to 190°C. Combine uncooked quinoa, chickpeas, cubed sweet potato, broccoli, tomatoes, coconut milk, olive oil, curry powder, and 200ml water in a baking dish.","Cover with foil and bake 30 min. Uncover and bake 10 more min until quinoa is fluffy."]},
+
+// ── SNACKS ─────────────────────────────────────────────────────
+{name:"Greek Yogurt with Berries and Seeds",category:"snack",servingSize:"1 bowl",prepTime:"2 min",
+ protein:26,carbs:29,fat:13,calories:332,
+ ingredients:[{name:"Greek Yogurt (plain, 0% fat)",amount:175,unit:"g"},{name:"Mixed Berries (frozen, thawed)",amount:80,unit:"g"},{name:"Hemp Hearts",amount:20,unit:"g"},{name:"Chia Seeds",amount:10,unit:"g"},{name:"Maple Syrup (pure)",amount:10,unit:"g"}],
+ instructions:["Spoon yogurt into a bowl. Top with thawed berries, hemp hearts, chia seeds, and maple syrup."]},
+
+{name:"Protein Smoothie (Simple)",category:"snack",servingSize:"1 glass",prepTime:"3 min",
+ protein:38,carbs:30,fat:7,calories:320,
+ ingredients:[{name:"Whey Protein Isolate",amount:30,unit:"g"},{name:"Soy Milk (unsweetened)",amount:300,unit:"ml"},{name:"Banana (ripe)",amount:100,unit:"g"}],
+ instructions:["Blend all ingredients until smooth. Drink immediately."]},
+
+{name:"Peanut Butter Apple Slices",category:"snack",servingSize:"1 plate",prepTime:"2 min",
+ protein:12,carbs:32,fat:21,calories:340,
+ ingredients:[{name:"Apple",amount:182,unit:"g"},{name:"Peanut Butter (natural)",amount:32,unit:"g"},{name:"Hemp Hearts",amount:10,unit:"g"}],
+ instructions:["Slice apple into wedges. Serve with peanut butter for dipping; sprinkle hemp hearts on top."]},
+
+{name:"Roasted Chickpeas (Spiced)",category:"snack",servingSize:"½ cup",prepTime:"30 min",
+ protein:14,carbs:43,fat:12,calories:333,
+ ingredients:[{name:"Chickpeas (canned, drained)",amount:160,unit:"g"},{name:"Olive Oil (extra virgin)",amount:8,unit:"g"},{name:"Smoked Paprika",amount:3,unit:"g"},{name:"Curry Powder",amount:2,unit:"g"}],
+ instructions:["Pat chickpeas very dry. Toss with olive oil, paprika, and curry powder.","Spread on a baking sheet and roast at 200°C for 25–30 min until crispy."]},
+
+{name:"Mixed Nuts and Seeds",category:"snack",servingSize:"1 handful",prepTime:"0 min",
+ protein:11,carbs:9,fat:27,calories:298,
+ ingredients:[{name:"Almonds (raw)",amount:20,unit:"g"},{name:"Walnuts",amount:15,unit:"g"},{name:"Pumpkin Seeds (raw)",amount:15,unit:"g"}],
+ instructions:["Combine in a small bowl or zip bag. Enjoy as-is — no prep needed."]},
+
+{name:"Cottage Cheese with Fruit",category:"snack",servingSize:"1 bowl",prepTime:"2 min",
+ protein:30,carbs:27,fat:12,calories:327,
+ ingredients:[{name:"Cottage Cheese (2% fat)",amount:200,unit:"g"},{name:"Blueberries",amount:80,unit:"g"},{name:"Hemp Hearts",amount:15,unit:"g"},{name:"Maple Syrup (pure)",amount:10,unit:"g"}],
+ instructions:["Spoon cottage cheese into a bowl. Top with blueberries, hemp hearts, and maple syrup."]},
+
+{name:"Hummus and Veggie Plate",category:"snack",servingSize:"1 plate",prepTime:"5 min",
+ protein:9,carbs:24,fat:8,calories:200,
+ ingredients:[{name:"Hummus",amount:80,unit:"g"},{name:"Bell Pepper (red)",amount:80,unit:"g"},{name:"Celery",amount:80,unit:"g"},{name:"Broccoli (fresh)",amount:60,unit:"g"}],
+ instructions:["Cut all vegetables into sticks or florets. Serve with hummus for dipping."]},
+
+{name:"Almond Butter Banana Smoothie",category:"snack",servingSize:"1 glass",prepTime:"3 min",
+ protein:17,carbs:43,fat:23,calories:417,
+ ingredients:[{name:"Almond Butter (natural)",amount:25,unit:"g"},{name:"Banana (ripe)",amount:120,unit:"g"},{name:"Soy Milk (unsweetened)",amount:250,unit:"ml"},{name:"Chia Seeds",amount:12,unit:"g"},{name:"Cinnamon (ground)",amount:2,unit:"g"}],
+ instructions:["Blend all ingredients on high until smooth. Good pre-workout fuel."]},
+
+{name:"Hemp Heart Energy Oat Bites",category:"snack",servingSize:"2 bites",prepTime:"15 min + 30 min freeze",
+ protein:28,carbs:70,fat:42,calories:735,
+ ingredients:[{name:"Rolled Oats (large flake)",amount:60,unit:"g"},{name:"Peanut Butter (natural)",amount:50,unit:"g"},{name:"Hemp Hearts",amount:20,unit:"g"},{name:"Chia Seeds",amount:10,unit:"g"},{name:"Maple Syrup (pure)",amount:20,unit:"g"},{name:"Vanilla Extract",amount:4,unit:"ml"}],
+ instructions:["Mix all ingredients in a bowl until a thick dough forms. If too dry add 1 tsp water.","Roll into 8–10 balls and freeze 30 min until firm. Keep refrigerated."]},
+];
+
+// ── UI ──────────────────────────────────────────────────────────
+const btn=document.getElementById("btn"),status=document.getElementById("status"),
+      log=document.getElementById("log"),bar=document.getElementById("bar"),
+      barWrap=document.getElementById("barWrap"),done=document.getElementById("done"),
+      warn=document.getElementById("warn");
+
+function addLog(t,err=false){const d=document.createElement("div");d.className="lr "+(err?"er":"ok");d.textContent=t;log.prepend(d);}
+
+onAuthStateChanged(auth,user=>{
+  if(!user){warn.style.display="block";warn.innerHTML='⚠️ Not signed in. <a href="login.html" style="color:inherit;font-weight:600">Sign in →</a>';btn.textContent="Sign in first";btn.disabled=false;btn.onclick=()=>{window.location.href="login.html";};}
+  else if(!isAdmin(user)){warn.style.display="block";warn.textContent="⚠️ Admin access required.";btn.textContent="Admin only";btn.disabled=true;}
+  else{btn.textContent=`Import All ${R.length} Canadian Recipes`;btn.disabled=false;btn.onclick=run;}
+});
+
+async function run(){
+  btn.disabled=true;barWrap.style.display="block";done.style.display="none";log.innerHTML="";
+  let ok=0,fail=0;
+  for(let i=0;i<R.length;i++){
+    const r=R[i];
+    status.textContent=`Saving ${i+1}/${R.length}: ${r.name}…`;
+    bar.style.width=((i+1)/R.length*100).toFixed(0)+"%";
+    try{await saveRecipe(r,"canadian");addLog(`✓ ${r.name}`);ok++;}
+    catch(e){addLog(`✗ ${r.name}: ${e.message}`,true);fail++;}
+  }
+  status.textContent=`Done — ${ok} saved, ${fail} failed.`;
+  if(fail===0){done.style.display="block";btn.textContent="✓ Done";}
+  else{btn.textContent="Retry";btn.disabled=false;}
+}
+</script>
+</body>
 </html>

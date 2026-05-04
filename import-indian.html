@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Import Indian Recipes</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .wrap{max-width:600px;margin:0 auto;padding:28px 16px 80px}
+    .card{background:linear-gradient(160deg,rgba(255,255,255,.06),rgba(255,255,255,.01));border:.5px solid rgba(255,255,255,.1);border-radius:20px;padding:24px}
+    h1{color:#7ed99a;font-size:19px;margin-bottom:6px}
+    .sub{color:rgba(255,255,255,.35);font-size:12px;margin-bottom:20px;line-height:1.5}
+    .btn{width:100%;padding:14px;background:#7ed99a;color:#0a1a0f;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif}
+    .btn:disabled{opacity:.4;cursor:not-allowed}
+    .bar-wrap{margin-top:16px;background:rgba(255,255,255,.05);border-radius:8px;overflow:hidden;height:7px;display:none}
+    .bar{height:100%;background:#7ed99a;width:0%;transition:width .3s}
+    .status{margin-top:12px;font-size:12px;color:rgba(255,255,255,.45)}
+    .log{margin-top:12px;max-height:260px;overflow-y:auto;font-size:10px;font-family:monospace}
+    .lr{padding:2px 0;border-bottom:.5px solid rgba(255,255,255,.04)}
+    .ok{color:#7ed99a}.er{color:#ff6b6b}
+    .done{margin-top:16px;padding:12px 16px;background:rgba(126,217,154,.1);border:.5px solid rgba(126,217,154,.3);border-radius:12px;color:#7ed99a;font-size:13px;font-weight:500;display:none;text-align:center}
+    .warn{padding:10px 14px;background:rgba(255,200,0,.07);border:.5px solid rgba(255,200,0,.25);border-radius:10px;color:rgba(255,200,0,.8);font-size:12px;margin-bottom:16px;display:none}
+  </style>
+</head>
+<body>
+<div class="glow-1"></div><div class="glow-2"></div>
+<div class="wrap"><div class="card">
+  <h1>🇮🇳 Import Indian Recipes</h1>
+  <div class="sub">35 vegetarian recipes · No eggs · No meat · Breakfast / Lunch / Dinner / Snacks<br>Sources: Varinder Ghuman · Biki Singh · Archana's Kitchen · Tarla Dalal · Hebbars Kitchen</div>
+  <div class="warn" id="warn"></div>
+  <button class="btn" id="btn" disabled>Checking auth…</button>
+  <div class="bar-wrap" id="barWrap"><div class="bar" id="bar"></div></div>
+  <div class="status" id="status"></div>
+  <div class="log" id="log"></div>
+  <div class="done" id="done">✅ All 35 Indian recipes imported! <a href="recipes.html" style="color:#7ed99a;font-weight:700;margin-left:6px">Open Recipes →</a></div>
+</div></div>
+
+<script type="module">
+import { auth, onAuthStateChanged, saveRecipe, isAdmin } from "./firebase.js";
+
+const R = [
+// ── BREAKFAST ─────────────────────────────────────────────────
+{name:"Paneer Bhurji",category:"breakfast",servingSize:"1 plate",prepTime:"15 min",
+ protein:29,carbs:14,fat:37,calories:496,
+ videoId:"qWbHSOplcvY",
+ ingredients:[{name:"Paneer (full fat)",amount:150,unit:"g"},{name:"Onion",amount:60,unit:"g"},{name:"Tomato",amount:80,unit:"g"},{name:"Capsicum / Bell Pepper",amount:50,unit:"g"},{name:"Ghee",amount:5,unit:"g"},{name:"Cumin Seeds (Jeera)",amount:2,unit:"g"},{name:"Turmeric Powder (Haldi)",amount:1,unit:"g"},{name:"Red Chilli Powder",amount:2,unit:"g"},{name:"Garam Masala",amount:2,unit:"g"},{name:"Salt",amount:3,unit:"g"},{name:"Coriander Leaves (Dhania)",amount:10,unit:"g"}],
+ instructions:["Heat ghee in a pan. Add jeera and let it splutter. Add onion and sauté until golden.","Add ginger-garlic (optional), tomato, and all spices. Cook until oil separates.","Crumble paneer directly into the pan. Mix well and cook 3–4 min. Garnish with coriander."]},
+
+{name:"Moong Dal Chilla",category:"breakfast",servingSize:"2 chillas",prepTime:"20 min",
+ protein:20,carbs:52,fat:6,calories:340,
+ videoId:"K5VB9OpSgOI",
+ ingredients:[{name:"Moong Dal (Yellow, split)",amount:80,unit:"g"},{name:"Ginger (Adrak)",amount:5,unit:"g"},{name:"Green Chilli",amount:5,unit:"g"},{name:"Onion",amount:40,unit:"g"},{name:"Coriander Leaves (Dhania)",amount:10,unit:"g"},{name:"Cumin Seeds (Jeera)",amount:2,unit:"g"},{name:"Turmeric Powder (Haldi)",amount:1,unit:"g"},{name:"Salt",amount:2,unit:"g"},{name:"Sunflower Oil",amount:5,unit:"g"}],
+ instructions:["Soak moong dal 4 hours; drain and blend with ginger, green chilli, jeera, turmeric, and salt into a smooth batter.","Fold in chopped onion and coriander. Pour ladlefuls onto a hot oiled pan; spread thin and cook 2–3 min per side until golden."]},
+
+{name:"Besan Chilla",category:"breakfast",servingSize:"2 chillas",prepTime:"15 min",
+ protein:19,carbs:51,fat:10,calories:392,
+ videoId:"xQBBLJiNgJI",
+ ingredients:[{name:"Besan (Chickpea Flour)",amount:80,unit:"g"},{name:"Onion",amount:50,unit:"g"},{name:"Tomato",amount:50,unit:"g"},{name:"Capsicum / Bell Pepper",amount:30,unit:"g"},{name:"Ginger (Adrak)",amount:5,unit:"g"},{name:"Green Chilli",amount:5,unit:"g"},{name:"Cumin Seeds (Jeera)",amount:2,unit:"g"},{name:"Turmeric Powder (Haldi)",amount:1,unit:"g"},{name:"Salt",amount:2,unit:"g"},{name:"Sunflower Oil",amount:5,unit:"g"}],
+ instructions:["Mix besan with turmeric, jeera, salt, and enough water to make a pourable batter.","Stir in finely chopped onion, tomato, capsicum, ginger, and green chilli.","Pour onto a hot oiled tawa; spread thin and cook 2–3 min per side."]},
+
+{name:"Overnight Oats (High Protein)",category:"breakfast",servingSize:"1 bowl",prepTime:"5 min + overnight",
+ protein:44,carbs:71,fat:18,calories:608,
+ videoId:"",
+ ingredients:[{name:"Oats (rolled)",amount:60,unit:"g"},{name:"Curd / Dahi (full fat)",amount:100,unit:"g"},{name:"Diesel NZ Whey Isolate",amount:30,unit:"g"},{name:"Chia Seeds",amount:10,unit:"g"},{name:"Banana (ripe)",amount:80,unit:"g"},{name:"Almonds (Badam)",amount:15,unit:"g"}],
+ instructions:["Mix oats, curd, whey protein, and chia seeds in a jar. Stir until protein is fully dissolved.","Seal and refrigerate overnight. In the morning top with sliced banana and almonds."]},
+
+{name:"Protein Smoothie",category:"breakfast",servingSize:"1 glass",prepTime:"5 min",
+ protein:43,carbs:44,fat:22,calories:522,
+ videoId:"",
+ ingredients:[{name:"Diesel NZ Whey Isolate",amount:30,unit:"g"},{name:"Milk (cow, full fat)",amount:250,unit:"ml"},{name:"Banana (ripe)",amount:100,unit:"g"},{name:"Peanut Butter (natural)",amount:20,unit:"g"},{name:"Chia Seeds",amount:10,unit:"g"}],
+ instructions:["Add all ingredients to a blender. Blend 30–40 sec until completely smooth.","Drink immediately post-workout for best recovery."]},
+
+{name:"Quinoa Upma",category:"breakfast",servingSize:"1 bowl",prepTime:"20 min",
+ protein:12,carbs:56,fat:9,calories:349,
+ videoId:"rCfTnlYqFuY",
+ ingredients:[{name:"Quinoa (raw)",amount:60,unit:"g"},{name:"Onion",amount:60,unit:"g"},{name:"Tomato",amount:60,unit:"g"},{name:"Peas (Matar, fresh)",amount:40,unit:"g"},{name:"Carrot (Gajar)",amount:40,unit:"g"},{name:"Mustard Oil",amount:5,unit:"g"},{name:"Cumin Seeds (Jeera)",amount:2,unit:"g"},{name:"Ginger (Adrak)",amount:5,unit:"g"},{name:"Green Chilli",amount:5,unit:"g"},{name:"Curry Leaves",amount:3,unit:"g"},{name:"Salt",amount:2,unit:"g"},{name:"Coriander Leaves (Dhania)",amount:10,unit:"g"}],
+ instructions:["Heat mustard oil; add jeera and curry leaves. Sauté onion, ginger, and green chilli.","Add carrot, peas, and tomato; cook 3 min. Stir in rinsed quinoa and 120ml water. Cover and cook 15 min on low heat. Garnish with coriander."]},
+
+{name:"Poha with Peanuts",category:"breakfast",servingSize:"1 plate",prepTime:"15 min",
+ protein:10,carbs:73,fat:20,calories:512,
+ videoId:"lWkCLGoQzaE",
+ ingredients:[{name:"Poha (Flattened Rice)",amount:80,unit:"g"},{name:"Peanuts / Groundnuts",amount:30,unit:"g"},{name:"Onion",amount:60,unit:"g"},{name:"Tomato",amount:40,unit:"g"},{name:"Green Chilli",amount:5,unit:"g"},{name:"Curry Leaves",amount:3,unit:"g"},{name:"Mustard Oil",amount:5,unit:"g"},{name:"Cumin Seeds (Jeera)",amount:2,unit:"g"},{name:"Turmeric Powder (Haldi)",amount:1,unit:"g"},{name:"Salt",amount:2,unit:"g"},{name:"Coriander Leaves (Dhania)",amount:8,unit:"g"}],
+ instructions:["Rinse poha and drain; set aside 5 min to soften. Dry roast peanuts and set aside.","Heat oil; add jeera, curry leaves, green chilli, and onion. Sauté 3 min. Add tomato, turmeric, salt, and peanuts. Fold in poha gently. Cook 2–3 min on low. Garnish with coriander."]},
+
+{name:"Soya Oats Porridge",category:"breakfast",servingSize:"1 bowl",prepTime:"10 min",
+ protein:32,carbs:80,fat:24,calories:635,
+ videoId:"",
+ ingredients:[{name:"Oats (rolled)",amount:60,unit:"g"},{name:"Soya Chunks",amount:20,unit:"g"},{name:"Milk (cow, full fat)",amount:200,unit:"ml"},{name:"Banana (ripe)",amount:80,unit:"g"},{name:"Peanut Butter (natural)",amount:15,unit:"g"},{name:"Almonds (Badam)",amount:10,unit:"g"}],
+ instructions:["Soak soya chunks in hot water 5 min; drain and squeeze dry. Chop finely.","Bring milk to a simmer. Add oats and soya; cook 5 min stirring until thick. Stir in peanut butter; top with banana slices and almonds."]},
+
+{name:"Sprouts Chaat",category:"breakfast",servingSize:"1 bowl",prepTime:"10 min",
+ protein:16,carbs:45,fat:1,calories:239,
+ videoId:"tVXzaRBZWtY",
+ ingredients:[{name:"Whole Moong (Green Gram)",amount:60,unit:"g"},{name:"Onion",amount:40,unit:"g"},{name:"Tomato",amount:40,unit:"g"},{name:"Cucumber (Kheera)",amount:50,unit:"g"},{name:"Green Chilli",amount:5,unit:"g"},{name:"Coriander Leaves (Dhania)",amount:8,unit:"g"},{name:"Salt",amount:2,unit:"g"}],
+ instructions:["Soak whole moong overnight; drain and leave in a damp cloth 12–24 hours to sprout.","Toss sprouted moong with finely chopped onion, tomato, cucumber, green chilli, coriander, salt, and a squeeze of lemon."]},
+
+// ── LUNCH ──────────────────────────────────────────────────────
+{name:"Dal Tadka",category:"lunch",servingSize:"1 bowl",prepTime:"30 min",
+ protein:15,carbs:51,fat:11,calories:357,
+ videoId:"_oyxCn2iSjU",
+ ingredients:[{name:"Toor Dal",amount:60,unit:"g"},{name:"Onion",amount:80,unit:"g"},{name:"Tomato",amount:80,unit:"g"},{name:"Garlic (Lehsun)",amount:10,unit:"g"},{name:"Ginger (Adrak)",amount:5,unit:"g"},{name:"Ghee",amount:10,unit:"g"},{name:"Cumin Seeds (Jeera)",amount:3,unit:"g"},{name:"Turmeric Powder (Haldi)",amount:2,unit:"g"},{name:"Red Chilli Powder",amount:2,unit:"g"},{name:"Garam Masala",amount:2,unit:"g"},{name:"Salt",amount:3,unit:"g"},{name:"Coriander Leaves (Dhania)",amount:10,unit:"g"}],
+ instructions:["Pressure cook toor dal with turmeric and salt until soft. Mash lightly.","For tadka: heat ghee, add jeera, garlic, and onion; sauté golden. Add tomato, chilli powder, and garam masala; cook until oil separates. Pour tadka over dal. Garnish with coriander."]},
+
+{name:"Rajma Masala",category:"lunch",servingSize:"1 bowl",prepTime:"45 min",
+ protein:21,carbs:61,fat:12,calories:413,
+ videoId:"YHKGpHuNz3Y",
+ ingredients:[{name:"Rajma (Kidney Beans)",amount:80,unit:"g"},{name:"Onion",amount:100,unit:"g"},{name:"Tomato",amount:100,unit:"g"},{name:"Garlic (Lehsun)",amount:10,unit:"g"},{name:"Ginger (Adrak)",amount:8,unit:"g"},{name:"Mustard Oil",amount:10,unit:"g"},{name:"Cumin Seeds (Jeera)",amount:3,unit:"g"},{name:"Turmeric Powder (Haldi)",amount:2,unit:"g"},{name:"Red Chilli Powder",amount:3,unit:"g"},{name:"Garam Masala",amount:3,unit:"g"},{name:"Salt",amount:3,unit:"g"},{name:"Coriander Leaves (Dhania)",amount:10,unit:"g"}],
+ instructions:["Soak rajma overnight; pressure cook until very soft. Heat mustard oil; add jeera, onion, and ginger-garlic paste; sauté golden.","Add tomatoes and spices; cook until oil separates. Add cooked rajma with water; simmer 15 min. Garnish with coriander. Best served with rice."]},
+
+{name:"Chana Masala",category:"lunch",servingSize:"1 bowl",prepTime:"40 min",
+ protein:17,carbs:62,fat:15,calories:438,
+ videoId:"Tsr2CIQEH9Y",
+ ingredients:[{name:"Kabuli Chana (Chickpeas)",amount:80,unit:"g"},{name:"Onion",amount:100,unit:"g"},{name:"Tomato",amount:100,unit:"g"},{name:"Garlic (Lehsun)",amount:10,unit:"g"},{name:"Ginger (Adrak)",amount:8,unit:"g"},{name:"Sunflower Oil",amount:10,unit:"g"},{name:"Cumin Seeds (Jeera)",amount:3,unit:"g"},{name:"Turmeric Powder (Haldi)",amount:2,unit:"g"},{name:"Red Chilli Powder",amount:3,unit:"g"},{name:"Garam Masala",amount:3,unit:"g"},{name:"Salt",amount:3,unit:"g"},{name:"Coriander Leaves (Dhania)",amount:10,unit:"g"}],
+ instructions:["Soak chickpeas overnight; pressure cook until tender. Heat oil; add jeera, onion, and ginger-garlic; sauté until golden.","Add blended tomatoes and all spices; cook until oil separates. Add chickpeas and simmer 12 min. Garnish with coriander."]},
+
+{name:"Palak Paneer",category:"lunch",servingSize:"1 bowl",prepTime:"30 min",
+ protein:24,carbs:16,fat:30,calories:414,
+ videoId:"vYGywZYHBOg",
+ ingredients:[{name:"Paneer (full fat)",amount:100,unit:"g"},{name:"Spinach (Palak)",amount:150,unit:"g"},{name:"Onion",amount:80,unit:"g"},{name:"Tomato",amount:60,unit:"g"},{name:"Garlic (Lehsun)",amount:8,unit:"g"},{name:"Ginger (Adrak)",amount:5,unit:"g"},{name:"Ghee",amount:8,unit:"g"},{name:"Cumin Seeds (Jeera)",amount:2,unit:"g"},{name:"Turmeric Powder (Haldi)",amount:1,unit:"g"},{name:"Red Chilli Powder",amount:2,unit:"g"},{name:"Garam Masala",amount:2,unit:"g"},{name:"Salt",amount:3,unit:"g"}],
+ instructions:["Blanch spinach 2 min in boiling water; drain and blend into a smooth purée. Pan-fry paneer cubes until golden; set aside.","Heat ghee; add jeera, onion, ginger-garlic; sauté golden. Add tomato and spices; cook 5 min. Stir in spinach purée; simmer 5 min. Add paneer and cook 3 more min."]},
+
+{name:"Soya Chunk Masala",category:"lunch",servingSize:"1 bowl",prepTime:"25 min",
+ protein:28,carbs:30,fat:9,calories:305,
+ videoId:"yt0xZ3hBjDM",
+ ingredients:[{name:"Soya Chunks",amount:50,unit:"g"},{name:"Onion",amount:80,unit:"g"},{name:"Tomato",amount:80,unit:"g"},{name:"Capsicum / Bell Pepper",amount:50,unit:"g"},{name:"Garlic (Lehsun)",amount:8,unit:"g"},{name:"Ginger (Adrak)",amount:5,unit:"g"},{name:"Sunflower Oil",amount:8,unit:"g"},{name:"Cumin Seeds (Jeera)",amount:2,unit:"g"},{name:"Turmeric Powder (Haldi)",amount:2,unit:"g"},{name:"Red Chilli Powder",amount:2,unit:"g"},{name:"Garam Masala",amount:2,unit:"g"},{name:"Salt",amount:3,unit:"g"},{name:"Coriander Leaves (Dhania)",amount:10,unit:"g"}],
+ instructions:["Soak soya chunks in hot water 10 min; squeeze out all water. Heat oil; add jeera, onion, ginger-garlic; sauté until golden.","Add tomato, capsicum, and spices; cook until oil separates. Add soya chunks; mix well and cook 8 min. Garnish with coriander."]},
+
+{name:"Dal Khichdi",category:"lunch",servingSize:"1 bowl",prepTime:"25 min",
+ protein:17,carbs:71,fat:6,calories:407,
+ videoId:"b3pJOXbqACs",
+ ingredients:[{name:"Moong Dal (Yellow, split)",amount:50,unit:"g"},{name:"Basmati Rice (raw)",amount:40,unit:"g"},{name:"Ghee",amount:5,unit:"g"},{name:"Cumin Seeds (Jeera)",amount:2,unit:"g"},{name:"Turmeric Powder (Haldi)",amount:1,unit:"g"},{name:"Ginger (Adrak)",amount:5,unit:"g"},{name:"Carrot (Gajar)",amount:40,unit:"g"},{name:"Peas (Matar, fresh)",amount:40,unit:"g"},{name:"Salt",amount:2,unit:"g"},{name:"Coriander Leaves (Dhania)",amount:8,unit:"g"}],
+ instructions:["Rinse dal and rice together. Heat ghee in a pressure cooker; add jeera and ginger.","Add dal, rice, carrot, peas, turmeric, salt, and 350ml water. Pressure cook 3 whistles. Serve with ghee on top and coriander garnish."]},
+
+{name:"Basmati Rice",category:"lunch",servingSize:"1 katori cooked",prepTime:"15 min",
+ protein:4,carbs:47,fat:5,calories:254,
+ videoId:"",
+ ingredients:[{name:"Basmati Rice (raw)",amount:60,unit:"g"},{name:"Ghee",amount:5,unit:"g"},{name:"Salt",amount:1,unit:"g"}],
+ instructions:["Rinse rice 2–3 times until water runs clear. Soak 15 min; drain.","Boil 500ml water with salt; add rice and cook 12 min uncovered until just done. Drain, serve with ghee."]},
+
+{name:"Whole Wheat Roti",category:"lunch",servingSize:"2 rotis",prepTime:"15 min",
+ protein:7,carbs:43,fat:6,calories:249,
+ videoId:"",
+ ingredients:[{name:"Whole Wheat Flour (Atta)",amount:60,unit:"g"},{name:"Ghee",amount:5,unit:"g"},{name:"Salt",amount:1,unit:"g"}],
+ instructions:["Mix atta with a pinch of salt and enough water to form a soft dough. Rest 10 min.","Divide into 2 balls; roll into thin circles. Cook on a hot tawa 1 min per side; finish directly on flame for puffing. Apply ghee before serving."]},
+
+{name:"Panchmel Dal",category:"lunch",servingSize:"1 bowl",prepTime:"35 min",
+ protein:21,carbs:58,fat:10,calories:398,
+ videoId:"AYU-UGY8W0A",
+ ingredients:[{name:"Toor Dal",amount:20,unit:"g"},{name:"Moong Dal (Yellow, split)",amount:15,unit:"g"},{name:"Masoor Dal (Red Lentil)",amount:15,unit:"g"},{name:"Chana Dal",amount:15,unit:"g"},{name:"Urad Dal",amount:15,unit:"g"},{name:"Onion",amount:80,unit:"g"},{name:"Tomato",amount:80,unit:"g"},{name:"Garlic (Lehsun)",amount:8,unit:"g"},{name:"Ginger (Adrak)",amount:5,unit:"g"},{name:"Ghee",amount:8,unit:"g"},{name:"Cumin Seeds (Jeera)",amount:3,unit:"g"},{name:"Turmeric Powder (Haldi)",amount:2,unit:"g"},{name:"Red Chilli Powder",amount:2,unit:"g"},{name:"Garam Masala",amount:2,unit:"g"},{name:"Salt",amount:3,unit:"g"}],
+ instructions:["Rinse and mix all 5 dals. Pressure cook with turmeric and salt for 4 whistles until very soft.","For tadka: heat ghee, add jeera, onion, ginger-garlic; sauté golden. Add tomato and spices; cook until oil separates. Pour over dal and simmer 5 min."]},
+
+{name:"Tofu Bhurji",category:"lunch",servingSize:"1 plate",prepTime:"15 min",
+ protein:27,carbs:15,fat:22,calories:341,
+ videoId:"ZyNs3BLFMTA",
+ ingredients:[{name:"Tofu (extra firm)",amount:150,unit:"g"},{name:"Onion",amount:60,unit:"g"},{name:"Tomato",amount:80,unit:"g"},{name:"Capsicum / Bell Pepper",amount:50,unit:"g"},{name:"Sunflower Oil",amount:8,unit:"g"},{name:"Cumin Seeds (Jeera)",amount:2,unit:"g"},{name:"Turmeric Powder (Haldi)",amount:1,unit:"g"},{name:"Red Chilli Powder",amount:2,unit:"g"},{name:"Garam Masala",amount:2,unit:"g"},{name:"Salt",amount:3,unit:"g"},{name:"Coriander Leaves (Dhania)",amount:10,unit:"g"}],
+ instructions:["Press tofu dry; crumble into chunks. Heat oil; add jeera, then onion; sauté until golden.","Add capsicum, tomato, and spices; cook until oil separates. Add crumbled tofu; mix and cook 5 min on medium. Garnish with coriander."]},
+
+{name:"Methi Thepla",category:"lunch",servingSize:"3 theplas",prepTime:"25 min",
+ protein:13,carbs:62,fat:8,calories:360,
+ videoId:"i_F5XLSKVSY",
+ ingredients:[{name:"Whole Wheat Flour (Atta)",amount:80,unit:"g"},{name:"Fenugreek Leaves (Methi)",amount:40,unit:"g"},{name:"Curd / Dahi (full fat)",amount:40,unit:"g"},{name:"Ginger (Adrak)",amount:5,unit:"g"},{name:"Green Chilli",amount:5,unit:"g"},{name:"Turmeric Powder (Haldi)",amount:1,unit:"g"},{name:"Cumin Seeds (Jeera)",amount:2,unit:"g"},{name:"Salt",amount:2,unit:"g"},{name:"Sunflower Oil",amount:5,unit:"g"}],
+ instructions:["Wash and finely chop fresh methi leaves. Mix atta, methi, curd, grated ginger, green chilli, turmeric, jeera, and salt.","Add a little water to form a soft dough. Divide into 3 portions; roll thin. Cook on a hot tawa with a few drops of oil, 1–2 min per side until golden spots appear."]},
+
+// ── DINNER ─────────────────────────────────────────────────────
+{name:"Masoor Dal",category:"dinner",servingSize:"1 bowl",prepTime:"20 min",
+ protein:17,carbs:44,fat:9,calories:318,
+ videoId:"ZZIatXMFaQI",
+ ingredients:[{name:"Masoor Dal (Red Lentil)",amount:60,unit:"g"},{name:"Onion",amount:60,unit:"g"},{name:"Tomato",amount:60,unit:"g"},{name:"Garlic (Lehsun)",amount:8,unit:"g"},{name:"Ginger (Adrak)",amount:5,unit:"g"},{name:"Ghee",amount:8,unit:"g"},{name:"Cumin Seeds (Jeera)",amount:2,unit:"g"},{name:"Turmeric Powder (Haldi)",amount:1,unit:"g"},{name:"Red Chilli Powder",amount:2,unit:"g"},{name:"Salt",amount:2,unit:"g"},{name:"Coriander Leaves (Dhania)",amount:8,unit:"g"}],
+ instructions:["Boil masoor dal with turmeric and salt until completely soft, about 15 min.","Heat ghee; add jeera, garlic, and onion; sauté golden. Add tomato, chilli powder; cook until oil separates. Pour tadka into dal; simmer 3 min. Garnish with coriander."]},
+
+{name:"Paneer Tikka",category:"dinner",servingSize:"1 plate",prepTime:"30 min",
+ protein:31,carbs:16,fat:39,calories:531,
+ videoId:"KaFRuMPLYcM",
+ ingredients:[{name:"Paneer (full fat)",amount:150,unit:"g"},{name:"Curd / Dahi (full fat)",amount:60,unit:"g"},{name:"Capsicum / Bell Pepper",amount:60,unit:"g"},{name:"Onion",amount:60,unit:"g"},{name:"Tomato",amount:60,unit:"g"},{name:"Ginger (Adrak)",amount:5,unit:"g"},{name:"Garlic (Lehsun)",amount:5,unit:"g"},{name:"Turmeric Powder (Haldi)",amount:1,unit:"g"},{name:"Red Chilli Powder",amount:3,unit:"g"},{name:"Garam Masala",amount:2,unit:"g"},{name:"Sunflower Oil",amount:5,unit:"g"},{name:"Salt",amount:3,unit:"g"}],
+ instructions:["Mix curd with ginger-garlic paste, red chilli, turmeric, garam masala, oil, and salt. Marinate paneer and veggie chunks 30 min.","Thread onto skewers and grill or cook on a cast iron pan on high heat, turning until charred on all sides."]},
+
+{name:"Tofu Tikka Masala",category:"dinner",servingSize:"1 bowl",prepTime:"30 min",
+ protein:27,carbs:14,fat:21,calories:337,
+ videoId:"IQMcAlNqsHE",
+ ingredients:[{name:"Tofu (extra firm)",amount:150,unit:"g"},{name:"Onion",amount:80,unit:"g"},{name:"Tomato",amount:100,unit:"g"},{name:"Garlic (Lehsun)",amount:8,unit:"g"},{name:"Ginger (Adrak)",amount:5,unit:"g"},{name:"Sunflower Oil",amount:8,unit:"g"},{name:"Cumin Seeds (Jeera)",amount:2,unit:"g"},{name:"Turmeric Powder (Haldi)",amount:1,unit:"g"},{name:"Red Chilli Powder",amount:2,unit:"g"},{name:"Garam Masala",amount:2,unit:"g"},{name:"Salt",amount:3,unit:"g"},{name:"Coriander Leaves (Dhania)",amount:10,unit:"g"}],
+ instructions:["Cut tofu into cubes; pan-fry in 3g oil until golden on all sides. Set aside.","In remaining oil add jeera, onion, ginger-garlic; sauté golden. Add blended tomato and spices; cook until oil separates. Add tofu; simmer 8 min. Garnish with coriander."]},
+
+{name:"Rajma Rice Bowl",category:"dinner",servingSize:"1 bowl",prepTime:"10 min if pre-cooked",
+ protein:25,carbs:105,fat:10,calories:594,
+ videoId:"",
+ ingredients:[{name:"Rajma (Kidney Beans)",amount:80,unit:"g"},{name:"Basmati Rice (raw)",amount:60,unit:"g"},{name:"Onion",amount:80,unit:"g"},{name:"Tomato",amount:80,unit:"g"},{name:"Garlic (Lehsun)",amount:8,unit:"g"},{name:"Ghee",amount:8,unit:"g"},{name:"Cumin Seeds (Jeera)",amount:2,unit:"g"},{name:"Turmeric Powder (Haldi)",amount:1,unit:"g"},{name:"Garam Masala",amount:2,unit:"g"},{name:"Salt",amount:3,unit:"g"}],
+ instructions:["Soak and pressure cook rajma. Cook basmati rice separately.","Heat ghee; add jeera, garlic, and onion; sauté golden. Add tomato and spices; cook until oil separates. Add rajma; simmer 10 min. Serve over rice."]},
+
+{name:"Kadai Paneer",category:"dinner",servingSize:"1 bowl",prepTime:"30 min",
+ protein:30,carbs:18,fat:42,calories:561,
+ videoId:"SjFMdH-sZo4",
+ ingredients:[{name:"Paneer (full fat)",amount:150,unit:"g"},{name:"Capsicum / Bell Pepper",amount:80,unit:"g"},{name:"Onion",amount:80,unit:"g"},{name:"Tomato",amount:100,unit:"g"},{name:"Garlic (Lehsun)",amount:10,unit:"g"},{name:"Ginger (Adrak)",amount:8,unit:"g"},{name:"Sunflower Oil",amount:10,unit:"g"},{name:"Cumin Seeds (Jeera)",amount:2,unit:"g"},{name:"Turmeric Powder (Haldi)",amount:1,unit:"g"},{name:"Red Chilli Powder",amount:3,unit:"g"},{name:"Garam Masala",amount:2,unit:"g"},{name:"Salt",amount:3,unit:"g"},{name:"Coriander Leaves (Dhania)",amount:10,unit:"g"}],
+ instructions:["Heat oil in a kadai; sauté onion until golden. Add ginger-garlic paste and cook 2 min.","Add blended tomatoes and all spices; cook until oil separates. Add capsicum and paneer cubes; cook 8 min on medium. Garnish with coriander."]},
+
+{name:"Chana Dal with Spinach",category:"dinner",servingSize:"1 bowl",prepTime:"35 min",
+ protein:20,carbs:51,fat:12,calories:382,
+ videoId:"cRmPLCMjEjA",
+ ingredients:[{name:"Chana Dal",amount:70,unit:"g"},{name:"Spinach (Palak)",amount:100,unit:"g"},{name:"Onion",amount:60,unit:"g"},{name:"Tomato",amount:60,unit:"g"},{name:"Garlic (Lehsun)",amount:8,unit:"g"},{name:"Ginger (Adrak)",amount:5,unit:"g"},{name:"Ghee",amount:8,unit:"g"},{name:"Cumin Seeds (Jeera)",amount:2,unit:"g"},{name:"Turmeric Powder (Haldi)",amount:1,unit:"g"},{name:"Red Chilli Powder",amount:2,unit:"g"},{name:"Salt",amount:3,unit:"g"}],
+ instructions:["Pressure cook chana dal with turmeric and salt for 5 whistles until soft.","Heat ghee; add jeera, onion, ginger-garlic; sauté golden. Add tomato, chilli, and chopped spinach; cook 5 min. Combine with dal and simmer 8 min."]},
+
+{name:"Matar Paneer",category:"dinner",servingSize:"1 bowl",prepTime:"25 min",
+ protein:24,carbs:23,fat:29,calories:447,
+ videoId:"W0fqnMPN_LI",
+ ingredients:[{name:"Paneer (full fat)",amount:100,unit:"g"},{name:"Peas (Matar, fresh)",amount:80,unit:"g"},{name:"Onion",amount:80,unit:"g"},{name:"Tomato",amount:80,unit:"g"},{name:"Garlic (Lehsun)",amount:8,unit:"g"},{name:"Ginger (Adrak)",amount:5,unit:"g"},{name:"Sunflower Oil",amount:8,unit:"g"},{name:"Cumin Seeds (Jeera)",amount:2,unit:"g"},{name:"Turmeric Powder (Haldi)",amount:1,unit:"g"},{name:"Red Chilli Powder",amount:2,unit:"g"},{name:"Garam Masala",amount:2,unit:"g"},{name:"Salt",amount:3,unit:"g"}],
+ instructions:["Heat oil; add jeera, onion, and ginger-garlic paste; sauté until golden.","Add blended tomatoes and all spices; cook until oil separates. Add peas and paneer cubes; simmer 10 min until peas are tender."]},
+
+// ── SNACKS ─────────────────────────────────────────────────────
+{name:"Sattu Drink",category:"snack",servingSize:"1 glass",prepTime:"3 min",
+ protein:8,carbs:36,fat:2,calories:201,
+ videoId:"",
+ ingredients:[{name:"Sattu (Roasted Chana Flour)",amount:40,unit:"g"},{name:"Jaggery (Gur)",amount:10,unit:"g"}],
+ instructions:["Dissolve jaggery in a glass of water (300ml). Add sattu and stir vigorously or shake until no lumps remain. Drink chilled or at room temperature."]},
+
+{name:"Greek Yogurt with Nuts",category:"snack",servingSize:"1 bowl",prepTime:"2 min",
+ protein:21,carbs:13,fat:25,calories:345,
+ videoId:"",
+ ingredients:[{name:"Greek Yogurt (full fat)",amount:150,unit:"g"},{name:"Almonds (Badam)",amount:15,unit:"g"},{name:"Walnuts (Akhrot)",amount:10,unit:"g"},{name:"Flaxseeds (Alsi)",amount:8,unit:"g"}],
+ instructions:["Spoon Greek yogurt into a bowl. Top with whole almonds, walnuts, and ground flaxseeds. No sweetener needed — the nuts provide texture and flavour."]},
+
+{name:"Peanut Butter Banana",category:"snack",servingSize:"1 serving",prepTime:"2 min",
+ protein:9,carbs:29,fat:15,calories:265,
+ videoId:"",
+ ingredients:[{name:"Peanut Butter (natural)",amount:30,unit:"g"},{name:"Banana (ripe)",amount:100,unit:"g"}],
+ instructions:["Slice banana. Eat with peanut butter straight from the spoon as a dip, or spread on banana halves."]},
+
+{name:"Sprouted Moong Salad",category:"snack",servingSize:"1 bowl",prepTime:"5 min",
+ protein:16,carbs:45,fat:1,calories:239,
+ videoId:"tVXzaRBZWtY",
+ ingredients:[{name:"Whole Moong (Green Gram)",amount:60,unit:"g"},{name:"Onion",amount:40,unit:"g"},{name:"Tomato",amount:40,unit:"g"},{name:"Cucumber (Kheera)",amount:50,unit:"g"},{name:"Green Chilli",amount:5,unit:"g"},{name:"Coriander Leaves (Dhania)",amount:8,unit:"g"}],
+ instructions:["Sprout moong by soaking overnight and keeping in a damp cloth 12–24 hr.","Toss with all chopped vegetables, salt, and a squeeze of lemon. Serve fresh."]},
+
+{name:"Protein Shake",category:"snack",servingSize:"1 glass",prepTime:"2 min",
+ protein:37,carbs:15,fat:10,calories:297,
+ videoId:"",
+ ingredients:[{name:"Diesel NZ Whey Isolate",amount:30,unit:"g"},{name:"Milk (cow, full fat)",amount:300,unit:"ml"}],
+ instructions:["Add whey to a shaker with milk. Shake vigorously 20–30 sec until fully mixed. Drink immediately post-workout."]},
+
+{name:"Mixed Nuts and Dates",category:"snack",servingSize:"1 handful",prepTime:"0 min",
+ protein:9,carbs:23,fat:17,calories:254,
+ videoId:"",
+ ingredients:[{name:"Almonds (Badam)",amount:15,unit:"g"},{name:"Cashews (Kaju)",amount:10,unit:"g"},{name:"Pumpkin Seeds",amount:10,unit:"g"},{name:"Dates (Khajoor, dry)",amount:20,unit:"g"}],
+ instructions:["Combine in a small bowl or portion bag. No prep needed — a perfect ready-to-go snack."]},
+
+{name:"Roasted Chana",category:"snack",servingSize:"1 handful (30g)",prepTime:"0 min",
+ protein:5,carbs:18,fat:2,calories:108,
+ videoId:"",
+ ingredients:[{name:"Chana (Bengal Gram whole, roasted)",amount:30,unit:"g"}],
+ instructions:["Buy pre-roasted chana from any Indian grocery. Measure 30g and eat as-is. Optionally add chaat masala and lemon for flavour."]},
+
+{name:"Paneer Cubes",category:"snack",servingSize:"100g",prepTime:"0 min",
+ protein:18,carbs:1,fat:21,calories:265,
+ videoId:"",
+ ingredients:[{name:"Paneer (full fat)",amount:100,unit:"g"},{name:"Salt",amount:1,unit:"g"},{name:"Red Chilli Powder",amount:1,unit:"g"}],
+ instructions:["Cut paneer into cubes. Sprinkle with salt and red chilli powder. Eat raw — paneer is safe to eat uncooked. High protein, zero carb snack."]},
+];
+
+// ── UI ──────────────────────────────────────────────────────────
+const btn=document.getElementById("btn"),status=document.getElementById("status"),
+      log=document.getElementById("log"),bar=document.getElementById("bar"),
+      barWrap=document.getElementById("barWrap"),done=document.getElementById("done"),
+      warn=document.getElementById("warn");
+
+function addLog(t,err=false){const d=document.createElement("div");d.className="lr "+(err?"er":"ok");d.textContent=t;log.prepend(d);}
+
+onAuthStateChanged(auth,user=>{
+  if(!user){warn.style.display="block";warn.innerHTML='⚠️ Not signed in. <a href="login.html" style="color:inherit;font-weight:600">Sign in →</a>';btn.textContent="Sign in first";btn.disabled=false;btn.onclick=()=>{window.location.href="login.html";};}
+  else if(!isAdmin(user)){warn.style.display="block";warn.textContent="⚠️ Admin access required.";btn.textContent="Admin only";btn.disabled=true;}
+  else{btn.textContent=`Import All ${R.length} Indian Recipes`;btn.disabled=false;btn.onclick=run;}
+});
+
+async function run(){
+  btn.disabled=true;barWrap.style.display="block";done.style.display="none";log.innerHTML="";
+  let ok=0,fail=0;
+  for(let i=0;i<R.length;i++){
+    const r=R[i];
+    status.textContent=`Saving ${i+1}/${R.length}: ${r.name}…`;
+    bar.style.width=((i+1)/R.length*100).toFixed(0)+"%";
+    try{await saveRecipe(r,"indian");addLog(`✓ ${r.name}`);ok++;}
+    catch(e){addLog(`✗ ${r.name}: ${e.message}`,true);fail++;}
+  }
+  status.textContent=`Done — ${ok} saved, ${fail} failed.`;
+  if(fail===0){done.style.display="block";btn.textContent="✓ Done";}
+  else{btn.textContent="Retry";btn.disabled=false;}
+}
+</script>
+</body>
+</html>
