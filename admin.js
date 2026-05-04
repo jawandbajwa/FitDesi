@@ -242,9 +242,12 @@ function openRecipeModal(recipe = null) {
   addedIngredients = recipe ? [...(recipe.ingredients || [])] : [];
   selectedRecipeCategory = recipe ? recipe.category : "";
 
+  const cuisineLabel = activeCuisine === "canadian" ? "🇨🇦 Canadian" : "🇮🇳 Indian";
   document.getElementById("recipeModalTitle").textContent = recipe
     ? "Edit Recipe"
-    : `Add ${activeCuisine === "canadian" ? "🇨🇦 Canadian" : "🇮🇳 Indian"} Recipe`;
+    : `Add ${cuisineLabel} Recipe`;
+  const badge = document.getElementById("recipeCuisineBadge");
+  if (badge) badge.textContent = `Saving to: ${cuisineLabel} recipes`;
   document.getElementById("recName").value = recipe ? recipe.name : "";
   document.getElementById("recServing").value = recipe
     ? recipe.servingSize || ""

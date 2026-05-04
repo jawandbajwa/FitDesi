@@ -157,11 +157,12 @@ async function syncToFirebase() {
       saveWorkoutCycle,
     } = await import("./firebase.js");
 
-    // Sync recipes
+    // Sync recipes — preserve each recipe's cuisine so it goes to the right collection
     const cachedRecipes = await getCachedRecipes();
     for (const recipe of cachedRecipes) {
       try {
-        await saveRecipe(recipe);
+        const cuisineForSync = recipe._cuisine || recipe.cuisine || "indian";
+        await saveRecipe(recipe, cuisineForSync);
       } catch (e) {
         console.error("Failed to sync recipe:", e);
       }
