@@ -1,7 +1,7 @@
 // FitDesi Service Worker — Network-first, auto-update on every deploy
 // Bump this version whenever you want to force a full cache wipe.
 // With network-first below, normal file changes don't need a version bump.
-const CACHE_NAME = "fitdesi-v7";
+const CACHE_NAME = "fitdesi-v8";
 
 const STATIC_ASSETS = [
   "./",
@@ -10,6 +10,7 @@ const STATIC_ASSETS = [
   "./app.js",
   "./firebase.js",
   "./coach.js",
+  "./coach-config.example.js",
   "./db.js",
   "./manifest.json",
   "./tracker.html",
@@ -31,17 +32,18 @@ const STATIC_ASSETS = [
   "./recipes_canada.js",
   "./icon-192.png",
   "./icon-512.png",
+  "./favicon.ico",
 ];
 
 // ─── INSTALL ─────────────────────────────────────────────────
-// Pre-cache all assets, then skip the "waiting" phase so the
-// new SW activates immediately instead of waiting for old tabs to close.
+// Cache files individually so one missing file doesn't break the entire SW.
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches
-      .open(CACHE_NAME)
-      .then((cache) => cache.addAll(STATIC_ASSETS))
-      .then(() => self.skipWaiting()), // ← activate NOW, don't wait
+    caches.open(CACHE_NAME).then((cache) =>
+      Promise.allSettled(
+        STATIC_ASSETS.map((url) => cache.add(url).catch(() => {}))
+      )
+    ).then(() => self.skipWaiting()),
   );
 });
 
