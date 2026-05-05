@@ -521,6 +521,17 @@ body {
   border-radius: 20px 20px 0 0;
 }
 
+/* Meal Planner — centered dialog instead of bottom sheet */
+#plannerModal {
+  align-items: center;
+  padding: 16px;
+}
+#plannerModal .modal {
+  border-radius: 20px;
+  max-height: 85vh;
+  width: 100%;
+}
+
 .modal-header {
   display: flex;
   justify-content: space-between;
@@ -2252,6 +2263,34 @@ input, select, textarea {
 [data-theme="light"] .login-card   { background: #ffffff; border-color: #dde8e1; }
 [data-theme="light"] .login-title  { color: #1a2e1e; }
 [data-theme="light"] .login-sub    { color: rgba(0,0,0,0.45); }
+
+/* ── Nav items (alias for nav-tab used on exercise/recipes pages) ── */
+[data-theme="light"] .nav-item       { color: rgba(0,0,0,0.3); }
+[data-theme="light"] .nav-item.active { color: #7ed99a; }
+
+/* ── Home page (index.html inline styles) ── */
+[data-theme="light"] .ring-val        { color: #1a2e1e !important; }
+[data-theme="light"] .ring-goal       { color: rgba(0,0,0,0.4) !important; }
+[data-theme="light"] .mini-ring-card  { background: #ffffff !important; border-color: #dde8e1 !important; }
+[data-theme="light"] .mini-ring-name  { color: rgba(0,0,0,0.4) !important; }
+[data-theme="light"] .mini-ring-val   { color: #1a2e1e !important; }
+[data-theme="light"] .mini-ring-goal  { color: rgba(0,0,0,0.35) !important; }
+[data-theme="light"] .streak-card     { background: #ffffff !important; border-color: #dde8e1 !important; }
+[data-theme="light"] .streak-label    { color: rgba(0,0,0,0.4) !important; }
+[data-theme="light"] .today-workout-card { background: #ffffff !important; }
+[data-theme="light"] .workout-name    { color: #1a2e1e !important; }
+[data-theme="light"] .workout-name.empty { color: rgba(0,0,0,0.35) !important; }
+[data-theme="light"] .workout-label   { color: rgba(126,217,154,0.6); }
+[data-theme="light"] .quick-btn       { background: #ffffff !important; border-color: #dde8e1 !important; color: rgba(0,0,0,0.65) !important; }
+[data-theme="light"] .coach-msg-home  { background: rgba(126,217,154,0.07); border-color: rgba(126,217,154,0.2); }
+[data-theme="light"] .coach-msg-text  { color: rgba(0,0,0,0.55) !important; }
+
+/* ── Exercise page modals (inline styles overridden with !important) ── */
+[data-theme="light"] #setPopupModal h2  { color: #1a2e1e !important; }
+[data-theme="light"] #setPopupModal p   { color: rgba(0,0,0,0.4) !important; }
+[data-theme="light"] #chooseSetB        { background: rgba(0,0,0,0.04) !important; border-color: rgba(0,0,0,0.15) !important; color: rgba(0,0,0,0.65) !important; }
+[data-theme="light"] #customSplitModal p { color: rgba(0,0,0,0.4) !important; }
+[data-theme="light"] #addCustomDay      { background: rgba(0,0,0,0.04) !important; border-color: rgba(0,0,0,0.12) !important; color: rgba(0,0,0,0.5) !important; }
 
 /* ── Misc ── */
 [data-theme="light"] .section-label { color: rgba(0,0,0,0.3); }

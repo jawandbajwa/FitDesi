@@ -950,15 +950,29 @@ function getTodayDayIndex() {
   return diffDays % splitDays.length;
 }
 
-function isNewCycle() {
-  if (!cycleData || !cycleData.startDate) return false;
+// Returns how many full cycles have elapsed since cycleData.startDate
+function elapsedCycleCount() {
+  const splitDays = getSplitDays();
+  if (!splitDays.length) return 0;
   const start = new Date(cycleData.startDate);
   const today = new Date();
   start.setHours(0, 0, 0, 0);
   today.setHours(0, 0, 0, 0);
   const diffDays = Math.floor((today - start) / (1000 * 60 * 60 * 24));
-  const splitDays = getSplitDays();
-  return diffDays > 0 && diffDays % splitDays.length === 0;
+  return Math.floor(diffDays / splitDays.length);
+}
+
+function isNewCycle() {
+  if (!cycleData || !cycleData.startDate) return false;
+
+  // Same-day localStorage guard — blocks re-show on refresh before Firestore loads
+  const todayStr = new Date().toISOString().split("T")[0];
+  if (localStorage.getItem("fitdesi_cycle_ack") === todayStr) return false;
+
+  // Compare elapsed cycles vs how many the user has already acknowledged
+  const elapsed = elapsedCycleCount();
+  const acknowledged = cycleData.acknowledgedCycles ?? 0;
+  return elapsed > acknowledged;
 }
 
 function getCurrentSet() {
@@ -1439,16 +1453,14 @@ document
 
 // ─── SET SELECTOR POPUP ──────────────────────────────────
 document.addEventListener("click", async (e) => {
-  if (e.target.id === "chooseSetA") {
-    cycleData.currentSet = "A";
+  if (e.target.id === "chooseSetA" || e.target.id === "chooseSetB") {
+    cycleData.currentSet = e.target.id === "chooseSetA" ? "A" : "B";
     cycleData.cycleCount = (cycleData.cycleCount || 1) + 1;
-    await saveWorkoutCycle(currentUser.uid, cycleData);
-    document.getElementById("setPopupModal").classList.remove("open");
-    renderMyWorkout();
-  }
-  if (e.target.id === "chooseSetB") {
-    cycleData.currentSet = "B";
-    cycleData.cycleCount = (cycleData.cycleCount || 1) + 1;
+    // Record how many cycles have been acknowledged so isNewCycle() won't
+    // fire again until another full split length has elapsed.
+    cycleData.acknowledgedCycles = elapsedCycleCount();
+    // Belt-and-suspenders localStorage stamp
+    localStorage.setItem("fitdesi_cycle_ack", new Date().toISOString().split("T")[0]);
     await saveWorkoutCycle(currentUser.uid, cycleData);
     document.getElementById("setPopupModal").classList.remove("open");
     renderMyWorkout();
@@ -1536,6 +1548,9 @@ onAuthStateChanged(auth, async (user) => {
       }));
     }
     if (isNewCycle()) {
+      // Stamp localStorage immediately so refresh before picking a set
+      // doesn't re-show the popup.
+      localStorage.setItem("fitdesi_cycle_ack", new Date().toISOString().split("T")[0]);
       document.getElementById("setPopupModal").classList.add("open");
     }
   }
