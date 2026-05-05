@@ -11,7 +11,8 @@ import {
   getRecipes,
   saveProgressEntry,
   getProgressHistory,
-  clearProgressHistory,
+  clearWeightHistory,
+  clearBodyFatHistory,
 } from "./firebase.js";
 
 // ─── CONSTANTS ───────────────────────────────────────────────
@@ -1422,12 +1423,16 @@ document.getElementById("saveProgress")?.addEventListener("click", async () => {
 });
 
 // ─── RESET PROGRESS ──────────────────────────────────────────
-async function handleResetProgress() {
+document.getElementById("resetWeightChart")?.addEventListener("click", async () => {
   if (!currentUser) return;
-  if (!confirm("Reset all progress history? This will clear every weight and body fat entry permanently.")) return;
-  await clearProgressHistory(currentUser.uid);
+  if (!confirm("Reset all weight entries? Body fat data will be kept.")) return;
+  await clearWeightHistory(currentUser.uid);
   loadProgressHistory();
-}
+});
 
-document.getElementById("resetWeightChart")?.addEventListener("click", handleResetProgress);
-document.getElementById("resetBodyFatChart")?.addEventListener("click", handleResetProgress);
+document.getElementById("resetBodyFatChart")?.addEventListener("click", async () => {
+  if (!currentUser) return;
+  if (!confirm("Reset all body fat entries? Weight data will be kept.")) return;
+  await clearBodyFatHistory(currentUser.uid);
+  loadProgressHistory();
+});

@@ -20,6 +20,7 @@ import {
   collection,
   getDocs,
   deleteDoc,
+  deleteField,
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // ─── OFFLINE DB ──────────────────────────────────────────────
@@ -398,12 +399,36 @@ async function getProgressHistory(userId) {
   }
 }
 
-async function clearProgressHistory(userId) {
+async function clearWeightHistory(userId) {
   try {
     const snap = await getDocs(collection(db, "users", userId, "progress"));
-    await Promise.all(snap.docs.map((d) => deleteDoc(doc(db, "users", userId, "progress", d.id))));
+    await Promise.all(snap.docs.map((d) => {
+      const data = d.data();
+      const ref = doc(db, "users", userId, "progress", d.id);
+      // If the doc has bodyFat too, just strip the weight field; otherwise delete the doc
+      return (data.bodyFat != null)
+        ? updateDoc(ref, { weight: deleteField() })
+        : deleteDoc(ref);
+    }));
   } catch (error) {
-    console.error("Error clearing progress history:", error);
+    console.error("Error clearing weight history:", error);
+    throw error;
+  }
+}
+
+async function clearBodyFatHistory(userId) {
+  try {
+    const snap = await getDocs(collection(db, "users", userId, "progress"));
+    await Promise.all(snap.docs.map((d) => {
+      const data = d.data();
+      const ref = doc(db, "users", userId, "progress", d.id);
+      // If the doc has weight too, just strip the bodyFat field; otherwise delete the doc
+      return (data.weight != null)
+        ? updateDoc(ref, { bodyFat: deleteField() })
+        : deleteDoc(ref);
+    }));
+  } catch (error) {
+    console.error("Error clearing body fat history:", error);
     throw error;
   }
 }
@@ -440,5 +465,6 @@ export {
   getWorkoutLog,
   saveProgressEntry,
   getProgressHistory,
-  clearProgressHistory,
+  clearWeightHistory,
+  clearBodyFatHistory,
 };
