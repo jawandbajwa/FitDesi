@@ -950,24 +950,29 @@ function getTodayDayIndex() {
   return diffDays % splitDays.length;
 }
 
-function isNewCycle() {
-  if (!cycleData || !cycleData.startDate) return false;
-
-  const todayStr = new Date().toISOString().split("T")[0];
-
-  // localStorage guard — survives page refresh instantly without waiting for Firestore
-  if (localStorage.getItem("fitdesi_cycle_ack") === todayStr) return false;
-
-  // Firestore guard — belt-and-suspenders if localStorage is cleared
-  if (cycleData.lastSetPickedDate === todayStr) return false;
-
+// Returns how many full cycles have elapsed since cycleData.startDate
+function elapsedCycleCount() {
+  const splitDays = getSplitDays();
+  if (!splitDays.length) return 0;
   const start = new Date(cycleData.startDate);
   const today = new Date();
   start.setHours(0, 0, 0, 0);
   today.setHours(0, 0, 0, 0);
   const diffDays = Math.floor((today - start) / (1000 * 60 * 60 * 24));
-  const splitDays = getSplitDays();
-  return diffDays > 0 && diffDays % splitDays.length === 0;
+  return Math.floor(diffDays / splitDays.length);
+}
+
+function isNewCycle() {
+  if (!cycleData || !cycleData.startDate) return false;
+
+  // Same-day localStorage guard — blocks re-show on refresh before Firestore loads
+  const todayStr = new Date().toISOString().split("T")[0];
+  if (localStorage.getItem("fitdesi_cycle_ack") === todayStr) return false;
+
+  // Compare elapsed cycles vs how many the user has already acknowledged
+  const elapsed = elapsedCycleCount();
+  const acknowledged = cycleData.acknowledgedCycles ?? 0;
+  return elapsed > acknowledged;
 }
 
 function getCurrentSet() {
@@ -1449,12 +1454,13 @@ document
 // ─── SET SELECTOR POPUP ──────────────────────────────────
 document.addEventListener("click", async (e) => {
   if (e.target.id === "chooseSetA" || e.target.id === "chooseSetB") {
-    const todayStr = new Date().toISOString().split("T")[0];
     cycleData.currentSet = e.target.id === "chooseSetA" ? "A" : "B";
     cycleData.cycleCount = (cycleData.cycleCount || 1) + 1;
-    cycleData.startDate = new Date().toISOString();
-    cycleData.lastSetPickedDate = todayStr;
-    localStorage.setItem("fitdesi_cycle_ack", todayStr);
+    // Record how many cycles have been acknowledged so isNewCycle() won't
+    // fire again until another full split length has elapsed.
+    cycleData.acknowledgedCycles = elapsedCycleCount();
+    // Belt-and-suspenders localStorage stamp
+    localStorage.setItem("fitdesi_cycle_ack", new Date().toISOString().split("T")[0]);
     await saveWorkoutCycle(currentUser.uid, cycleData);
     document.getElementById("setPopupModal").classList.remove("open");
     renderMyWorkout();
@@ -1542,13 +1548,9 @@ onAuthStateChanged(auth, async (user) => {
       }));
     }
     if (isNewCycle()) {
-      const todayStr = new Date().toISOString().split("T")[0];
-      // Stamp localStorage immediately — blocks the popup on any subsequent
-      // refresh today, before Firestore even loads.
-      localStorage.setItem("fitdesi_cycle_ack", todayStr);
-      cycleData.lastSetPickedDate = todayStr;
-      cycleData.startDate = new Date().toISOString();
-      saveWorkoutCycle(currentUser.uid, cycleData); // also persist to Firestore
+      // Stamp localStorage immediately so refresh before picking a set
+      // doesn't re-show the popup.
+      localStorage.setItem("fitdesi_cycle_ack", new Date().toISOString().split("T")[0]);
       document.getElementById("setPopupModal").classList.add("open");
     }
   }
