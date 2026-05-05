@@ -21,6 +21,41 @@ let deleteTarget = null;
 let deleteType = "";
 let activeCuisine = "indian";
 
+// ─── INLINE VALIDATION HELPER ────────────────────────────────
+function validateField(id, required = true) {
+  const el = document.getElementById(id);
+  if (!el) return true;
+
+  let errEl = document.getElementById(id + "_err");
+  if (!errEl) {
+    errEl = document.createElement("div");
+    errEl.className = "field-error";
+    errEl.id = id + "_err";
+    el.insertAdjacentElement("afterend", errEl);
+    el.addEventListener("input", () => {
+      el.classList.remove("input-error");
+      errEl.textContent = "";
+    });
+  }
+
+  const raw = el.value.trim();
+  if (raw === "") {
+    el.classList.remove("input-error");
+    errEl.textContent = "";
+    if (required) { el.classList.add("input-error"); errEl.textContent = "Required"; return false; }
+    return true;
+  }
+  const val = parseFloat(raw);
+  if (isNaN(val)) {
+    el.classList.add("input-error"); errEl.textContent = "Enter a valid number"; return false;
+  }
+  const min = el.getAttribute("min") !== null ? parseFloat(el.getAttribute("min")) : -Infinity;
+  const max = el.getAttribute("max") !== null ? parseFloat(el.getAttribute("max")) : Infinity;
+  if (val < min) { el.classList.add("input-error"); errEl.textContent = `Min value is ${min}`; return false; }
+  if (val > max) { el.classList.add("input-error"); errEl.textContent = `Max value is ${max}`; return false; }
+  el.classList.remove("input-error"); errEl.textContent = ""; return true;
+}
+
 // ─── EMOJI HELPERS ───────────────────────────────────────────
 function getCategoryEmoji(category) {
   const map = {
@@ -172,6 +207,14 @@ document
       alert("Please enter ingredient name.");
       return;
     }
+
+    // Validate numeric macro fields (optional but must be within range if entered)
+    const r1 = validateField("ingProtein",  false);
+    const r2 = validateField("ingCarbs",    false);
+    const r3 = validateField("ingFat",      false);
+    const r4 = validateField("ingCalories", false);
+    const r5 = validateField("ingFiber",    false);
+    if (!r1 || !r2 || !r3 || !r4 || !r5) return;
 
     const ingredient = { name, protein, carbs, fat, calories, fiber, category };
     if (editingIngredientId) ingredient.id = editingIngredientId;

@@ -2029,3 +2029,18 @@ input, select, textarea {
 .bottom-nav {
   padding-bottom: max(env(safe-area-inset-bottom, 0px), 8px);
 }
+
+/* ── INLINE FIELD VALIDATION ─────────────────────────────── */
+.field-error {
+  font-size: 11px;
+  color: #e05c5c;
+  margin-top: 4px;
+  min-height: 14px;
+  display: block;
+}
+
+input.input-error,
+.ep-input.input-error {
+  border-color: rgba(224, 92, 92, 0.6) !important;
+  background: rgba(224, 92, 92, 0.05) !important;
+}

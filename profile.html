@@ -338,6 +338,44 @@
         return { calories, protein, carbs, fat };
       }
 
+      // ── Inline validation helper ─────────────────────────────
+      function validateField(id, required = true) {
+        const el = document.getElementById(id);
+        if (!el) return true;
+        if (el.closest && el.closest(".hidden")) return true;
+
+        let errEl = document.getElementById(id + "_err");
+        if (!errEl) {
+          errEl = document.createElement("div");
+          errEl.className = "field-error";
+          errEl.id = id + "_err";
+          el.insertAdjacentElement("afterend", errEl);
+          el.addEventListener("input", () => {
+            el.classList.remove("input-error");
+            errEl.textContent = "";
+          });
+        }
+
+        const raw = el.value.trim();
+        if (raw === "") {
+          el.classList.remove("input-error");
+          errEl.textContent = "";
+          if (required) { el.classList.add("input-error"); errEl.textContent = "Required"; return false; }
+          return true;
+        }
+        const val = parseFloat(raw);
+        if (isNaN(val)) {
+          el.classList.add("input-error");
+          errEl.textContent = "Enter a valid number";
+          return false;
+        }
+        const min = el.getAttribute("min") !== null ? parseFloat(el.getAttribute("min")) : -Infinity;
+        const max = el.getAttribute("max") !== null ? parseFloat(el.getAttribute("max")) : Infinity;
+        if (val < min) { el.classList.add("input-error"); errEl.textContent = `Min value is ${min}`; return false; }
+        if (val > max) { el.classList.add("input-error"); errEl.textContent = `Max value is ${max}`; return false; }
+        el.classList.remove("input-error"); errEl.textContent = ""; return true;
+      }
+
       // ── Toast ────────────────────────────────────────────────
       function showToast(msg) {
         const el = document.getElementById("epToast");
@@ -414,14 +452,29 @@
       // ── Save ────────────────────────────────────────────────
       async function saveEditProfile() {
         const name   = document.getElementById("epName").value.trim();
-        const age    = parseInt(document.getElementById("epAge").value);
-        const weight = getEpWeightKg();
-        const height = getEpHeightCm();
+        const isKg   = document.getElementById("epWtKg").classList.contains("active");
+        const isCm   = document.getElementById("epHtCm").classList.contains("active");
 
-        if (!name || !age || !weight || !height || !epGender || !epGoal || !epActivity) {
+        // Run all numeric validations first so every error shows at once
+        const r_age    = validateField("epAge",    true);
+        const r_weight = isKg ? validateField("epWeight",    true) : validateField("epWeightLbs", true);
+        const r_heightA = isCm ? validateField("epHeight",   true) : validateField("epHeightFt",  true);
+        const r_heightB = isCm ? true : validateField("epHeightIn", false);
+        const r_neck   = validateField("epNeck",  false);
+        const r_waist  = validateField("epWaist", false);
+        const r_hip    = validateField("epHip",   false);
+        const numericOk = r_age && r_weight && r_heightA && r_heightB
+                          && r_neck && r_waist && r_hip;
+
+        if (!name || !epGender || !epGoal || !epActivity) {
           showToast("⚠️ Please fill in all required fields");
           return;
         }
+        if (!numericOk) return;
+
+        const age    = parseInt(document.getElementById("epAge").value);
+        const weight = getEpWeightKg();
+        const height = getEpHeightCm();
 
         const btn = document.getElementById("epSave");
         btn.disabled = true;

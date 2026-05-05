@@ -16,6 +16,72 @@ import {
 // ─── CONSTANTS ───────────────────────────────────────────────
 const MEALS = ["breakfast", "lunch", "snack", "dinner"];
 
+// ─── INLINE VALIDATION HELPER ────────────────────────────────
+/**
+ * Validates a numeric input by id.
+ * required=true  → empty counts as an error
+ * required=false → empty is fine; only validates range if a value is present
+ * Injects a .field-error sibling and highlights the input on failure.
+ * Skips the field entirely if it lives inside a .hidden container.
+ */
+function validateField(id, required = true) {
+  const el = document.getElementById(id);
+  if (!el) return true;
+  if (el.closest(".hidden")) return true; // invisible toggle field — skip
+
+  let errEl = document.getElementById(id + "_err");
+  if (!errEl) {
+    errEl = document.createElement("div");
+    errEl.className = "field-error";
+    errEl.id = id + "_err";
+    el.insertAdjacentElement("afterend", errEl);
+    el.addEventListener("input", () => {
+      el.classList.remove("input-error");
+      errEl.textContent = "";
+    });
+  }
+
+  const raw = el.value.trim();
+
+  if (raw === "") {
+    el.classList.remove("input-error");
+    errEl.textContent = "";
+    if (required) {
+      el.classList.add("input-error");
+      errEl.textContent = "Required";
+      return false;
+    }
+    return true;
+  }
+
+  const val = parseFloat(raw);
+  if (isNaN(val)) {
+    el.classList.add("input-error");
+    errEl.textContent = "Enter a valid number";
+    return false;
+  }
+
+  const minAttr = el.getAttribute("min");
+  const maxAttr = el.getAttribute("max");
+  const min = minAttr !== null ? parseFloat(minAttr) : -Infinity;
+  const max = maxAttr !== null ? parseFloat(maxAttr) : Infinity;
+
+  if (val < min) {
+    el.classList.add("input-error");
+    errEl.textContent = `Min value is ${min}`;
+    return false;
+  }
+  if (val > max) {
+    el.classList.add("input-error");
+    errEl.textContent = `Max value is ${max}`;
+    return false;
+  }
+
+  el.classList.remove("input-error");
+  errEl.textContent = "";
+  return true;
+}
+
 // ─── STATE ───────────────────────────────────────────────────
 let currentUser = null;
 let selectedGoal = "";
@@ -951,29 +1017,34 @@ document.addEventListener("click", async function (e) {
 
   if (e.target.id === "toStep2") {
     const name = document.getElementById("userName").value.trim();
-    const age = document.getElementById("userAge").value;
-    const weight = getWeightInKg();
-    const height = getHeightInCm();
+    const isKg = document.getElementById("weightKg").classList.contains("active");
+    const isCm = document.getElementById("heightCm").classList.contains("active");
+
+    // Run all numeric validations up front so every error shows at once
+    const r_age    = validateField("userAge",    true);
+    const r_weight = isKg
+      ? validateField("userWeight",    true)
+      : validateField("userWeightLbs", true);
+    const r_heightA = isCm
+      ? validateField("userHeight",   true)
+      : validateField("userHeightFt", true);
+    const r_heightB = isCm ? true : validateField("userHeightIn", false);
+    const r_neck   = validateField("userNeck",  false);
+    const r_waist  = validateField("userWaist", false);
+    const r_hip    = validateField("userHip",   false);
+    const numericOk = r_age && r_weight && r_heightA && r_heightB
+                      && r_neck && r_waist && r_hip;
+
     if (!name) {
       alert("Please enter your name.");
-      return;
-    }
-    if (!age) {
-      alert("Please enter your age.");
       return;
     }
     if (!selectedGender) {
       alert("Please select your gender.");
       return;
     }
-    if (!weight) {
-      alert("Please enter your weight.");
-      return;
-    }
-    if (!height) {
-      alert("Please enter your height.");
-      return;
-    }
+    if (!numericOk) return;
+
     document.getElementById("step1").classList.add("hidden");
     document.getElementById("step2").classList.remove("hidden");
   }
@@ -1061,13 +1132,19 @@ document.addEventListener("click", async function (e) {
       alert("Please enter a food name.");
       return;
     }
+    // Validate macros — optional (0 is fine) but must be within range if entered
+    const r1 = validateField("manualProtein",  false);
+    const r2 = validateField("manualCarbs",    false);
+    const r3 = validateField("manualFat",      false);
+    const r4 = validateField("manualCalories", false);
+    if (!r1 || !r2 || !r3 || !r4) return;
+
     await addFoodToMeal({
       name,
-      protein: parseFloat(document.getElementById("manualProtein").value) || 0,
-      carbs: parseFloat(document.getElementById("manualCarbs").value) || 0,
-      fat: parseFloat(document.getElementById("manualFat").value) || 0,
-      calories:
-        parseFloat(document.getElementById("manualCalories").value) || 0,
+      protein:  parseFloat(document.getElementById("manualProtein").value)  || 0,
+      carbs:    parseFloat(document.getElementById("manualCarbs").value)    || 0,
+      fat:      parseFloat(document.getElementById("manualFat").value)      || 0,
+      calories: parseFloat(document.getElementById("manualCalories").value) || 0,
     });
   }
 
@@ -1321,10 +1398,17 @@ function renderProgressCharts(history) {
 document.getElementById("saveProgress")?.addEventListener("click", async () => {
   if (!currentUser) return;
 
-  const weight = parseFloat(document.getElementById("progressWeight").value);
-  const bodyFat = parseFloat(document.getElementById("progressBodyFat").value);
+  const wRaw  = document.getElementById("progressWeight").value.trim();
+  const bfRaw = document.getElementById("progressBodyFat").value.trim();
+  if (!wRaw && !bfRaw) return; // nothing entered
 
-  if (!weight && !bodyFat) return;
+  // Validate whichever fields have a value
+  const r1 = wRaw  ? validateField("progressWeight",  true) : true;
+  const r2 = bfRaw ? validateField("progressBodyFat", true) : true;
+  if (!r1 || !r2) return;
+
+  const weight  = wRaw  ? parseFloat(wRaw)  : null;
+  const bodyFat = bfRaw ? parseFloat(bfRaw) : null;
 
   await saveProgressEntry(currentUser.uid, { weight, bodyFat });
 
