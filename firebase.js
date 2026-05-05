@@ -214,7 +214,11 @@ async function getRecipes(cuisine = "indian") {
         cuisine === "canadian" ? "recipes_canadian" : "recipes_indian";
       const snap = await getDocs(collection(db, "shared", col, "items"));
       // Tag each recipe with its cuisine so the cache stays separated
-      const recipes = snap.docs.map((d) => ({ id: d.id, ...d.data(), _cuisine: cuisine }));
+      const recipes = snap.docs.map((d) => ({
+        id: d.id,
+        ...d.data(),
+        _cuisine: cuisine,
+      }));
       // Cache for offline (keyed by cuisine)
       await cacheRecipes(recipes, cuisine);
       return recipes;
@@ -402,14 +406,16 @@ async function getProgressHistory(userId) {
 async function clearWeightHistory(userId) {
   try {
     const snap = await getDocs(collection(db, "users", userId, "progress"));
-    await Promise.all(snap.docs.map((d) => {
-      const data = d.data();
-      const ref = doc(db, "users", userId, "progress", d.id);
-      // If the doc has bodyFat too, just strip the weight field; otherwise delete the doc
-      return (data.bodyFat != null)
-        ? updateDoc(ref, { weight: deleteField() })
-        : deleteDoc(ref);
-    }));
+    await Promise.all(
+      snap.docs.map((d) => {
+        const data = d.data();
+        const ref = doc(db, "users", userId, "progress", d.id);
+        // If the doc has bodyFat too, just strip the weight field; otherwise delete the doc
+        return data.bodyFat != null
+          ? updateDoc(ref, { weight: deleteField() })
+          : deleteDoc(ref);
+      }),
+    );
   } catch (error) {
     console.error("Error clearing weight history:", error);
     throw error;
@@ -419,14 +425,16 @@ async function clearWeightHistory(userId) {
 async function clearBodyFatHistory(userId) {
   try {
     const snap = await getDocs(collection(db, "users", userId, "progress"));
-    await Promise.all(snap.docs.map((d) => {
-      const data = d.data();
-      const ref = doc(db, "users", userId, "progress", d.id);
-      // If the doc has weight too, just strip the bodyFat field; otherwise delete the doc
-      return (data.weight != null)
-        ? updateDoc(ref, { bodyFat: deleteField() })
-        : deleteDoc(ref);
-    }));
+    await Promise.all(
+      snap.docs.map((d) => {
+        const data = d.data();
+        const ref = doc(db, "users", userId, "progress", d.id);
+        // If the doc has weight too, just strip the bodyFat field; otherwise delete the doc
+        return data.weight != null
+          ? updateDoc(ref, { bodyFat: deleteField() })
+          : deleteDoc(ref);
+      }),
+    );
   } catch (error) {
     console.error("Error clearing body fat history:", error);
     throw error;
@@ -436,17 +444,22 @@ async function clearBodyFatHistory(userId) {
 // ─── COACH FUNCTIONS ──────────────────────────────────────────
 async function addMealToLog(uid, meal) {
   try {
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toISOString().split("T")[0];
     const logRef = doc(db, "users", uid, "logs", today);
-    
+
     // Get existing log
     const existingLog = await getDoc(logRef);
-    const currentLog = existingLog.exists() ? existingLog.data() : {
-      breakfast: [], lunch: [], snack: [], dinner: []
-    };
-    
+    const currentLog = existingLog.exists()
+      ? existingLog.data()
+      : {
+          breakfast: [],
+          lunch: [],
+          snack: [],
+          dinner: [],
+        };
+
     // Add meal to appropriate array
-    const mealType = meal.meal_type || 'snack';
+    const mealType = meal.meal_type || "snack";
     if (!currentLog[mealType]) currentLog[mealType] = [];
     currentLog[mealType].push({
       name: meal.name,
@@ -454,9 +467,9 @@ async function addMealToLog(uid, meal) {
       carbs: meal.carbs,
       fat: meal.fat,
       calories: meal.calories,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-    
+
     await setDoc(logRef, currentLog);
   } catch (error) {
     console.error("Error adding meal to log:", error);
@@ -466,10 +479,14 @@ async function addMealToLog(uid, meal) {
 
 async function completeWorkout(uid, date) {
   try {
-    await setDoc(doc(db, "users", uid, "workoutLogs", date), {
-      completed: true,
-      completedAt: new Date().toISOString()
-    }, { merge: true });
+    await setDoc(
+      doc(db, "users", uid, "workoutLogs", date),
+      {
+        completed: true,
+        completedAt: new Date().toISOString(),
+      },
+      { merge: true },
+    );
   } catch (error) {
     console.error("Error completing workout:", error);
     throw error;
@@ -478,9 +495,25 @@ async function completeWorkout(uid, date) {
 
 async function swapExercise(uid, date, oldName, newName) {
   try {
-    const workoutRef = doc(db, "users", uid, "workouts", date, "exercises", oldName);
-    const newRef = doc(db, "users", uid, "workouts", date, "exercises", newName);
-    
+    const workoutRef = doc(
+      db,
+      "users",
+      uid,
+      "workouts",
+      date,
+      "exercises",
+      oldName,
+    );
+    const newRef = doc(
+      db,
+      "users",
+      uid,
+      "workouts",
+      date,
+      "exercises",
+      newName,
+    );
+
     // Get old exercise data
     const oldDoc = await getDoc(workoutRef);
     if (oldDoc.exists()) {

@@ -666,9 +666,17 @@
         getUserProfile,
         getDailyLog,
       } from "./firebase.js";
-      import { initCoach } from "./coach.js";
 
-      initCoach();
+      async function loadCoach() {
+        try {
+          const coachModule = await import("./coach.js");
+          coachModule.initCoach();
+        } catch (error) {
+          console.warn("FitDesi coach module not loaded:", error);
+        }
+      }
+
+      loadCoach();
 
       const PROTEIN_CIRC = 339.3;
       const MINI_CIRC = 87.96;

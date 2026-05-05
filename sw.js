@@ -9,7 +9,6 @@ const STATIC_ASSETS = [
   "./style.css",
   "./app.js",
   "./firebase.js",
-  "./coach.js",
   "./db.js",
   "./manifest.json",
   "./tracker.html",

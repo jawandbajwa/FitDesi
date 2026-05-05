@@ -2,14 +2,25 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
     <title>FitDesi — Profile</title>
     <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#7ed99a" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
     <link rel="apple-touch-icon" href="icon-192.png" />
-    <script>try{if(localStorage.getItem("fitdesi_theme")==="light")document.documentElement.setAttribute("data-theme","light")}catch(e){}</script>
+    <script>
+      try {
+        if (localStorage.getItem("fitdesi_theme") === "light")
+          document.documentElement.setAttribute("data-theme", "light");
+      } catch (e) {}
+    </script>
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="profile.css" />
   </head>
@@ -20,7 +31,6 @@
     </header>
 
     <div class="profile-scroll">
-
       <!-- USER CARD -->
       <div class="user-card">
         <img id="userAvatar" class="user-avatar" src="" alt="" />
@@ -28,7 +38,7 @@
           <div class="user-name" id="userName">—</div>
           <div class="user-email" id="userEmail">—</div>
         </div>
-        <div class="user-badge" id="userBadge" style="display:none">Admin</div>
+        <div class="user-badge" id="userBadge" style="display: none">Admin</div>
       </div>
 
       <!-- STATS ROW -->
@@ -76,7 +86,19 @@
             <span class="settings-row-value" id="displayActivity">—</span>
           </div>
         </div>
-        <button class="settings-action-btn green-btn" id="editProfileBtn" style="cursor:pointer;font-family:inherit;font-size:13px;width:100%;border:none">✏️ Edit Profile &amp; Recalculate</button>
+        <button
+          class="settings-action-btn green-btn"
+          id="editProfileBtn"
+          style="
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 13px;
+            width: 100%;
+            border: none;
+          "
+        >
+          ✏️ Edit Profile &amp; Recalculate
+        </button>
       </div>
 
       <!-- SECTION: DISPLAY & UNITS -->
@@ -149,8 +171,8 @@
 
       <!-- SIGN OUT -->
       <button class="signout-btn" id="signOutBtn">Sign Out</button>
-
-    </div><!-- end profile-scroll -->
+    </div>
+    <!-- end profile-scroll -->
 
     <!-- ── EDIT PROFILE BOTTOM SHEET ─────────────────────── -->
     <div class="ep-overlay" id="epOverlay">
@@ -163,17 +185,41 @@
         <div class="ep-body">
           <div class="ep-group">
             <label>Your Name</label>
-            <input class="ep-input" id="epName" type="text" placeholder="What should I call you?" />
+            <input
+              class="ep-input"
+              id="epName"
+              type="text"
+              placeholder="What should I call you?"
+            />
           </div>
           <div class="ep-group">
             <label>Age</label>
-            <input class="ep-input" id="epAge" type="number" placeholder="Years" min="10" max="100" />
+            <input
+              class="ep-input"
+              id="epAge"
+              type="number"
+              placeholder="Years"
+              min="10"
+              max="100"
+            />
           </div>
           <div class="ep-group">
             <label>Gender</label>
             <div class="ep-option-row">
-              <button class="ep-option-btn" data-ep-field="gender" data-ep-val="male">Male</button>
-              <button class="ep-option-btn" data-ep-field="gender" data-ep-val="female">Female</button>
+              <button
+                class="ep-option-btn"
+                data-ep-field="gender"
+                data-ep-val="male"
+              >
+                Male
+              </button>
+              <button
+                class="ep-option-btn"
+                data-ep-field="gender"
+                data-ep-val="female"
+              >
+                Female
+              </button>
             </div>
           </div>
           <div class="ep-group">
@@ -183,11 +229,25 @@
               <button class="ep-unit-btn" id="epWtLbs">lbs</button>
             </div>
             <div class="ep-input-row" id="epWtKgRow">
-              <input class="ep-input" id="epWeight" type="number" placeholder="e.g. 70" min="20" max="400" />
+              <input
+                class="ep-input"
+                id="epWeight"
+                type="number"
+                placeholder="e.g. 70"
+                min="20"
+                max="400"
+              />
               <span class="ep-unit-lbl">kg</span>
             </div>
             <div class="ep-input-row hidden" id="epWtLbsRow">
-              <input class="ep-input" id="epWeightLbs" type="number" placeholder="e.g. 154" min="44" max="880" />
+              <input
+                class="ep-input"
+                id="epWeightLbs"
+                type="number"
+                placeholder="e.g. 154"
+                min="44"
+                max="880"
+              />
               <span class="ep-unit-lbl">lbs</span>
             </div>
           </div>
@@ -198,55 +258,152 @@
               <button class="ep-unit-btn" id="epHtFt">ft / in</button>
             </div>
             <div class="ep-input-row" id="epHtCmRow">
-              <input class="ep-input" id="epHeight" type="number" placeholder="e.g. 175" min="100" max="250" />
+              <input
+                class="ep-input"
+                id="epHeight"
+                type="number"
+                placeholder="e.g. 175"
+                min="100"
+                max="250"
+              />
               <span class="ep-unit-lbl">cm</span>
             </div>
             <div class="ep-input-row hidden" id="epHtFtRow">
-              <input class="ep-input" id="epHeightFt" type="number" placeholder="5" min="3" max="8" style="max-width:80px" />
+              <input
+                class="ep-input"
+                id="epHeightFt"
+                type="number"
+                placeholder="5"
+                min="3"
+                max="8"
+                style="max-width: 80px"
+              />
               <span class="ep-unit-lbl">ft</span>
-              <input class="ep-input" id="epHeightIn" type="number" placeholder="9" min="0" max="11" style="max-width:80px" />
+              <input
+                class="ep-input"
+                id="epHeightIn"
+                type="number"
+                placeholder="9"
+                min="0"
+                max="11"
+                style="max-width: 80px"
+              />
               <span class="ep-unit-lbl">in</span>
             </div>
           </div>
           <div class="ep-group">
             <label>Neck circumference (cm)</label>
-            <input class="ep-input" id="epNeck" type="number" placeholder="e.g. 37" min="20" max="80" />
+            <input
+              class="ep-input"
+              id="epNeck"
+              type="number"
+              placeholder="e.g. 37"
+              min="20"
+              max="80"
+            />
           </div>
           <div class="ep-group">
             <label>Waist circumference (cm) — at navel</label>
-            <input class="ep-input" id="epWaist" type="number" placeholder="e.g. 82" min="40" max="250" />
+            <input
+              class="ep-input"
+              id="epWaist"
+              type="number"
+              placeholder="e.g. 82"
+              min="40"
+              max="250"
+            />
           </div>
           <div class="ep-group">
             <label>Hip circumference (cm) — females only</label>
-            <input class="ep-input" id="epHip" type="number" placeholder="e.g. 95" min="50" max="250" />
+            <input
+              class="ep-input"
+              id="epHip"
+              type="number"
+              placeholder="e.g. 95"
+              min="50"
+              max="250"
+            />
           </div>
           <div class="ep-group">
             <label>Fitness Goal</label>
             <div class="ep-goal-grid">
-              <button class="ep-goal-btn" data-ep-field="goal" data-ep-val="recomp">
+              <button
+                class="ep-goal-btn"
+                data-ep-field="goal"
+                data-ep-val="recomp"
+              >
                 <span class="ep-goal-icon">⚡</span>
-                <div><span class="ep-goal-title">Body Recomposition</span><span class="ep-goal-desc">Lose fat &amp; build muscle simultaneously</span></div>
+                <div>
+                  <span class="ep-goal-title">Body Recomposition</span
+                  ><span class="ep-goal-desc"
+                    >Lose fat &amp; build muscle simultaneously</span
+                  >
+                </div>
               </button>
-              <button class="ep-goal-btn" data-ep-field="goal" data-ep-val="muscle">
+              <button
+                class="ep-goal-btn"
+                data-ep-field="goal"
+                data-ep-val="muscle"
+              >
                 <span class="ep-goal-icon">💪</span>
-                <div><span class="ep-goal-title">Muscle Gain</span><span class="ep-goal-desc">Build maximum muscle, slight surplus</span></div>
+                <div>
+                  <span class="ep-goal-title">Muscle Gain</span
+                  ><span class="ep-goal-desc"
+                    >Build maximum muscle, slight surplus</span
+                  >
+                </div>
               </button>
-              <button class="ep-goal-btn" data-ep-field="goal" data-ep-val="fatloss">
+              <button
+                class="ep-goal-btn"
+                data-ep-field="goal"
+                data-ep-val="fatloss"
+              >
                 <span class="ep-goal-icon">🔥</span>
-                <div><span class="ep-goal-title">Fat Loss</span><span class="ep-goal-desc">Lose fat while preserving muscle</span></div>
+                <div>
+                  <span class="ep-goal-title">Fat Loss</span
+                  ><span class="ep-goal-desc"
+                    >Lose fat while preserving muscle</span
+                  >
+                </div>
               </button>
             </div>
           </div>
           <div class="ep-group">
             <label>Activity Level</label>
             <div class="ep-option-row">
-              <button class="ep-option-btn" data-ep-field="activity" data-ep-val="sedentary">Sedentary</button>
-              <button class="ep-option-btn" data-ep-field="activity" data-ep-val="light">Lightly Active</button>
-              <button class="ep-option-btn" data-ep-field="activity" data-ep-val="moderate">Moderate</button>
-              <button class="ep-option-btn" data-ep-field="activity" data-ep-val="active">Very Active</button>
+              <button
+                class="ep-option-btn"
+                data-ep-field="activity"
+                data-ep-val="sedentary"
+              >
+                Sedentary
+              </button>
+              <button
+                class="ep-option-btn"
+                data-ep-field="activity"
+                data-ep-val="light"
+              >
+                Lightly Active
+              </button>
+              <button
+                class="ep-option-btn"
+                data-ep-field="activity"
+                data-ep-val="moderate"
+              >
+                Moderate
+              </button>
+              <button
+                class="ep-option-btn"
+                data-ep-field="activity"
+                data-ep-val="active"
+              >
+                Very Active
+              </button>
             </div>
           </div>
-          <button class="ep-save-btn" id="epSave">Save &amp; Recalculate</button>
+          <button class="ep-save-btn" id="epSave">
+            Save &amp; Recalculate
+          </button>
         </div>
       </div>
     </div>
@@ -255,44 +412,112 @@
     <!-- BOTTOM NAV -->
     <nav class="bottom-nav">
       <a href="recipes.html" class="nav-item" data-page="recipes">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
-          <path d="M8 12h8M12 8v8"/>
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path
+            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"
+          />
+          <path d="M8 12h8M12 8v8" />
         </svg>
         <span>Recipes</span>
       </a>
       <a href="tracker.html" class="nav-item" data-page="nutrition">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M3 3h18v4H3zM3 10h18v4H3zM3 17h18v4H3z"/>
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M3 3h18v4H3zM3 10h18v4H3zM3 17h18v4H3z" />
         </svg>
         <span>Nutrition</span>
       </a>
       <a href="index.html" class="nav-item home-tab" data-page="home">
         <div class="home-tab-ring">
           <svg width="58" height="58" viewBox="0 0 58 58">
-            <circle cx="29" cy="29" r="22" fill="none" stroke="#1a2e1e" stroke-width="4"/>
-            <circle cx="29" cy="29" r="22" fill="none" stroke="#7ed99a" stroke-width="4"
-              stroke-dasharray="138.2" stroke-dashoffset="138.2"
-              stroke-linecap="round" transform="rotate(-90 29 29)"
-              id="navProteinRing" class="nav-protein-ring"/>
+            <circle
+              cx="29"
+              cy="29"
+              r="22"
+              fill="none"
+              stroke="#1a2e1e"
+              stroke-width="4"
+            />
+            <circle
+              cx="29"
+              cy="29"
+              r="22"
+              fill="none"
+              stroke="#7ed99a"
+              stroke-width="4"
+              stroke-dasharray="138.2"
+              stroke-dashoffset="138.2"
+              stroke-linecap="round"
+              transform="rotate(-90 29 29)"
+              id="navProteinRing"
+              class="nav-protein-ring"
+            />
           </svg>
-          <svg class="home-tab-icon" style="position:relative;z-index:1" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7ed99a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-            <polyline points="9 22 9 12 15 12 15 22"/>
+          <svg
+            class="home-tab-icon"
+            style="position: relative; z-index: 1"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#7ed99a"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            <polyline points="9 22 9 12 15 12 15 22" />
           </svg>
         </div>
         <span>Home</span>
       </a>
       <a href="exercise.html" class="nav-item" data-page="workout">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M6.5 6.5h11M6.5 17.5h11M4 12h16M4 12l-2-2M4 12l-2 2M20 12l2-2M20 12l2 2"/>
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path
+            d="M6.5 6.5h11M6.5 17.5h11M4 12h16M4 12l-2-2M4 12l-2 2M20 12l2-2M20 12l2 2"
+          />
         </svg>
         <span>Workout</span>
       </a>
       <a href="profile.html" class="nav-item active" data-page="profile">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-          <circle cx="12" cy="7" r="4"/>
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
         </svg>
         <span>Profile</span>
       </a>
@@ -310,38 +535,52 @@
 
       // ── Label maps ───────────────────────────────────────────
       const GOAL_LABELS = {
-        recomp:  "Body Recomp",
-        muscle:  "Muscle Gain",
+        recomp: "Body Recomp",
+        muscle: "Muscle Gain",
         fatloss: "Fat Loss",
       };
       const ACTIVITY_LABELS = {
         sedentary: "Sedentary",
-        light:     "Lightly Active",
-        moderate:  "Moderate",
-        active:    "Very Active",
+        light: "Lightly Active",
+        moderate: "Moderate",
+        active: "Very Active",
       };
 
       // ── State ────────────────────────────────────────────────
       let currentUser = null;
-      let epGender = "", epGoal = "", epActivity = "";
+      let epGender = "",
+        epGoal = "",
+        epActivity = "";
 
       // ── Macro calculator (mirrors tracker.js) ────────────────
       function calculateMacros(p) {
-        let bmr = p.gender === "male"
-          ? 10*p.weight + 6.25*p.height - 5*p.age + 5
-          : 10*p.weight + 6.25*p.height - 5*p.age - 161;
-        const mult = { sedentary:1.2, light:1.375, moderate:1.55, active:1.725 };
+        let bmr =
+          p.gender === "male"
+            ? 10 * p.weight + 6.25 * p.height - 5 * p.age + 5
+            : 10 * p.weight + 6.25 * p.height - 5 * p.age - 161;
+        const mult = {
+          sedentary: 1.2,
+          light: 1.375,
+          moderate: 1.55,
+          active: 1.725,
+        };
         const tdee = bmr * (mult[p.activity] || 1.55);
         let calories, protein, carbs, fat;
         if (p.goal === "recomp") {
-          calories = Math.round(tdee*0.95); protein = Math.round(p.weight*2.2);
-          fat = Math.round(calories*0.25/9); carbs = Math.round((calories - protein*4 - fat*9)/4);
+          calories = Math.round(tdee * 0.95);
+          protein = Math.round(p.weight * 2.2);
+          fat = Math.round((calories * 0.25) / 9);
+          carbs = Math.round((calories - protein * 4 - fat * 9) / 4);
         } else if (p.goal === "muscle") {
-          calories = Math.round(tdee*1.1); protein = Math.round(p.weight*2.0);
-          fat = Math.round(calories*0.28/9); carbs = Math.round((calories - protein*4 - fat*9)/4);
+          calories = Math.round(tdee * 1.1);
+          protein = Math.round(p.weight * 2.0);
+          fat = Math.round((calories * 0.28) / 9);
+          carbs = Math.round((calories - protein * 4 - fat * 9) / 4);
         } else {
-          calories = Math.round(tdee*0.85); protein = Math.round(p.weight*2.4);
-          fat = Math.round(calories*0.25/9); carbs = Math.round((calories - protein*4 - fat*9)/4);
+          calories = Math.round(tdee * 0.85);
+          protein = Math.round(p.weight * 2.4);
+          fat = Math.round((calories * 0.25) / 9);
+          carbs = Math.round((calories - protein * 4 - fat * 9) / 4);
         }
         return { calories, protein, carbs, fat };
       }
@@ -368,7 +607,11 @@
         if (raw === "") {
           el.classList.remove("input-error");
           errEl.textContent = "";
-          if (required) { el.classList.add("input-error"); errEl.textContent = "Required"; return false; }
+          if (required) {
+            el.classList.add("input-error");
+            errEl.textContent = "Required";
+            return false;
+          }
           return true;
         }
         const val = parseFloat(raw);
@@ -377,11 +620,27 @@
           errEl.textContent = "Enter a valid number";
           return false;
         }
-        const min = el.getAttribute("min") !== null ? parseFloat(el.getAttribute("min")) : -Infinity;
-        const max = el.getAttribute("max") !== null ? parseFloat(el.getAttribute("max")) : Infinity;
-        if (val < min) { el.classList.add("input-error"); errEl.textContent = `Min value is ${min}`; return false; }
-        if (val > max) { el.classList.add("input-error"); errEl.textContent = `Max value is ${max}`; return false; }
-        el.classList.remove("input-error"); errEl.textContent = ""; return true;
+        const min =
+          el.getAttribute("min") !== null
+            ? parseFloat(el.getAttribute("min"))
+            : -Infinity;
+        const max =
+          el.getAttribute("max") !== null
+            ? parseFloat(el.getAttribute("max"))
+            : Infinity;
+        if (val < min) {
+          el.classList.add("input-error");
+          errEl.textContent = `Min value is ${min}`;
+          return false;
+        }
+        if (val > max) {
+          el.classList.add("input-error");
+          errEl.textContent = `Max value is ${max}`;
+          return false;
+        }
+        el.classList.remove("input-error");
+        errEl.textContent = "";
+        return true;
       }
 
       // ── Toast ────────────────────────────────────────────────
@@ -396,28 +655,47 @@
       function displayProfile(profile) {
         if (!profile) return;
         const macros = calculateMacros(profile);
-        document.getElementById("statProtein").textContent   = macros.protein + "g";
-        document.getElementById("statWeight").textContent    = (profile.weight || "—") + (profile.weight ? "kg" : "");
-        document.getElementById("statGoal").textContent      = GOAL_LABELS[profile.goal] || profile.goal || "—";
-        document.getElementById("displayName").textContent   = profile.name     || "—";
-        document.getElementById("displayWeight").textContent = profile.weight   ? profile.weight + " kg"  : "—";
-        document.getElementById("displayHeight").textContent = profile.height   ? profile.height + " cm"  : "—";
-        document.getElementById("displayAge").textContent    = profile.age      ? profile.age    + " yrs" : "—";
-        document.getElementById("displayGoal").textContent   = GOAL_LABELS[profile.goal]     || profile.goal     || "—";
-        document.getElementById("displayActivity").textContent = ACTIVITY_LABELS[profile.activity] || profile.activity || "—";
+        document.getElementById("statProtein").textContent =
+          macros.protein + "g";
+        document.getElementById("statWeight").textContent =
+          (profile.weight || "—") + (profile.weight ? "kg" : "");
+        document.getElementById("statGoal").textContent =
+          GOAL_LABELS[profile.goal] || profile.goal || "—";
+        document.getElementById("displayName").textContent =
+          profile.name || "—";
+        document.getElementById("displayWeight").textContent = profile.weight
+          ? profile.weight + " kg"
+          : "—";
+        document.getElementById("displayHeight").textContent = profile.height
+          ? profile.height + " cm"
+          : "—";
+        document.getElementById("displayAge").textContent = profile.age
+          ? profile.age + " yrs"
+          : "—";
+        document.getElementById("displayGoal").textContent =
+          GOAL_LABELS[profile.goal] || profile.goal || "—";
+        document.getElementById("displayActivity").textContent =
+          ACTIVITY_LABELS[profile.activity] || profile.activity || "—";
       }
 
       // ── Weight / height getters ───────────────────────────────
       function getEpWeightKg() {
         if (document.getElementById("epWtKg").classList.contains("active"))
           return parseFloat(document.getElementById("epWeight").value) || 0;
-        return Math.round((parseFloat(document.getElementById("epWeightLbs").value)||0) * 0.453592 * 10) / 10;
+        return (
+          Math.round(
+            (parseFloat(document.getElementById("epWeightLbs").value) || 0) *
+              0.453592 *
+              10,
+          ) / 10
+        );
       }
       function getEpHeightCm() {
         if (document.getElementById("epHtCm").classList.contains("active"))
           return parseFloat(document.getElementById("epHeight").value) || 0;
         const ft = parseFloat(document.getElementById("epHeightFt").value) || 0;
-        const inches = parseFloat(document.getElementById("epHeightIn").value) || 0;
+        const inches =
+          parseFloat(document.getElementById("epHeightIn").value) || 0;
         return Math.round(ft * 30.48 + inches * 2.54);
       }
 
@@ -429,24 +707,33 @@
           showToast("Complete your profile in the Nutrition tab first");
           return;
         }
-        epGender   = profile.gender   || "";
-        epGoal     = profile.goal     || "";
+        epGender = profile.gender || "";
+        epGoal = profile.goal || "";
         epActivity = profile.activity || "";
 
-        document.getElementById("epName").value   = profile.name   || "";
-        document.getElementById("epAge").value    = profile.age    || "";
+        document.getElementById("epName").value = profile.name || "";
+        document.getElementById("epAge").value = profile.age || "";
         document.getElementById("epWeight").value = profile.weight || "";
         document.getElementById("epHeight").value = profile.height || "";
-        document.getElementById("epNeck").value   = profile.neck   || "";
-        document.getElementById("epWaist").value  = profile.waist  || "";
-        document.getElementById("epHip").value    = profile.hip    || "";
+        document.getElementById("epNeck").value = profile.neck || "";
+        document.getElementById("epWaist").value = profile.waist || "";
+        document.getElementById("epHip").value = profile.hip || "";
 
-        document.querySelectorAll(".ep-option-btn[data-ep-field='gender']")
-          .forEach(b => b.classList.toggle("active", b.dataset.epVal === epGender));
-        document.querySelectorAll(".ep-option-btn[data-ep-field='activity']")
-          .forEach(b => b.classList.toggle("active", b.dataset.epVal === epActivity));
-        document.querySelectorAll(".ep-goal-btn[data-ep-field='goal']")
-          .forEach(b => b.classList.toggle("active", b.dataset.epVal === epGoal));
+        document
+          .querySelectorAll(".ep-option-btn[data-ep-field='gender']")
+          .forEach((b) =>
+            b.classList.toggle("active", b.dataset.epVal === epGender),
+          );
+        document
+          .querySelectorAll(".ep-option-btn[data-ep-field='activity']")
+          .forEach((b) =>
+            b.classList.toggle("active", b.dataset.epVal === epActivity),
+          );
+        document
+          .querySelectorAll(".ep-goal-btn[data-ep-field='goal']")
+          .forEach((b) =>
+            b.classList.toggle("active", b.dataset.epVal === epGoal),
+          );
 
         document.getElementById("epOverlay").classList.add("open");
         document.body.style.overflow = "hidden";
@@ -459,20 +746,34 @@
 
       // ── Save ────────────────────────────────────────────────
       async function saveEditProfile() {
-        const name   = document.getElementById("epName").value.trim();
-        const isKg   = document.getElementById("epWtKg").classList.contains("active");
-        const isCm   = document.getElementById("epHtCm").classList.contains("active");
+        const name = document.getElementById("epName").value.trim();
+        const isKg = document
+          .getElementById("epWtKg")
+          .classList.contains("active");
+        const isCm = document
+          .getElementById("epHtCm")
+          .classList.contains("active");
 
         // Run all numeric validations first so every error shows at once
-        const r_age    = validateField("epAge",    true);
-        const r_weight = isKg ? validateField("epWeight",    true) : validateField("epWeightLbs", true);
-        const r_heightA = isCm ? validateField("epHeight",   true) : validateField("epHeightFt",  true);
+        const r_age = validateField("epAge", true);
+        const r_weight = isKg
+          ? validateField("epWeight", true)
+          : validateField("epWeightLbs", true);
+        const r_heightA = isCm
+          ? validateField("epHeight", true)
+          : validateField("epHeightFt", true);
         const r_heightB = isCm ? true : validateField("epHeightIn", false);
-        const r_neck   = validateField("epNeck",  false);
-        const r_waist  = validateField("epWaist", false);
-        const r_hip    = validateField("epHip",   false);
-        const numericOk = r_age && r_weight && r_heightA && r_heightB
-                          && r_neck && r_waist && r_hip;
+        const r_neck = validateField("epNeck", false);
+        const r_waist = validateField("epWaist", false);
+        const r_hip = validateField("epHip", false);
+        const numericOk =
+          r_age &&
+          r_weight &&
+          r_heightA &&
+          r_heightB &&
+          r_neck &&
+          r_waist &&
+          r_hip;
 
         if (!name || !epGender || !epGoal || !epActivity) {
           showToast("⚠️ Please fill in all required fields");
@@ -480,7 +781,7 @@
         }
         if (!numericOk) return;
 
-        const age    = parseInt(document.getElementById("epAge").value);
+        const age = parseInt(document.getElementById("epAge").value);
         const weight = getEpWeightKg();
         const height = getEpHeightCm();
 
@@ -489,11 +790,16 @@
         btn.textContent = "Saving…";
 
         const profile = {
-          name, age, gender: epGender, weight, height,
-          neck:  parseFloat(document.getElementById("epNeck").value)  || 0,
+          name,
+          age,
+          gender: epGender,
+          weight,
+          height,
+          neck: parseFloat(document.getElementById("epNeck").value) || 0,
           waist: parseFloat(document.getElementById("epWaist").value) || 0,
-          hip:   parseFloat(document.getElementById("epHip").value)   || 0,
-          goal: epGoal, activity: epActivity,
+          hip: parseFloat(document.getElementById("epHip").value) || 0,
+          goal: epGoal,
+          activity: epActivity,
         };
 
         try {
@@ -501,10 +807,10 @@
 
           // Push recalculated macros to localStorage so Nutrition + Home ring update
           const macros = calculateMacros(profile);
-          localStorage.setItem("proteinGoal",  macros.protein);
+          localStorage.setItem("proteinGoal", macros.protein);
           localStorage.setItem("caloriesGoal", macros.calories);
-          localStorage.setItem("carbsGoal",    macros.carbs);
-          localStorage.setItem("fatGoal",      macros.fat);
+          localStorage.setItem("carbsGoal", macros.carbs);
+          localStorage.setItem("fatGoal", macros.fat);
 
           displayProfile(profile);
           closeEditModal();
@@ -519,29 +825,38 @@
       }
 
       // ── Modal events ─────────────────────────────────────────
-      document.getElementById("editProfileBtn").addEventListener("click", openEditModal);
-      document.getElementById("epClose").addEventListener("click", closeEditModal);
-      document.getElementById("epOverlay").addEventListener("click", e => {
+      document
+        .getElementById("editProfileBtn")
+        .addEventListener("click", openEditModal);
+      document
+        .getElementById("epClose")
+        .addEventListener("click", closeEditModal);
+      document.getElementById("epOverlay").addEventListener("click", (e) => {
         if (e.target === document.getElementById("epOverlay")) closeEditModal();
       });
-      document.getElementById("epSave").addEventListener("click", saveEditProfile);
+      document
+        .getElementById("epSave")
+        .addEventListener("click", saveEditProfile);
 
       // Option buttons (gender / activity)
-      document.querySelectorAll(".ep-option-btn").forEach(btn => {
+      document.querySelectorAll(".ep-option-btn").forEach((btn) => {
         btn.addEventListener("click", () => {
           const field = btn.dataset.epField;
-          document.querySelectorAll(`.ep-option-btn[data-ep-field="${field}"]`)
-            .forEach(b => b.classList.remove("active"));
+          document
+            .querySelectorAll(`.ep-option-btn[data-ep-field="${field}"]`)
+            .forEach((b) => b.classList.remove("active"));
           btn.classList.add("active");
-          if (field === "gender")   epGender   = btn.dataset.epVal;
+          if (field === "gender") epGender = btn.dataset.epVal;
           if (field === "activity") epActivity = btn.dataset.epVal;
         });
       });
 
       // Goal buttons
-      document.querySelectorAll(".ep-goal-btn").forEach(btn => {
+      document.querySelectorAll(".ep-goal-btn").forEach((btn) => {
         btn.addEventListener("click", () => {
-          document.querySelectorAll(".ep-goal-btn").forEach(b => b.classList.remove("active"));
+          document
+            .querySelectorAll(".ep-goal-btn")
+            .forEach((b) => b.classList.remove("active"));
           btn.classList.add("active");
           epGoal = btn.dataset.epVal;
         });
@@ -577,13 +892,21 @@
 
       // ── Auth & initial load ───────────────────────────────────
       onAuthStateChanged(auth, async (user) => {
-        if (!user) { window.location.href = "login.html"; return; }
+        if (!user) {
+          window.location.href = "login.html";
+          return;
+        }
         currentUser = user;
 
         const avatarEl = document.getElementById("userAvatar");
-        if (user.photoURL) { avatarEl.src = user.photoURL; avatarEl.style.display = "block"; }
-        else { avatarEl.style.display = "none"; }
-        document.getElementById("userName").textContent  = user.displayName || "—";
+        if (user.photoURL) {
+          avatarEl.src = user.photoURL;
+          avatarEl.style.display = "block";
+        } else {
+          avatarEl.style.display = "none";
+        }
+        document.getElementById("userName").textContent =
+          user.displayName || "—";
         document.getElementById("userEmail").textContent = user.email || "—";
 
         if (isAdmin(user)) {
@@ -594,31 +917,40 @@
         try {
           const profile = await getUserProfile(user.uid);
           displayProfile(profile);
-        } catch (e) { console.error("Profile load error:", e); }
+        } catch (e) {
+          console.error("Profile load error:", e);
+        }
       });
 
       // Sign out
-      document.getElementById("signOutBtn").addEventListener("click", async () => {
-        await signOutUser();
-        window.location.href = "login.html";
-      });
+      document
+        .getElementById("signOutBtn")
+        .addEventListener("click", async () => {
+          await signOutUser();
+          window.location.href = "login.html";
+        });
 
       // Notification toggles
-      ["toggleMealReminders", "toggleWorkoutReminders"].forEach(id => {
+      ["toggleMealReminders", "toggleWorkoutReminders"].forEach((id) => {
         const el = document.getElementById(id);
         el.checked = localStorage.getItem(id) === "true";
-        el.addEventListener("change", () => localStorage.setItem(id, el.checked));
+        el.addEventListener("change", () =>
+          localStorage.setItem(id, el.checked),
+        );
       });
 
       // Nav protein ring
-      (function() {
+      (function () {
         const goal = parseInt(localStorage.getItem("proteinGoal") || "0");
         if (!goal) return;
         const data = JSON.parse(localStorage.getItem("proteinData") || "{}");
         const protein = data[new Date().toDateString()] || 0;
         const ring = document.getElementById("navProteinRing");
-        if (ring) ring.setAttribute("stroke-dashoffset",
-          (138.2 * (1 - Math.min(protein / goal, 1))).toFixed(1));
+        if (ring)
+          ring.setAttribute(
+            "stroke-dashoffset",
+            (138.2 * (1 - Math.min(protein / goal, 1))).toFixed(1),
+          );
       })();
 
       // ── Theme toggle ──────────────────────────────────────────
@@ -629,23 +961,43 @@
           document.documentElement.removeAttribute("data-theme");
         }
         localStorage.setItem("fitdesi_theme", theme);
-        document.getElementById("themeBtnDark").classList.toggle("active", theme === "dark" || theme === null);
-        document.getElementById("themeBtnLight").classList.toggle("active", theme === "light");
+        document
+          .getElementById("themeBtnDark")
+          .classList.toggle("active", theme === "dark" || theme === null);
+        document
+          .getElementById("themeBtnLight")
+          .classList.toggle("active", theme === "light");
       }
 
       // Init active state (theme already applied by inline script in <head>)
       const _t = localStorage.getItem("fitdesi_theme") || "dark";
-      document.getElementById("themeBtnDark").classList.toggle("active", _t !== "light");
-      document.getElementById("themeBtnLight").classList.toggle("active", _t === "light");
+      document
+        .getElementById("themeBtnDark")
+        .classList.toggle("active", _t !== "light");
+      document
+        .getElementById("themeBtnLight")
+        .classList.toggle("active", _t === "light");
 
-      document.getElementById("themeBtnDark").addEventListener("click",  () => applyTheme("dark"));
-      document.getElementById("themeBtnLight").addEventListener("click", () => applyTheme("light"));
+      document
+        .getElementById("themeBtnDark")
+        .addEventListener("click", () => applyTheme("dark"));
+      document
+        .getElementById("themeBtnLight")
+        .addEventListener("click", () => applyTheme("light"));
     </script>
 
     <!-- Coach -->
     <script type="module">
-      import { initCoach } from './coach.js';
-      initCoach();
+      async function loadCoach() {
+        try {
+          const coachModule = await import("./coach.js");
+          coachModule.initCoach();
+        } catch (error) {
+          console.warn("FitDesi coach module not loaded:", error);
+        }
+      }
+
+      loadCoach();
     </script>
   </body>
 </html>
