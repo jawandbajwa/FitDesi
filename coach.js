@@ -2,12 +2,13 @@
 // AI Personal Coach for FitDesi - Admin Only
 
 import {
+  onAuthStateChanged,
   getUserProfile,
   addMealToLog,
   completeWorkout,
   swapExercise,
+  auth,
 } from "./firebase.js";
-import { auth } from "./firebase.js";
 
 // ─── STATE ──────────────────────────────────────────────────────
 let isAdmin = false;
@@ -24,40 +25,36 @@ let micButton = null;
 let quickRepliesContainer = null;
 
 // ─── INIT ──────────────────────────────────────────────────────
-export async function initCoach() {
+export function initCoach() {
   console.log("🤖 Coach: initCoach called");
 
-  // Check if user is admin
-  if (!auth.currentUser) {
-    console.log("🤖 Coach: No user logged in");
-    return;
-  }
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      console.log("🤖 Coach: No user logged in");
+      return;
+    }
 
-  console.log("🤖 Coach: User logged in, checking profile...");
+    console.log("🤖 Coach: User logged in, checking profile...");
+    const profile = await getUserProfile(user.uid);
+    console.log("🤖 Coach: User profile:", profile);
 
-  const profile = await getUserProfile(auth.currentUser.uid);
-  console.log("🤖 Coach: User profile:", profile);
+    if (!profile || !profile.isAdmin) {
+      console.log("🤖 Coach: User is not admin");
+      return;
+    }
 
-  // TEMP: Show profile info for debugging
-  alert(`User Profile:\n${JSON.stringify(profile, null, 2)}\n\nisAdmin: ${profile?.isAdmin}`);
+    console.log("🤖 Coach: User is admin, initializing coach...");
+    isAdmin = true;
 
-  if (!profile || !profile.isAdmin) {
-    console.log("🤖 Coach: User is not admin");
-    return;
-  }
+    // Create floating button
+    createFloatingButton();
 
-  console.log("🤖 Coach: User is admin, initializing coach...");
+    // Create chat sheet
+    createChatSheet();
 
-  isAdmin = true;
-
-  // Create floating button
-  createFloatingButton();
-
-  // Create chat sheet
-  createChatSheet();
-
-  // Setup voice recognition
-  setupVoiceRecognition();
+    // Setup voice recognition
+    setupVoiceRecognition();
+  });
 }
 
 // ─── FLOATING BUTTON ───────────────────────────────────────────

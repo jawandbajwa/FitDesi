@@ -2,20 +2,31 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
     <title>FitDesi</title>
     <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#7ed99a" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
     <link rel="apple-touch-icon" href="icon-192.png" />
-    <script>try{if(localStorage.getItem("fitdesi_theme")==="light")document.documentElement.setAttribute("data-theme","light")}catch(e){}</script>
+    <script>
+      try {
+        if (localStorage.getItem("fitdesi_theme") === "light")
+          document.documentElement.setAttribute("data-theme", "light");
+      } catch (e) {}
+    </script>
     <link rel="stylesheet" href="style.css" />
     <style>
       /* ─── HOME PAGE SPECIFIC ────────────────────────────── */
       .greeting-line {
         font-size: 13px;
-        color: rgba(126,217,154,0.6);
+        color: rgba(126, 217, 154, 0.6);
         padding: 18px 20px 2px;
         letter-spacing: 0.3px;
       }
@@ -40,7 +51,8 @@
 
       .protein-ring-wrap svg {
         position: absolute;
-        top: 0; left: 0;
+        top: 0;
+        left: 0;
       }
 
       .ring-center {
@@ -58,7 +70,7 @@
 
       .ring-lbl {
         font-size: 10px;
-        color: rgba(126,217,154,0.6);
+        color: rgba(126, 217, 154, 0.6);
         text-transform: uppercase;
         letter-spacing: 1px;
         margin-top: 2px;
@@ -66,7 +78,7 @@
 
       .ring-goal {
         font-size: 11px;
-        color: rgba(255,255,255,0.3);
+        color: rgba(255, 255, 255, 0.3);
         margin-top: 3px;
       }
 
@@ -97,7 +109,8 @@
 
       .mini-ring-svg-wrap svg {
         position: absolute;
-        top: 0; left: 0;
+        top: 0;
+        left: 0;
       }
 
       .mini-ring-info {
@@ -106,7 +119,7 @@
 
       .mini-ring-name {
         font-size: 10px;
-        color: rgba(255,255,255,0.35);
+        color: rgba(255, 255, 255, 0.35);
         text-transform: uppercase;
         letter-spacing: 0.5px;
       }
@@ -120,7 +133,7 @@
 
       .mini-ring-goal {
         font-size: 10px;
-        color: rgba(255,255,255,0.25);
+        color: rgba(255, 255, 255, 0.25);
       }
 
       /* Streak card */
@@ -135,9 +148,13 @@
         padding: 14px 16px;
       }
 
-      .streak-flame { font-size: 28px; }
+      .streak-flame {
+        font-size: 28px;
+      }
 
-      .streak-info { flex: 1; }
+      .streak-info {
+        flex: 1;
+      }
 
       .streak-num {
         font-size: 24px;
@@ -148,7 +165,7 @@
 
       .streak-label {
         font-size: 11px;
-        color: rgba(255,255,255,0.35);
+        color: rgba(255, 255, 255, 0.35);
         margin-top: 2px;
       }
 
@@ -161,8 +178,8 @@
         width: 8px;
         height: 8px;
         border-radius: 50%;
-        background: rgba(245,166,35,0.2);
-        border: 1px solid rgba(245,166,35,0.3);
+        background: rgba(245, 166, 35, 0.2);
+        border: 1px solid rgba(245, 166, 35, 0.3);
         transition: background 0.2s;
       }
 
@@ -175,7 +192,7 @@
       .today-workout-card {
         margin: 0 16px 12px;
         background: #111a13;
-        border: 1px solid rgba(126,217,154,0.2);
+        border: 1px solid rgba(126, 217, 154, 0.2);
         border-radius: 14px;
         padding: 14px 16px;
         display: flex;
@@ -185,7 +202,7 @@
 
       .workout-label {
         font-size: 10px;
-        color: rgba(126,217,154,0.5);
+        color: rgba(126, 217, 154, 0.5);
         text-transform: uppercase;
         letter-spacing: 1.5px;
         margin-bottom: 4px;
@@ -200,10 +217,12 @@
       .workout-name.empty {
         font-size: 13px;
         font-weight: 400;
-        color: rgba(255,255,255,0.3);
+        color: rgba(255, 255, 255, 0.3);
       }
 
-      .workout-card-info { flex: 1; }
+      .workout-card-info {
+        flex: 1;
+      }
 
       .workout-start-btn {
         background: #7ed99a;
@@ -219,7 +238,9 @@
         transition: opacity 0.15s;
       }
 
-      .workout-start-btn:hover { opacity: 0.85; }
+      .workout-start-btn:hover {
+        opacity: 0.85;
+      }
 
       /* Quick actions */
       .quick-actions {
@@ -233,7 +254,7 @@
         background: #111a13;
         border: 1px solid #1a2e1e;
         border-radius: 12px;
-        color: rgba(255,255,255,0.7);
+        color: rgba(255, 255, 255, 0.7);
         font-size: 12px;
         font-weight: 500;
         padding: 14px 8px;
@@ -248,18 +269,20 @@
       }
 
       .quick-btn:hover {
-        border-color: rgba(126,217,154,0.3);
+        border-color: rgba(126, 217, 154, 0.3);
         color: #7ed99a;
       }
 
-      .quick-btn-icon { font-size: 20px; }
+      .quick-btn-icon {
+        font-size: 20px;
+      }
 
       /* Coach message */
       .coach-msg-home {
         margin: 0 16px 16px;
-        background: rgba(126,217,154,0.05);
-        border: 1px solid rgba(126,217,154,0.12);
-        border-left: 3px solid rgba(126,217,154,0.35);
+        background: rgba(126, 217, 154, 0.05);
+        border: 1px solid rgba(126, 217, 154, 0.12);
+        border-left: 3px solid rgba(126, 217, 154, 0.35);
         border-radius: 10px;
         padding: 12px 14px;
         display: flex;
@@ -267,11 +290,14 @@
         gap: 10px;
       }
 
-      .coach-msg-icon { font-size: 18px; flex-shrink: 0; }
+      .coach-msg-icon {
+        font-size: 18px;
+        flex-shrink: 0;
+      }
 
       .coach-msg-text {
         font-size: 12px;
-        color: rgba(255,255,255,0.45);
+        color: rgba(255, 255, 255, 0.45);
         line-height: 1.6;
       }
     </style>
@@ -294,11 +320,28 @@
       <!-- Large protein ring -->
       <div class="protein-ring-wrap">
         <svg width="130" height="130" viewBox="0 0 130 130">
-          <circle cx="65" cy="65" r="54" fill="none" stroke="#1a2e1e" stroke-width="10"/>
-          <circle cx="65" cy="65" r="54" fill="none" stroke="#7ed99a" stroke-width="10"
-            stroke-dasharray="339.3" stroke-dashoffset="339.3"
-            stroke-linecap="round" transform="rotate(-90 65 65)"
-            id="proteinRingArc" style="transition: stroke-dashoffset 0.6s ease;"/>
+          <circle
+            cx="65"
+            cy="65"
+            r="54"
+            fill="none"
+            stroke="#1a2e1e"
+            stroke-width="10"
+          />
+          <circle
+            cx="65"
+            cy="65"
+            r="54"
+            fill="none"
+            stroke="#7ed99a"
+            stroke-width="10"
+            stroke-dasharray="339.3"
+            stroke-dashoffset="339.3"
+            stroke-linecap="round"
+            transform="rotate(-90 65 65)"
+            id="proteinRingArc"
+            style="transition: stroke-dashoffset 0.6s ease"
+          />
         </svg>
         <div class="ring-center">
           <div class="ring-val" id="proteinToday">0g</div>
@@ -312,11 +355,28 @@
         <div class="mini-ring-card">
           <div class="mini-ring-svg-wrap">
             <svg width="36" height="36" viewBox="0 0 36 36">
-              <circle cx="18" cy="18" r="14" fill="none" stroke="#1a2e1e" stroke-width="4"/>
-              <circle cx="18" cy="18" r="14" fill="none" stroke="#5bc8f5" stroke-width="4"
-                stroke-dasharray="87.96" stroke-dashoffset="87.96"
-                stroke-linecap="round" transform="rotate(-90 18 18)"
-                id="carbsRingArc" style="transition: stroke-dashoffset 0.6s ease;"/>
+              <circle
+                cx="18"
+                cy="18"
+                r="14"
+                fill="none"
+                stroke="#1a2e1e"
+                stroke-width="4"
+              />
+              <circle
+                cx="18"
+                cy="18"
+                r="14"
+                fill="none"
+                stroke="#5bc8f5"
+                stroke-width="4"
+                stroke-dasharray="87.96"
+                stroke-dashoffset="87.96"
+                stroke-linecap="round"
+                transform="rotate(-90 18 18)"
+                id="carbsRingArc"
+                style="transition: stroke-dashoffset 0.6s ease"
+              />
             </svg>
           </div>
           <div class="mini-ring-info">
@@ -329,11 +389,28 @@
         <div class="mini-ring-card">
           <div class="mini-ring-svg-wrap">
             <svg width="36" height="36" viewBox="0 0 36 36">
-              <circle cx="18" cy="18" r="14" fill="none" stroke="#1a2e1e" stroke-width="4"/>
-              <circle cx="18" cy="18" r="14" fill="none" stroke="#f5a623" stroke-width="4"
-                stroke-dasharray="87.96" stroke-dashoffset="87.96"
-                stroke-linecap="round" transform="rotate(-90 18 18)"
-                id="fatRingArc" style="transition: stroke-dashoffset 0.6s ease;"/>
+              <circle
+                cx="18"
+                cy="18"
+                r="14"
+                fill="none"
+                stroke="#1a2e1e"
+                stroke-width="4"
+              />
+              <circle
+                cx="18"
+                cy="18"
+                r="14"
+                fill="none"
+                stroke="#f5a623"
+                stroke-width="4"
+                stroke-dasharray="87.96"
+                stroke-dashoffset="87.96"
+                stroke-linecap="round"
+                transform="rotate(-90 18 18)"
+                id="fatRingArc"
+                style="transition: stroke-dashoffset 0.6s ease"
+              />
             </svg>
           </div>
           <div class="mini-ring-info">
@@ -346,11 +423,28 @@
         <div class="mini-ring-card">
           <div class="mini-ring-svg-wrap">
             <svg width="36" height="36" viewBox="0 0 36 36">
-              <circle cx="18" cy="18" r="14" fill="none" stroke="#1a2e1e" stroke-width="4"/>
-              <circle cx="18" cy="18" r="14" fill="none" stroke="#e05c5c" stroke-width="4"
-                stroke-dasharray="87.96" stroke-dashoffset="87.96"
-                stroke-linecap="round" transform="rotate(-90 18 18)"
-                id="calRingArc" style="transition: stroke-dashoffset 0.6s ease;"/>
+              <circle
+                cx="18"
+                cy="18"
+                r="14"
+                fill="none"
+                stroke="#1a2e1e"
+                stroke-width="4"
+              />
+              <circle
+                cx="18"
+                cy="18"
+                r="14"
+                fill="none"
+                stroke="#e05c5c"
+                stroke-width="4"
+                stroke-dasharray="87.96"
+                stroke-dashoffset="87.96"
+                stroke-linecap="round"
+                transform="rotate(-90 18 18)"
+                id="calRingArc"
+                style="transition: stroke-dashoffset 0.6s ease"
+              />
             </svg>
           </div>
           <div class="mini-ring-info">
@@ -384,9 +478,16 @@
     <div class="today-workout-card" id="todayWorkout">
       <div class="workout-card-info">
         <div class="workout-label">Today's Workout</div>
-        <div class="workout-name empty">Set up your cycle in the Workout page</div>
+        <div class="workout-name empty">
+          Set up your cycle in the Workout page
+        </div>
       </div>
-      <button class="workout-start-btn" onclick="location.href='exercise.html'">Start →</button>
+      <button
+        class="workout-start-btn"
+        onclick="location.href = 'exercise.html'"
+      >
+        Start →
+      </button>
     </div>
 
     <!-- Quick actions -->
@@ -414,43 +515,113 @@
     <!-- Bottom nav -->
     <nav class="bottom-nav">
       <a href="recipes.html" class="nav-tab" data-page="recipes">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/>
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" />
+          <path d="M7 2v20" />
+          <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7" />
         </svg>
         <span class="nav-label">Recipes</span>
       </a>
       <a href="tracker.html" class="nav-tab" data-page="nutrition">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/>
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M18 20V10" />
+          <path d="M12 20V4" />
+          <path d="M6 20v-6" />
         </svg>
         <span class="nav-label">Nutrition</span>
       </a>
       <a href="index.html" class="nav-tab nav-home-tab active" data-page="home">
         <div class="home-tab-ring">
           <svg width="58" height="58" viewBox="0 0 58 58">
-            <circle cx="29" cy="29" r="22" fill="none" stroke="#1a2e1e" stroke-width="4"/>
-            <circle cx="29" cy="29" r="22" fill="none" stroke="#7ed99a" stroke-width="4"
-              stroke-dasharray="138.2" stroke-dashoffset="138.2"
-              stroke-linecap="round" transform="rotate(-90 29 29)"
-              id="navProteinRing" class="nav-protein-ring"/>
+            <circle
+              cx="29"
+              cy="29"
+              r="22"
+              fill="none"
+              stroke="#1a2e1e"
+              stroke-width="4"
+            />
+            <circle
+              cx="29"
+              cy="29"
+              r="22"
+              fill="none"
+              stroke="#7ed99a"
+              stroke-width="4"
+              stroke-dasharray="138.2"
+              stroke-dashoffset="138.2"
+              stroke-linecap="round"
+              transform="rotate(-90 29 29)"
+              id="navProteinRing"
+              class="nav-protein-ring"
+            />
           </svg>
-          <svg class="home-tab-icon" style="position:relative;z-index:1" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7ed99a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-            <polyline points="9 22 9 12 15 12 15 22"/>
+          <svg
+            class="home-tab-icon"
+            style="position: relative; z-index: 1"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#7ed99a"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            <polyline points="9 22 9 12 15 12 15 22" />
           </svg>
         </div>
         <span class="nav-label">Home</span>
       </a>
       <a href="exercise.html" class="nav-tab" data-page="workout">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M6.5 6.5h11M6.5 17.5h11M4 12h16M4 12l-2-2M4 12l-2 2M20 12l2-2M20 12l2 2"/>
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path
+            d="M6.5 6.5h11M6.5 17.5h11M4 12h16M4 12l-2-2M4 12l-2 2M20 12l2-2M20 12l2 2"
+          />
         </svg>
         <span class="nav-label">Workout</span>
       </a>
       <a href="profile.html" class="nav-tab" data-page="profile">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-          <circle cx="12" cy="7" r="4"/>
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
         </svg>
         <span class="nav-label">Profile</span>
       </a>
@@ -461,13 +632,13 @@
       <div class="spinner"></div>
       <span>Loading...</span>
     </div>
-    <div id="errorMessage" class="error-message" style="display:none"></div>
+    <div id="errorMessage" class="error-message" style="display: none"></div>
 
     <script src="app.js"></script>
 
     <!-- Coach -->
     <script type="module">
-      import { initCoach } from './coach.js';
+      import { initCoach } from "./coach.js";
       initCoach();
     </script>
 
@@ -475,13 +646,19 @@
     <script>
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
-          navigator.serviceWorker.register("./sw.js").then((reg) => {
-            // When a new SW takes control, reload so the user gets the update
-            // immediately without having to close and reopen the app.
-            navigator.serviceWorker.addEventListener("controllerchange", () => {
-              window.location.reload();
-            });
-          }).catch(() => {});
+          navigator.serviceWorker
+            .register("./sw.js")
+            .then((reg) => {
+              // When a new SW takes control, reload so the user gets the update
+              // immediately without having to close and reopen the app.
+              navigator.serviceWorker.addEventListener(
+                "controllerchange",
+                () => {
+                  window.location.reload();
+                },
+              );
+            })
+            .catch(() => {});
         });
       }
     </script>
@@ -691,6 +868,7 @@
             "Drink 3+ litres on workout days for best recovery.",
           ];
           document.getElementById("dailyTip").textContent = tips[new Date().getDay() % tips.length];
+        }
 
         } catch (error) {
           console.error("Error loading:", error);
