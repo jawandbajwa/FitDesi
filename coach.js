@@ -12,7 +12,7 @@ import {
 } from "./firebase.js";
 
 // ─── STATE ──────────────────────────────────────────────────────
-let isAdmin = false;
+let coachIsAdmin = false;
 let conversationHistory = [];
 let isListening = false;
 let recognition = null;
@@ -51,7 +51,7 @@ export function initCoach() {
     }
 
     console.log("🤖 Coach: User is admin, initializing coach...");
-    isAdmin = true;
+    coachIsAdmin = true;
 
     // Create floating button
     createFloatingButton();
