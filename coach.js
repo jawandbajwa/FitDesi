@@ -287,9 +287,17 @@ async function sendMessage(text = null) {
     showQuickReplies(getQuickRepliesForContext(messageContent));
   } catch (error) {
     console.error("Coach API error:", error);
+    let errorMsg = "Sorry, I'm having trouble connecting. Try again?";
+    if (
+      error.message.includes("API key") ||
+      error.message.includes("not configured")
+    ) {
+      errorMsg =
+        "⚠️ Coach not configured. Ask your admin to add an Anthropic API key in Settings.";
+    }
     addMessage({
       role: "assistant",
-      content: "Sorry, I'm having trouble connecting. Try again?",
+      content: errorMsg,
     });
   }
 }
@@ -437,6 +445,13 @@ async function getContext() {
 
 // ─── ANTHROPIC API ────────────────────────────────────────────
 async function callAnthropicAPI(messages, context) {
+  const apiKey = localStorage.getItem("fitdesi_anthropic_key");
+  if (!apiKey || apiKey === "YOUR_ANTHROPIC_API_KEY") {
+    throw new Error(
+      "Anthropic API key not configured. Go to Settings to add your API key from https://console.anthropic.com/",
+    );
+  }
+
   const systemPrompt = `You are Jawand's personal fitness coach inside FitDesi. You know him well: body recomposition goal, 169g protein daily, 300g carbs, 69g fat, 2496 calories. Indian vegetarian and Canadian plant-based food. Workouts 5 days a week.
 Personality: direct, warm, like a knowledgeable friend who knows fitness. Maximum 2 sentences per response. No bullet points. Talk like a real person not a bot.
 When user mentions eating something, estimate macros from your knowledge. When they are tired suggest the fastest high protein option. When they want to swap food or exercise, do it.
@@ -476,11 +491,16 @@ or
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": "YOUR_ANTHROPIC_API_KEY", // Replace with actual key
+      "x-api-key": apiKey,
       "anthropic-version": "2023-06-01",
     },
     body: JSON.stringify(payload),
   });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error?.message || "API request failed");
+  }
 
   const data = await response.json();
   return data.content[0].text;
