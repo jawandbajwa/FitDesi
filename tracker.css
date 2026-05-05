@@ -84,7 +84,7 @@
 
 .chart-card-header {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   margin-bottom: 12px;
 }
@@ -95,10 +95,30 @@
   color: rgba(255,255,255,0.75);
 }
 
+.chart-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .chart-card-unit {
   font-size: 11px;
   color: rgba(255,255,255,0.25);
 }
+
+.chart-reset-btn {
+  font-size: 11px;
+  font-weight: 600;
+  color: #e05c5c;
+  background: rgba(224,92,92,0.08);
+  border: 0.5px solid rgba(224,92,92,0.3);
+  border-radius: 6px;
+  padding: 3px 10px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.chart-reset-btn:hover { background: rgba(224,92,92,0.15); }
 
 .chart-wrap {
   position: relative;

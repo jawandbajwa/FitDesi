@@ -398,6 +398,16 @@ async function getProgressHistory(userId) {
   }
 }
 
+async function clearProgressHistory(userId) {
+  try {
+    const snap = await getDocs(collection(db, "users", userId, "progress"));
+    await Promise.all(snap.docs.map((d) => deleteDoc(doc(db, "users", userId, "progress", d.id))));
+  } catch (error) {
+    console.error("Error clearing progress history:", error);
+    throw error;
+  }
+}
+
 // ─── EXPORT ──────────────────────────────────────────────────
 export {
   auth,
@@ -430,4 +440,5 @@ export {
   getWorkoutLog,
   saveProgressEntry,
   getProgressHistory,
+  clearProgressHistory,
 };

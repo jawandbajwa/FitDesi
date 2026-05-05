@@ -293,14 +293,20 @@
           <div class="chart-card">
             <div class="chart-card-header">
               <span class="chart-card-title">Weight Over Time</span>
-              <span class="chart-card-unit">kg</span>
+              <div class="chart-card-actions">
+                <span class="chart-card-unit">kg</span>
+                <button class="chart-reset-btn" id="resetWeightChart">Reset</button>
+              </div>
             </div>
             <div class="chart-wrap"><canvas id="weightChart"></canvas></div>
           </div>
           <div class="chart-card" style="margin-top:12px">
             <div class="chart-card-header">
               <span class="chart-card-title">Body Fat Over Time</span>
-              <span class="chart-card-unit">%</span>
+              <div class="chart-card-actions">
+                <span class="chart-card-unit">%</span>
+                <button class="chart-reset-btn" id="resetBodyFatChart">Reset</button>
+              </div>
             </div>
             <div class="chart-wrap"><canvas id="bodyFatChart"></canvas></div>
           </div>

@@ -11,6 +11,7 @@ import {
   getRecipes,
   saveProgressEntry,
   getProgressHistory,
+  clearProgressHistory,
 } from "./firebase.js";
 
 // ─── CONSTANTS ───────────────────────────────────────────────
@@ -1419,3 +1420,14 @@ document.getElementById("saveProgress")?.addEventListener("click", async () => {
   // Reload charts
   loadProgressHistory();
 });
+
+// ─── RESET PROGRESS ──────────────────────────────────────────
+async function handleResetProgress() {
+  if (!currentUser) return;
+  if (!confirm("Reset all progress history? This will clear every weight and body fat entry permanently.")) return;
+  await clearProgressHistory(currentUser.uid);
+  loadProgressHistory();
+}
+
+document.getElementById("resetWeightChart")?.addEventListener("click", handleResetProgress);
+document.getElementById("resetBodyFatChart")?.addEventListener("click", handleResetProgress);
