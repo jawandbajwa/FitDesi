@@ -2,14 +2,26 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <link rel="icon" href="icon-192.png" />
     <title>FitDesi — Admin</title>
     <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#7ed99a" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
     <link rel="apple-touch-icon" href="icon-192.png" />
-    <script>try{if(localStorage.getItem("fitdesi_theme")==="light")document.documentElement.setAttribute("data-theme","light")}catch(e){}</script>
+    <script>
+      try {
+        if (localStorage.getItem("fitdesi_theme") === "light")
+          document.documentElement.setAttribute("data-theme", "light");
+      } catch (e) {}
+    </script>
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="admin.css" />
   </head>
@@ -135,19 +147,43 @@
         <div class="macro-form-grid">
           <div class="form-group">
             <label>Protein (g)</label>
-            <input type="number" id="ingProtein" placeholder="0" min="0" max="100" />
+            <input
+              type="number"
+              id="ingProtein"
+              placeholder="0"
+              min="0"
+              max="100"
+            />
           </div>
           <div class="form-group">
             <label>Carbs (g)</label>
-            <input type="number" id="ingCarbs" placeholder="0" min="0" max="100" />
+            <input
+              type="number"
+              id="ingCarbs"
+              placeholder="0"
+              min="0"
+              max="100"
+            />
           </div>
           <div class="form-group">
             <label>Fat (g)</label>
-            <input type="number" id="ingFat" placeholder="0" min="0" max="100" />
+            <input
+              type="number"
+              id="ingFat"
+              placeholder="0"
+              min="0"
+              max="100"
+            />
           </div>
           <div class="form-group">
             <label>Calories</label>
-            <input type="number" id="ingCalories" placeholder="0" min="0" max="900" />
+            <input
+              type="number"
+              id="ingCalories"
+              placeholder="0"
+              min="0"
+              max="900"
+            />
           </div>
         </div>
         <div class="form-group">
@@ -184,7 +220,21 @@
           <h2 id="recipeModalTitle">Add Recipe</h2>
           <button class="modal-close" id="recipeModalClose">✕</button>
         </div>
-        <div id="recipeCuisineBadge" style="display:inline-block;margin-bottom:16px;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;background:rgba(126,217,154,0.12);border:0.5px solid rgba(126,217,154,0.35);color:#7ed99a;letter-spacing:0.5px"></div>
+        <div
+          id="recipeCuisineBadge"
+          style="
+            display: inline-block;
+            margin-bottom: 16px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            background: rgba(126, 217, 154, 0.12);
+            border: 0.5px solid rgba(126, 217, 154, 0.35);
+            color: #7ed99a;
+            letter-spacing: 0.5px;
+          "
+        ></div>
         <div class="form-group">
           <label>Recipe Name</label>
           <input type="text" id="recName" placeholder="e.g. Dal Tadka" />
