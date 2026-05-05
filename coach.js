@@ -293,7 +293,7 @@ async function sendMessage(text = null) {
       error.message.includes("not configured")
     ) {
       errorMsg =
-        "⚠️ Coach not configured. Run: localStorage.setItem('fitdesi_gemini_key','YOUR_KEY') in the browser console.";
+        "⚠️ Coach not configured. Run: localStorage.setItem('fitdesi_gemini_key','Your_key') in the browser console.";
     }
     addMessage({
       role: "assistant",
@@ -447,7 +447,9 @@ async function getContext() {
 async function callAnthropicAPI(messages, context) {
   const GEMINI_API_KEY = localStorage.getItem("fitdesi_gemini_key") || "";
   if (!GEMINI_API_KEY) {
-    throw new Error("API key not configured — set fitdesi_gemini_key in localStorage");
+    throw new Error(
+      "API key not configured — set fitdesi_gemini_key in localStorage",
+    );
   }
   const systemPrompt = `You are Jawand's personal fitness coach inside FitDesi. You know him well: body recomposition goal, 169g protein daily, 300g carbs, 69g fat, 2496 calories. Indian vegetarian and Canadian plant-based food. Workouts 5 days a week.
 Personality: direct, warm, like a knowledgeable friend who knows fitness. Maximum 2 sentences per response. No bullet points. Talk like a real person not a bot.
