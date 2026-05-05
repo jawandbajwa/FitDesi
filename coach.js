@@ -38,6 +38,9 @@ export async function initCoach() {
   const profile = await getUserProfile(auth.currentUser.uid);
   console.log("🤖 Coach: User profile:", profile);
 
+  // TEMP: Show profile info for debugging
+  alert(`User Profile:\n${JSON.stringify(profile, null, 2)}\n\nisAdmin: ${profile?.isAdmin}`);
+
   if (!profile || !profile.isAdmin) {
     console.log("🤖 Coach: User is not admin");
     return;
