@@ -3,6 +3,7 @@
 
 import {
   onAuthStateChanged,
+  isAdmin,
   getUserProfile,
   addMealToLog,
   completeWorkout,
@@ -28,6 +29,11 @@ let quickRepliesContainer = null;
 export function initCoach() {
   console.log("🤖 Coach: initCoach called");
 
+  if (coachButton) {
+    console.log("🤖 Coach: already initialized");
+    return;
+  }
+
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
       console.log("🤖 Coach: No user logged in");
@@ -37,8 +43,9 @@ export function initCoach() {
     console.log("🤖 Coach: User logged in, checking profile...");
     const profile = await getUserProfile(user.uid);
     console.log("🤖 Coach: User profile:", profile);
+    console.log("🤖 Coach: Email admin check:", isAdmin(user));
 
-    if (!profile || !profile.isAdmin) {
+    if (!profile || (!profile.isAdmin && !isAdmin(user))) {
       console.log("🤖 Coach: User is not admin");
       return;
     }
