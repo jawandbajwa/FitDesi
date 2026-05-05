@@ -952,6 +952,15 @@ function getTodayDayIndex() {
 
 function isNewCycle() {
   if (!cycleData || !cycleData.startDate) return false;
+
+  const todayStr = new Date().toISOString().split("T")[0];
+
+  // localStorage guard — survives page refresh instantly without waiting for Firestore
+  if (localStorage.getItem("fitdesi_cycle_ack") === todayStr) return false;
+
+  // Firestore guard — belt-and-suspenders if localStorage is cleared
+  if (cycleData.lastSetPickedDate === todayStr) return false;
+
   const start = new Date(cycleData.startDate);
   const today = new Date();
   start.setHours(0, 0, 0, 0);
@@ -1439,16 +1448,13 @@ document
 
 // ─── SET SELECTOR POPUP ──────────────────────────────────
 document.addEventListener("click", async (e) => {
-  if (e.target.id === "chooseSetA") {
-    cycleData.currentSet = "A";
+  if (e.target.id === "chooseSetA" || e.target.id === "chooseSetB") {
+    const todayStr = new Date().toISOString().split("T")[0];
+    cycleData.currentSet = e.target.id === "chooseSetA" ? "A" : "B";
     cycleData.cycleCount = (cycleData.cycleCount || 1) + 1;
-    await saveWorkoutCycle(currentUser.uid, cycleData);
-    document.getElementById("setPopupModal").classList.remove("open");
-    renderMyWorkout();
-  }
-  if (e.target.id === "chooseSetB") {
-    cycleData.currentSet = "B";
-    cycleData.cycleCount = (cycleData.cycleCount || 1) + 1;
+    cycleData.startDate = new Date().toISOString();
+    cycleData.lastSetPickedDate = todayStr;
+    localStorage.setItem("fitdesi_cycle_ack", todayStr);
     await saveWorkoutCycle(currentUser.uid, cycleData);
     document.getElementById("setPopupModal").classList.remove("open");
     renderMyWorkout();
@@ -1536,6 +1542,13 @@ onAuthStateChanged(auth, async (user) => {
       }));
     }
     if (isNewCycle()) {
+      const todayStr = new Date().toISOString().split("T")[0];
+      // Stamp localStorage immediately — blocks the popup on any subsequent
+      // refresh today, before Firestore even loads.
+      localStorage.setItem("fitdesi_cycle_ack", todayStr);
+      cycleData.lastSetPickedDate = todayStr;
+      cycleData.startDate = new Date().toISOString();
+      saveWorkoutCycle(currentUser.uid, cycleData); // also persist to Firestore
       document.getElementById("setPopupModal").classList.add("open");
     }
   }

@@ -231,14 +231,15 @@
 }
 
 .theme-seg-btn.active {
-  background: rgba(126,217,154,0.15);
+  background: rgba(126,217,154,0.12);
   color: #7ed99a;
+  box-shadow: 0 0 0 1.5px #7ed99a;
 }
 
 /* Light theme overrides for the toggle itself */
 [data-theme="light"] .theme-seg          { background: rgba(0,0,0,0.07); }
 [data-theme="light"] .theme-seg-btn      { color: rgba(0,0,0,0.35); }
-[data-theme="light"] .theme-seg-btn.active { background: rgba(126,217,154,0.2); color: #3d9960; }
+[data-theme="light"] .theme-seg-btn.active { background: rgba(126,217,154,0.15); color: #3d9960; box-shadow: 0 0 0 1.5px #3d9960; }
 
 /* ── EDIT PROFILE BOTTOM SHEET ───────────────────────────────── */
 .ep-overlay {
