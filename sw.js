@@ -1,7 +1,7 @@
 // FitDesi Service Worker — Network-first, auto-update on every deploy
 // Bump this version whenever you want to force a full cache wipe.
 // With network-first below, normal file changes don't need a version bump.
-const CACHE_NAME = "fitdesi-v4";
+const CACHE_NAME = "fitdesi-v5";
 
 const STATIC_ASSETS = [
   "./",
@@ -9,6 +9,7 @@ const STATIC_ASSETS = [
   "./style.css",
   "./app.js",
   "./firebase.js",
+  "./coach.js",
   "./db.js",
   "./manifest.json",
   "./tracker.html",
@@ -40,7 +41,7 @@ self.addEventListener("install", (event) => {
     caches
       .open(CACHE_NAME)
       .then((cache) => cache.addAll(STATIC_ASSETS))
-      .then(() => self.skipWaiting())   // ← activate NOW, don't wait
+      .then(() => self.skipWaiting()), // ← activate NOW, don't wait
   );
 });
 
@@ -55,10 +56,10 @@ self.addEventListener("activate", (event) => {
         Promise.all(
           keys
             .filter((key) => key !== CACHE_NAME)
-            .map((key) => caches.delete(key))
-        )
+            .map((key) => caches.delete(key)),
+        ),
       )
-      .then(() => self.clients.claim())  // ← control open tabs immediately
+      .then(() => self.clients.claim()), // ← control open tabs immediately
   );
 });
 
@@ -78,13 +79,15 @@ self.addEventListener("fetch", (event) => {
         // Fresh from network — update the cache entry
         if (networkResponse && networkResponse.ok) {
           const clone = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          caches
+            .open(CACHE_NAME)
+            .then((cache) => cache.put(event.request, clone));
         }
         return networkResponse;
       })
       .catch(() =>
         // Network unavailable — serve from cache (offline support)
-        caches.match(event.request)
-      )
+        caches.match(event.request),
+      ),
   );
 });
