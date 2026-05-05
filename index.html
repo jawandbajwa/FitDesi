@@ -465,6 +465,12 @@
 
     <script src="app.js"></script>
 
+    <!-- Coach -->
+    <script type="module">
+      import { initCoach } from './coach.js';
+      initCoach();
+    </script>
+
     <!-- Service Worker — auto-reloads the page when a new version activates -->
     <script>
       if ("serviceWorker" in navigator) {

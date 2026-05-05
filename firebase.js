@@ -433,6 +433,69 @@ async function clearBodyFatHistory(userId) {
   }
 }
 
+// ─── COACH FUNCTIONS ──────────────────────────────────────────
+async function addMealToLog(uid, meal) {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const logRef = doc(db, "users", uid, "logs", today);
+    
+    // Get existing log
+    const existingLog = await getDoc(logRef);
+    const currentLog = existingLog.exists() ? existingLog.data() : {
+      breakfast: [], lunch: [], snack: [], dinner: []
+    };
+    
+    // Add meal to appropriate array
+    const mealType = meal.meal_type || 'snack';
+    if (!currentLog[mealType]) currentLog[mealType] = [];
+    currentLog[mealType].push({
+      name: meal.name,
+      protein: meal.protein,
+      carbs: meal.carbs,
+      fat: meal.fat,
+      calories: meal.calories,
+      timestamp: new Date().toISOString()
+    });
+    
+    await setDoc(logRef, currentLog);
+  } catch (error) {
+    console.error("Error adding meal to log:", error);
+    throw error;
+  }
+}
+
+async function completeWorkout(uid, date) {
+  try {
+    await setDoc(doc(db, "users", uid, "workoutLogs", date), {
+      completed: true,
+      completedAt: new Date().toISOString()
+    }, { merge: true });
+  } catch (error) {
+    console.error("Error completing workout:", error);
+    throw error;
+  }
+}
+
+async function swapExercise(uid, date, oldName, newName) {
+  try {
+    const workoutRef = doc(db, "users", uid, "workouts", date, "exercises", oldName);
+    const newRef = doc(db, "users", uid, "workouts", date, "exercises", newName);
+    
+    // Get old exercise data
+    const oldDoc = await getDoc(workoutRef);
+    if (oldDoc.exists()) {
+      const data = oldDoc.data();
+      // Create new exercise with same data
+      await setDoc(newRef, data);
+      // Delete old exercise
+      await deleteDoc(workoutRef);
+    }
+  } catch (error) {
+    console.error("Error swapping exercise:", error);
+    throw error;
+  }
+}
+
 // ─── EXPORT ──────────────────────────────────────────────────
 export {
   auth,
@@ -467,4 +530,7 @@ export {
   getProgressHistory,
   clearWeightHistory,
   clearBodyFatHistory,
+  addMealToLog,
+  completeWorkout,
+  swapExercise,
 };
