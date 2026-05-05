@@ -208,6 +208,38 @@
 
 .hidden { display: none !important; }
 
+/* ── THEME TOGGLE ────────────────────────────────────────── */
+.theme-seg {
+  display: flex;
+  background: rgba(255,255,255,0.06);
+  border-radius: 8px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.theme-seg-btn {
+  padding: 5px 13px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: rgba(255,255,255,0.35);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+
+.theme-seg-btn.active {
+  background: rgba(126,217,154,0.15);
+  color: #7ed99a;
+}
+
+/* Light theme overrides for the toggle itself */
+[data-theme="light"] .theme-seg          { background: rgba(0,0,0,0.07); }
+[data-theme="light"] .theme-seg-btn      { color: rgba(0,0,0,0.35); }
+[data-theme="light"] .theme-seg-btn.active { background: rgba(126,217,154,0.2); color: #3d9960; }
+
 /* ── EDIT PROFILE BOTTOM SHEET ───────────────────────────────── */
 .ep-overlay {
   position: fixed;

@@ -9,6 +9,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <link rel="apple-touch-icon" href="icon-192.png" />
+    <script>try{if(localStorage.getItem("fitdesi_theme")==="light")document.documentElement.setAttribute("data-theme","light")}catch(e){}</script>
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="profile.css" />
   </head>
@@ -86,9 +87,16 @@
             <span class="settings-row-label">Weight Unit</span>
             <span class="settings-row-value" id="displayUnit">kg</span>
           </div>
-          <div class="settings-row last">
+          <div class="settings-row">
             <span class="settings-row-label">Cuisine</span>
             <span class="settings-row-value">Indian + Canadian</span>
+          </div>
+          <div class="settings-row last">
+            <span class="settings-row-label">Theme</span>
+            <div class="theme-seg">
+              <button class="theme-seg-btn" id="themeBtnDark">🌙 Dark</button>
+              <button class="theme-seg-btn" id="themeBtnLight">☀️ Light</button>
+            </div>
           </div>
         </div>
       </div>
@@ -612,6 +620,26 @@
         if (ring) ring.setAttribute("stroke-dashoffset",
           (138.2 * (1 - Math.min(protein / goal, 1))).toFixed(1));
       })();
+
+      // ── Theme toggle ──────────────────────────────────────────
+      function applyTheme(theme) {
+        if (theme === "light") {
+          document.documentElement.setAttribute("data-theme", "light");
+        } else {
+          document.documentElement.removeAttribute("data-theme");
+        }
+        localStorage.setItem("fitdesi_theme", theme);
+        document.getElementById("themeBtnDark").classList.toggle("active", theme === "dark" || theme === null);
+        document.getElementById("themeBtnLight").classList.toggle("active", theme === "light");
+      }
+
+      // Init active state (theme already applied by inline script in <head>)
+      const _t = localStorage.getItem("fitdesi_theme") || "dark";
+      document.getElementById("themeBtnDark").classList.toggle("active", _t !== "light");
+      document.getElementById("themeBtnLight").classList.toggle("active", _t === "light");
+
+      document.getElementById("themeBtnDark").addEventListener("click",  () => applyTheme("dark"));
+      document.getElementById("themeBtnLight").addEventListener("click", () => applyTheme("light"));
     </script>
   </body>
 </html>

@@ -2030,6 +2030,233 @@ input, select, textarea {
   padding-bottom: max(env(safe-area-inset-bottom, 0px), 8px);
 }
 
+/* ══════════════════════════════════════════════════════════
+   LIGHT THEME
+   Applied via data-theme="light" on <html>.
+   Overrides every hardcoded dark colour in the codebase.
+   ══════════════════════════════════════════════════════════ */
+[data-theme="light"] {
+  --bg:          #f3f6f4;
+  --card:        #ffffff;
+  --border:      #dde8e1;
+  --text:        #1a2e1e;
+  --text-dim:    rgba(0,0,0,0.45);
+  --text-faint:  rgba(0,0,0,0.2);
+  --green-dark:  rgba(126,217,154,0.25);
+  color-scheme:  light;
+}
+
+/* ── Body & header ── */
+[data-theme="light"] body          { background: #f3f6f4; color: #1a2e1e; }
+[data-theme="light"] .app-header   { background: #f3f6f4; border-bottom-color: #dde8e1; }
+[data-theme="light"] .app-header-title,
+[data-theme="light"] .app-logo     { color: #1a2e1e; }
+[data-theme="light"] .header-date  { color: rgba(0,0,0,0.4); }
+
+/* ── Bottom nav ── */
+[data-theme="light"] .bottom-nav   { background: rgba(243,246,244,0.97); border-top-color: #dde8e1; }
+[data-theme="light"] .nav-tab      { color: rgba(0,0,0,0.3); }
+[data-theme="light"] .nav-tab.active { color: #7ed99a; }
+[data-theme="light"] .home-tab-ring { background: #f3f6f4; }
+
+/* ── Segmented control ── */
+[data-theme="light"] .seg-btn       { color: rgba(0,0,0,0.4); }
+[data-theme="light"] .seg-btn.active { background: #ffffff; color: #1a2e1e;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.12); }
+
+/* ── Cards / surfaces ── */
+[data-theme="light"] .card,
+[data-theme="light"] .section-group,
+[data-theme="light"] .meal-section,
+[data-theme="light"] .settings-card,
+[data-theme="light"] .macro-ring-card { background: #ffffff; border-color: #dde8e1; }
+
+/* ── Section rows ── */
+[data-theme="light"] .section-row       { border-bottom-color: rgba(0,0,0,0.06); }
+[data-theme="light"] .section-row:hover { background: rgba(0,0,0,0.02); }
+[data-theme="light"] .section-row-label { color: #1a2e1e; }
+[data-theme="light"] .section-row-value { color: rgba(0,0,0,0.45); }
+[data-theme="light"] .section-row-icon.muted { background: rgba(0,0,0,0.05); }
+
+/* ── Modals ── */
+[data-theme="light"] .modal           { background: #ffffff; border-color: #dde8e1; }
+[data-theme="light"] .modal-header h2,
+[data-theme="light"] .modal h2        { color: #1a2e1e; }
+[data-theme="light"] .modal-close     { background: rgba(0,0,0,0.06); color: rgba(0,0,0,0.45); }
+[data-theme="light"] .modal-divider   { color: rgba(0,0,0,0.25); }
+
+/* ── Forms / inputs ── */
+[data-theme="light"] .form-group input,
+[data-theme="light"] .form-input,
+[data-theme="light"] .search-input,
+[data-theme="light"] .time-input       { background: rgba(0,0,0,0.04); border-color: #dde8e1; color: #1a2e1e; }
+[data-theme="light"] .form-group input::placeholder,
+[data-theme="light"] .form-input::placeholder,
+[data-theme="light"] .search-input::placeholder { color: rgba(0,0,0,0.25); }
+[data-theme="light"] .form-group label { color: rgba(0,0,0,0.45); }
+[data-theme="light"] .unit             { color: rgba(0,0,0,0.4); }
+
+/* ── Buttons ── */
+[data-theme="light"] .toggle-btn      { background: rgba(0,0,0,0.04); border-color: #dde8e1; color: rgba(0,0,0,0.45); }
+[data-theme="light"] .option-btn      { background: rgba(0,0,0,0.04); border-color: #dde8e1; color: rgba(0,0,0,0.5); }
+[data-theme="light"] .goal-btn        { background: rgba(0,0,0,0.03); border-color: #dde8e1; }
+[data-theme="light"] .goal-title      { color: rgba(0,0,0,0.8); }
+[data-theme="light"] .goal-desc       { color: rgba(0,0,0,0.4); }
+[data-theme="light"] .secondary-btn   { background: rgba(0,0,0,0.04); border-color: #dde8e1; color: rgba(0,0,0,0.5); }
+[data-theme="light"] .secondary-btn:hover { background: rgba(0,0,0,0.07); }
+
+/* ── Meal sections ── */
+[data-theme="light"] .meal-header     { border-bottom-color: rgba(0,0,0,0.06); }
+[data-theme="light"] .meal-name       { color: #1a2e1e; }
+[data-theme="light"] .meal-total      { color: rgba(0,0,0,0.4); }
+[data-theme="light"] .meal-item       { border-bottom-color: rgba(0,0,0,0.05); }
+[data-theme="light"] .meal-item-name  { color: rgba(0,0,0,0.75); }
+[data-theme="light"] .meal-item-macros { color: rgba(0,0,0,0.4); }
+
+/* ── Macro rings ── */
+[data-theme="light"] .macro-ring-val    { color: #7ed99a; }
+[data-theme="light"] .macro-ring-target { color: rgba(0,0,0,0.35); }
+[data-theme="light"] .macro-ring-lbl    { color: rgba(0,0,0,0.35); }
+[data-theme="light"] .macro-ring-bar    { background: rgba(0,0,0,0.08); }
+
+/* ── Coach bar ── */
+[data-theme="light"] .coach-bar  { background: #ffffff; border-color: #dde8e1; }
+[data-theme="light"] .coach-text { color: rgba(0,0,0,0.65); }
+
+/* ── Onboarding card ── */
+[data-theme="light"] .onboarding-card { background: #ffffff; border-color: #dde8e1; }
+[data-theme="light"] .onboarding-card h2 { color: #1a2e1e; }
+[data-theme="light"] .onboarding-card p  { color: rgba(0,0,0,0.5); }
+[data-theme="light"] .info-box { background: rgba(0,0,0,0.04); border-color: #dde8e1; }
+[data-theme="light"] .info-title { color: rgba(0,0,0,0.7); }
+[data-theme="light"] .info-desc  { color: rgba(0,0,0,0.45); }
+
+/* ── Profile page ── */
+[data-theme="light"] .user-card        { background: #ffffff; border-color: #dde8e1; }
+[data-theme="light"] .user-name        { color: #1a2e1e; }
+[data-theme="light"] .user-email       { color: rgba(0,0,0,0.35); }
+[data-theme="light"] .stat-pill        { background: #ffffff; border-color: #dde8e1; }
+[data-theme="light"] .stat-lbl         { color: rgba(0,0,0,0.35); }
+[data-theme="light"] .settings-group   { background: #ffffff; border-color: #dde8e1; }
+[data-theme="light"] .settings-section.green .settings-group { border-color: rgba(126,217,154,0.3); }
+[data-theme="light"] .settings-section.blue  .settings-group { border-color: rgba(91,200,245,0.3); }
+[data-theme="light"] .settings-section.orange .settings-group { border-color: rgba(245,166,35,0.3); }
+[data-theme="light"] .settings-section.purple .settings-group { border-color: rgba(167,139,250,0.3); }
+[data-theme="light"] .settings-row        { border-bottom-color: rgba(0,0,0,0.06); }
+[data-theme="light"] .settings-row-label  { color: rgba(0,0,0,0.75); }
+[data-theme="light"] .settings-row-value  { color: rgba(0,0,0,0.4); }
+[data-theme="light"] .green-btn { background: rgba(126,217,154,0.1); }
+
+/* ── Edit profile sheet ── */
+[data-theme="light"] .ep-overlay  { background: rgba(0,0,0,0.5); }
+[data-theme="light"] .ep-sheet    { background: #f3f6f4; }
+[data-theme="light"] .ep-header   { background: #f3f6f4; border-bottom-color: rgba(0,0,0,0.08); }
+[data-theme="light"] .ep-title    { color: #1a2e1e; }
+[data-theme="light"] .ep-handle   { background: rgba(0,0,0,0.15); }
+[data-theme="light"] .ep-close    { background: rgba(0,0,0,0.07); color: rgba(0,0,0,0.45); }
+[data-theme="light"] .ep-group label { color: rgba(0,0,0,0.4); }
+[data-theme="light"] .ep-input    { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.1); color: #1a2e1e; }
+[data-theme="light"] .ep-input::placeholder { color: rgba(0,0,0,0.25); }
+[data-theme="light"] .ep-unit-toggle { background: rgba(0,0,0,0.06); }
+[data-theme="light"] .ep-unit-btn    { color: rgba(0,0,0,0.4); }
+[data-theme="light"] .ep-option-btn  { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.1); color: rgba(0,0,0,0.55); }
+[data-theme="light"] .ep-goal-btn    { background: rgba(0,0,0,0.03); border-color: rgba(0,0,0,0.08); color: rgba(0,0,0,0.65); }
+[data-theme="light"] .ep-goal-desc   { color: rgba(0,0,0,0.35); }
+[data-theme="light"] .ep-goal-btn.active .ep-goal-desc { color: rgba(126,217,154,0.7); }
+
+/* ── Progress tab ── */
+[data-theme="light"] .prog-stat-card  { background: #ffffff; border-color: #dde8e1; }
+[data-theme="light"] .prog-stat-lbl   { color: rgba(0,0,0,0.35); }
+[data-theme="light"] .prog-stat-note  { color: rgba(0,0,0,0.35); }
+[data-theme="light"] .prog-stat-note.good { color: #5ab87a; }
+[data-theme="light"] .prog-stat-note.warn { color: #d4891c; }
+[data-theme="light"] .chart-card       { background: #ffffff; border-color: #dde8e1; }
+[data-theme="light"] .chart-card-title { color: rgba(0,0,0,0.7); }
+[data-theme="light"] .chart-card-unit  { color: rgba(0,0,0,0.25); }
+[data-theme="light"] .chart-reset-btn  { color: #c04040; background: rgba(224,92,92,0.07); border-color: rgba(224,92,92,0.25); }
+[data-theme="light"] .progress-form    { background: #ffffff; }
+
+/* ── Food / add modal ── */
+[data-theme="light"] .food-item        { border-bottom-color: rgba(0,0,0,0.06); }
+[data-theme="light"] .food-item-name   { color: rgba(0,0,0,0.75); }
+[data-theme="light"] .food-item-macros { color: rgba(0,0,0,0.4); }
+[data-theme="light"] .manual-macros    { }
+
+/* ── Planner ── */
+[data-theme="light"] .planner-meal-card   { background: #ffffff; border-color: #dde8e1; }
+[data-theme="light"] .planner-meal-name   { color: #1a2e1e; }
+[data-theme="light"] .planner-meal-macros { color: rgba(0,0,0,0.4); }
+[data-theme="light"] .planner-meal-label  { color: rgba(0,0,0,0.5); }
+[data-theme="light"] .planner-total-item  { background: rgba(0,0,0,0.03); border-color: #dde8e1; }
+[data-theme="light"] .planner-total-val   { color: #1a2e1e; }
+[data-theme="light"] .planner-total-lbl   { color: rgba(0,0,0,0.4); }
+[data-theme="light"] .planner-targets     { background: rgba(0,0,0,0.03); border-color: #dde8e1; }
+[data-theme="light"] .planner-target-val  { color: #1a2e1e; }
+[data-theme="light"] .planner-target-lbl  { color: rgba(0,0,0,0.4); }
+[data-theme="light"] .planner-mode-btn,
+[data-theme="light"] .planner-cuisine-btn { color: rgba(0,0,0,0.45); background: rgba(0,0,0,0.04); }
+[data-theme="light"] .planner-mode-toggle,
+[data-theme="light"] .planner-cuisine-toggle { background: rgba(0,0,0,0.05); }
+[data-theme="light"] .swap-item           { border-bottom-color: rgba(0,0,0,0.06); }
+[data-theme="light"] .swap-item-name      { color: rgba(0,0,0,0.75); }
+[data-theme="light"] .swap-item-macros    { color: rgba(0,0,0,0.4); }
+
+/* ── Shopping list ── */
+[data-theme="light"] .shopping-list       { background: #ffffff; border-color: #dde8e1; }
+[data-theme="light"] .shopping-header     { border-bottom-color: rgba(0,0,0,0.06); }
+[data-theme="light"] .shopping-title      { color: #1a2e1e; }
+[data-theme="light"] .shopping-item       { border-bottom-color: rgba(0,0,0,0.05); }
+[data-theme="light"] .shopping-item-name  { color: rgba(0,0,0,0.75); }
+[data-theme="light"] .shopping-item-amount { color: rgba(0,0,0,0.4); }
+
+/* ── Recipes page ── */
+[data-theme="light"] .recipe-card        { background: #ffffff; border-color: #dde8e1; }
+[data-theme="light"] .recipe-name        { color: #1a2e1e; }
+[data-theme="light"] .recipe-macros      { color: rgba(0,0,0,0.4); }
+[data-theme="light"] .cuisine-toggle-row { background: rgba(0,0,0,0.04); border-color: #dde8e1; }
+[data-theme="light"] .cuisine-btn        { color: rgba(0,0,0,0.4); }
+[data-theme="light"] .category-chip      { background: rgba(0,0,0,0.05); color: rgba(0,0,0,0.45); }
+[data-theme="light"] .category-chip.active { background: rgba(126,217,154,0.15); }
+
+/* ── Exercise / workout page ── */
+[data-theme="light"] .split-card,
+[data-theme="light"] .exercise-card,
+[data-theme="light"] .workout-card       { background: #ffffff; border-color: #dde8e1; }
+[data-theme="light"] .split-name,
+[data-theme="light"] .exercise-name      { color: #1a2e1e; }
+[data-theme="light"] .exercise-meta,
+[data-theme="light"] .split-meta         { color: rgba(0,0,0,0.4); }
+[data-theme="light"] .muscle-chip        { background: rgba(0,0,0,0.05); color: rgba(0,0,0,0.45); }
+[data-theme="light"] .muscle-chip.active { background: rgba(126,217,154,0.15); }
+[data-theme="light"] .week-day           { background: rgba(0,0,0,0.03); border-color: #dde8e1; color: rgba(0,0,0,0.45); }
+[data-theme="light"] .week-day.active    { background: rgba(126,217,154,0.1); }
+
+/* ── Admin page ── */
+[data-theme="light"] .admin-item         { background: #ffffff; border-color: #dde8e1; }
+[data-theme="light"] .admin-item-name    { color: #1a2e1e; }
+[data-theme="light"] .admin-item-meta    { color: rgba(0,0,0,0.4); }
+[data-theme="light"] .tab-btn            { color: rgba(0,0,0,0.4); background: rgba(0,0,0,0.04); }
+[data-theme="light"] .tab-btn.active     { background: rgba(126,217,154,0.12); color: #5ab87a; }
+[data-theme="light"] .select-input       { background: rgba(0,0,0,0.04); border-color: #dde8e1; color: #1a2e1e; }
+[data-theme="light"] .macro-display-card { background: rgba(0,0,0,0.03); border-color: #dde8e1; }
+[data-theme="light"] .macro-display-val  { color: #1a2e1e; }
+[data-theme="light"] .macro-display-lbl  { color: rgba(0,0,0,0.4); }
+[data-theme="light"] .added-ing-row      { background: rgba(0,0,0,0.03); border-color: #dde8e1; }
+[data-theme="light"] .added-ing-name     { color: rgba(0,0,0,0.75); }
+[data-theme="light"] .added-ing-amount   { background: rgba(0,0,0,0.04); border-color: #dde8e1; color: #1a2e1e; }
+[data-theme="light"] .ing-result-item    { border-bottom-color: rgba(0,0,0,0.06); }
+[data-theme="light"] .ing-result-item span { color: rgba(0,0,0,0.75); }
+[data-theme="light"] .ing-result-macros  { color: rgba(0,0,0,0.4); }
+
+/* ── Login page ── */
+[data-theme="light"] .login-card   { background: #ffffff; border-color: #dde8e1; }
+[data-theme="light"] .login-title  { color: #1a2e1e; }
+[data-theme="light"] .login-sub    { color: rgba(0,0,0,0.45); }
+
+/* ── Misc ── */
+[data-theme="light"] .section-label { color: rgba(0,0,0,0.3); }
+[data-theme="light"] .page-title    { color: #1a2e1e; }
+
 /* ── INLINE FIELD VALIDATION ─────────────────────────────── */
 .field-error {
   font-size: 11px;
