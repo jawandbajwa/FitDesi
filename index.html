@@ -635,8 +635,6 @@
     </div>
     <div id="errorMessage" class="error-message" style="display: none"></div>
 
-    <script src="app.js"></script>
-
     <!-- Service Worker — auto-reloads the page when a new version activates -->
     <script>
       if ("serviceWorker" in navigator) {
@@ -805,13 +803,15 @@
         return { protein, carbs, fat, calories: Math.round(calTarget) };
       }
 
-      // Set date
+      // Set date + placeholder greeting immediately (before auth resolves)
       document.getElementById("currentDate").textContent =
         new Date().toLocaleDateString("en-US", {
           weekday: "short",
           day: "numeric",
           month: "short",
         });
+      document.getElementById("greeting").textContent =
+        `Good ${getTimeOfDay()}`;
 
       onAuthStateChanged(auth, async (user) => {
         if (!user) {
@@ -942,60 +942,51 @@
               macros.calories > 0 ? calories / macros.calories : 0,
             );
             setRing("navProteinRing", 138.2, protein / macros.protein);
-          } else {
-            // Workouts this week from Firebase
-            try {
-              const { getDocs, collection, db } = await import("./firebase.js");
-              const workoutsSnap = await getDocs(
-                collection(db, "users", user.uid, "workouts"),
-              );
-              const today = new Date();
-              today.setHours(0, 0, 0, 0);
-              const weekAgo = new Date(today);
-              weekAgo.setDate(today.getDate() - 7);
-              let weekCount = 0;
-              const doneDays = [];
-              workoutsSnap.forEach((doc) => {
-                const d = new Date(doc.id);
-                if (!isNaN(d) && d >= weekAgo) {
-                  weekCount++;
-                  doneDays.push(d);
-                }
-              });
-              document.getElementById("workoutsDone").textContent = weekCount;
-              // Fill streak dots
-              const dots = document.querySelectorAll(".streak-dot");
-              const dayNames = [
-                "Sun",
-                "Mon",
-                "Tue",
-                "Wed",
-                "Thu",
-                "Fri",
-                "Sat",
-              ];
-              for (let i = 6; i >= 0; i--) {
-                const day = new Date(today);
-                day.setDate(today.getDate() - i);
-                const dayStr = day.toDateString();
-                const done = doneDays.some((d) => d.toDateString() === dayStr);
-                if (done) dots[6 - i].classList.add("filled");
-              }
-            } catch (e) {}
-
-            // Daily tip
-            const tips = [
-              "Combine dal with rice for a complete amino acid profile.",
-              "Paneer gives ~18g protein per 100g — stack it.",
-              "Eat your biggest meal within 2 hours post-workout.",
-              "Soaked chana has more bioavailable protein — prep the night before.",
-              "Greek yogurt + fruit = perfect high-protein snack.",
-              "Tofu absorbs spices well and packs 8g per 100g.",
-              "Drink 3+ litres on workout days for best recovery.",
-            ];
-            document.getElementById("dailyTip").textContent =
-              tips[new Date().getDay() % tips.length];
           }
+
+          // ── Workout streak (always runs, regardless of profile) ──
+          try {
+            const { getDocs, collection, db } = await import("./firebase.js");
+            const workoutsSnap = await getDocs(
+              collection(db, "users", user.uid, "workoutLogs"),
+            );
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const weekAgo = new Date(today);
+            weekAgo.setDate(today.getDate() - 7);
+            let weekCount = 0;
+            const doneDays = [];
+            workoutsSnap.forEach((doc) => {
+              const d = new Date(doc.id);
+              if (!isNaN(d) && d >= weekAgo) {
+                weekCount++;
+                doneDays.push(d);
+              }
+            });
+            document.getElementById("workoutsDone").textContent = weekCount;
+            // Fill streak dots
+            const dots = document.querySelectorAll(".streak-dot");
+            for (let i = 6; i >= 0; i--) {
+              const day = new Date(today);
+              day.setDate(today.getDate() - i);
+              const dayStr = day.toDateString();
+              const done = doneDays.some((d) => d.toDateString() === dayStr);
+              if (done) dots[6 - i].classList.add("filled");
+            }
+          } catch (e) {}
+
+          // ── Daily tip (always shown) ──
+          const tips = [
+            "Combine dal with rice for a complete amino acid profile.",
+            "Paneer gives ~18g protein per 100g — stack it.",
+            "Eat your biggest meal within 2 hours post-workout.",
+            "Soaked chana has more bioavailable protein — prep the night before.",
+            "Greek yogurt + fruit = perfect high-protein snack.",
+            "Tofu absorbs spices well and packs 8g per 100g.",
+            "Drink 3+ litres on workout days for best recovery.",
+          ];
+          document.getElementById("dailyTip").textContent =
+            tips[new Date().getDay() % tips.length];
         } catch (error) {
           console.error("Error loading:", error);
           document.getElementById("loadingOverlay").classList.add("hidden");

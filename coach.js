@@ -54,8 +54,6 @@ export function initCoach() {
 
 // ─── FLOATING BUTTON ───────────────────────────────────────────
 function createFloatingButton() {
-  console.log("🤖 Coach: Creating floating button");
-
   coachButton = document.createElement("button");
   coachButton.id = "coachButton";
   coachButton.innerHTML = `
