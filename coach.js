@@ -211,11 +211,10 @@ function createChatSheet() {
   messagesContainer.style.cssText = `
     flex: 1;
     overflow-y: auto;
-    padding: 12px 20px 4px;
+    padding: 12px 20px 8px;
     display: flex;
     flex-direction: column;
     gap: 12px;
-    justify-content: flex-end;
     min-height: 0;
   `;
 
@@ -448,8 +447,9 @@ async function sendMessage(text = null) {
   addMessage(userMessage);
   conversationHistory.push(userMessage);
 
-  // Clear quick replies and show typing indicator
-  quickRepliesContainer.innerHTML = "";
+  // Show typing indicator (keep quick replies visible until response arrives)
+  quickRepliesContainer.style.opacity = "0.4";
+  quickRepliesContainer.style.pointerEvents = "none";
   const typingEl = document.createElement("div");
   typingEl.id = "coach-typing";
   typingEl.innerHTML = `<span></span><span></span><span></span>`;
@@ -513,10 +513,14 @@ async function sendMessage(text = null) {
       await executeAction(action);
     }
 
-    // Show quick replies
+    // Replace quick replies with contextual ones
+    quickRepliesContainer.style.opacity = "1";
+    quickRepliesContainer.style.pointerEvents = "auto";
     showQuickReplies(getQuickRepliesForContext(messageContent));
   } catch (error) {
     document.getElementById("coach-typing")?.remove();
+    quickRepliesContainer.style.opacity = "1";
+    quickRepliesContainer.style.pointerEvents = "auto";
     console.error("Coach API error:", error);
     let errorMsg = "Sorry, I'm having trouble connecting. Try again?";
     if (
