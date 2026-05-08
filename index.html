@@ -6,6 +6,10 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" />
     <link rel="icon" href="icon-192.png" />
     <title>FitDesi</title>
     <link rel="manifest" href="manifest.json" />
@@ -684,6 +688,9 @@
         getWorkoutCycle,
         getUserProfile,
         getDailyLog,
+        getDocs,
+        collection,
+        db,
       } from "./firebase.js";
 
       async function loadCoach() {
@@ -869,11 +876,18 @@
           });
           document.querySelector(".nav-right").appendChild(signOutBtn);
 
-          // Today's workout
+          // ── Fire all 4 Firebase reads in parallel ──────────────
           document.getElementById("loadingOverlay").classList.remove("hidden");
-          const cycleData = await getWorkoutCycle(user.uid);
+          const todayStr = new Date().toDateString();
+          const [cycleData, profile, todayLog, workoutsSnap] = await Promise.all([
+            getWorkoutCycle(user.uid),
+            getUserProfile(user.uid),
+            getDailyLog(user.uid, todayStr).catch(() => ({})),
+            getDocs(collection(db, "users", user.uid, "workoutLogs")).catch(() => null),
+          ]);
           document.getElementById("loadingOverlay").classList.add("hidden");
 
+          // ── Today's workout ──
           const todayWorkout = getTodayWorkout(cycleData);
           const wEl = document.getElementById("todayWorkout");
           if (wEl && todayWorkout) {
@@ -885,119 +899,76 @@
               <button class="workout-start-btn" onclick="location.href='exercise.html'">Start →</button>`;
           }
 
-          // Profile & macros
-          const profile = await getUserProfile(user.uid);
+          // ── Macros & rings ──
           if (profile) {
             const macros = calculateMacros(profile);
-            document.getElementById("proteinGoal").textContent =
-              macros.protein + "g";
-            document.getElementById("carbsGoalLabel").textContent =
-              "of " + macros.carbs + "g";
-            document.getElementById("fatGoalLabel").textContent =
-              "of " + macros.fat + "g";
-            document.getElementById("calGoalLabel").textContent =
-              "of " + macros.calories;
+            document.getElementById("proteinGoal").textContent = macros.protein + "g";
+            document.getElementById("carbsGoalLabel").textContent = "of " + macros.carbs + "g";
+            document.getElementById("fatGoalLabel").textContent = "of " + macros.fat + "g";
+            document.getElementById("calGoalLabel").textContent = "of " + macros.calories;
 
-            // Fetch today's log from Firebase (fall back to localStorage cache)
-            let protein = 0,
-              carbs = 0,
-              fat = 0,
-              calories = 0;
-            try {
-              const todayLog = await getDailyLog(
-                user.uid,
-                new Date().toDateString(),
-              );
+            let protein = 0, carbs = 0, fat = 0, calories = 0;
+            if (todayLog && Object.keys(todayLog).length) {
               ["breakfast", "lunch", "snack", "dinner"].forEach((meal) => {
                 (todayLog[meal] || []).forEach((item) => {
                   protein += item.protein || 0;
-                  carbs += item.carbs || 0;
-                  fat += item.fat || 0;
+                  carbs   += item.carbs   || 0;
+                  fat     += item.fat     || 0;
                   calories += item.calories || 0;
                 });
               });
-              protein = Math.round(protein);
-              carbs = Math.round(carbs);
-              fat = Math.round(fat);
+              protein  = Math.round(protein);
+              carbs    = Math.round(carbs);
+              fat      = Math.round(fat);
               calories = Math.round(calories);
               // Keep localStorage cache in sync
-              const todayStr = new Date().toDateString();
-              const cached = JSON.parse(
-                localStorage.getItem("fitdesiLogs") || "{}",
-              );
+              const cached = JSON.parse(localStorage.getItem("fitdesiLogs") || "{}");
               cached[todayStr] = { protein, carbs, fat, calories };
               localStorage.setItem("fitdesiLogs", JSON.stringify(cached));
-            } catch (_) {
+            } else {
               // Fallback to localStorage cache
-              const cached = JSON.parse(
-                localStorage.getItem("fitdesiLogs") || "{}",
-              );
-              const day = cached[new Date().toDateString()] || {};
-              protein = day.protein || 0;
-              carbs = day.carbs || 0;
-              fat = day.fat || 0;
+              const day = JSON.parse(localStorage.getItem("fitdesiLogs") || "{}")[todayStr] || {};
+              protein  = day.protein  || 0;
+              carbs    = day.carbs    || 0;
+              fat      = day.fat      || 0;
               calories = day.calories || 0;
             }
 
-            document.getElementById("proteinToday").textContent = protein + "g";
-            document.getElementById("carbsToday").textContent = carbs + "g";
-            document.getElementById("fatToday").textContent = fat + "g";
+            document.getElementById("proteinToday").textContent  = protein + "g";
+            document.getElementById("carbsToday").textContent    = carbs + "g";
+            document.getElementById("fatToday").textContent      = fat + "g";
             document.getElementById("caloriesToday").textContent = calories;
 
-            // Update rings
             setRing("proteinRingArc", PROTEIN_CIRC, protein / macros.protein);
-            setRing(
-              "carbsRingArc",
-              MINI_CIRC,
-              macros.carbs > 0 ? carbs / macros.carbs : 0,
-            );
-            setRing(
-              "fatRingArc",
-              MINI_CIRC,
-              macros.fat > 0 ? fat / macros.fat : 0,
-            );
-            setRing(
-              "calRingArc",
-              MINI_CIRC,
-              macros.calories > 0 ? calories / macros.calories : 0,
-            );
+            setRing("carbsRingArc",   MINI_CIRC, macros.carbs    > 0 ? carbs    / macros.carbs    : 0);
+            setRing("fatRingArc",     MINI_CIRC, macros.fat      > 0 ? fat      / macros.fat      : 0);
+            setRing("calRingArc",     MINI_CIRC, macros.calories > 0 ? calories / macros.calories : 0);
             setRing("navProteinRing", 138.2, protein / macros.protein);
           }
 
-          // ── Workout streak (always runs, regardless of profile) ──
-          try {
-            const { getDocs, collection, db } = await import("./firebase.js");
-            const workoutsSnap = await getDocs(
-              collection(db, "users", user.uid, "workoutLogs"),
-            );
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            const weekAgo = new Date(today);
-            weekAgo.setDate(today.getDate() - 7);
+          // ── Workout streak ──
+          if (workoutsSnap) {
+            const today = new Date(); today.setHours(0, 0, 0, 0);
+            const weekAgo = new Date(today); weekAgo.setDate(today.getDate() - 7);
             let weekCount = 0;
             const doneDays = [];
             workoutsSnap.forEach((doc) => {
               const d = new Date(doc.id);
-              if (!isNaN(d) && d >= weekAgo) {
-                weekCount++;
-                doneDays.push(d);
-              }
+              if (!isNaN(d) && d >= weekAgo) { weekCount++; doneDays.push(d); }
             });
             document.getElementById("workoutsDone").textContent = weekCount;
-            // Fill streak dots + day labels
             const DAY_INITIALS = ["Su","Mo","Tu","We","Th","Fr","Sa"];
             const items = document.querySelectorAll(".streak-item");
             for (let i = 6; i >= 0; i--) {
-              const day = new Date(today);
-              day.setDate(today.getDate() - i);
+              const day = new Date(today); day.setDate(today.getDate() - i);
               const idx = 6 - i;
               const done = doneDays.some((d) => d.toDateString() === day.toDateString());
               if (done) items[idx].querySelector(".streak-dot").classList.add("filled");
               items[idx].querySelector(".streak-day-lbl").textContent = DAY_INITIALS[day.getDay()];
             }
-          } catch (e) {}
+          }
 
-          // ── Daily tip (always shown) ──
+          // ── Daily tip ──
           const tips = [
             "Combine dal with rice for a complete amino acid profile.",
             "Paneer gives ~18g protein per 100g — stack it.",
@@ -1007,8 +978,7 @@
             "Tofu absorbs spices well and packs 8g per 100g.",
             "Drink 3+ litres on workout days for best recovery.",
           ];
-          document.getElementById("dailyTip").textContent =
-            tips[new Date().getDay() % tips.length];
+          document.getElementById("dailyTip").textContent = tips[new Date().getDay() % tips.length];
         } catch (error) {
           console.error("Error loading:", error);
           document.getElementById("loadingOverlay").classList.add("hidden");

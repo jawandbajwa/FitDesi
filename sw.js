@@ -1,7 +1,7 @@
 // FitDesi Service Worker — Network-first, auto-update on every deploy
 // Bump this version whenever you want to force a full cache wipe.
 // With network-first below, normal file changes don't need a version bump.
-const CACHE_NAME = "fitdesi-v41";
+const CACHE_NAME = "fitdesi-v42";
 
 const STATIC_ASSETS = [
   "./",
@@ -67,31 +67,32 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-// ─── FETCH — Network First, Cache Fallback ───────────────────
-// Always try the network. On success, refresh the cache entry so
-// next offline visit gets the latest file. On failure, serve cache.
-// This guarantees deployed changes are visible on the next page load
-// without the user needing to delete and recreate the bookmark.
+// ─── FETCH — Stale-While-Revalidate ──────────────────────────
+// Serve from cache immediately (fast first paint), then fetch the
+// network in the background and update the cache so the *next* load
+// gets the freshest file.  On first visit (cache miss) we wait for
+// the network.  If the network is unavailable we fall back to cache.
 self.addEventListener("fetch", (event) => {
   // Only intercept GET requests for our own origin
   if (event.request.method !== "GET") return;
   if (!event.request.url.startsWith(self.location.origin)) return;
 
   event.respondWith(
-    fetch(event.request)
-      .then((networkResponse) => {
-        // Fresh from network — update the cache entry
-        if (networkResponse && networkResponse.ok) {
-          const clone = networkResponse.clone();
-          caches
-            .open(CACHE_NAME)
-            .then((cache) => cache.put(event.request, clone));
-        }
-        return networkResponse;
-      })
-      .catch(() =>
-        // Network unavailable — serve from cache (offline support)
-        caches.match(event.request),
-      ),
+    caches.open(CACHE_NAME).then((cache) =>
+      cache.match(event.request).then((cached) => {
+        // Background revalidation — always run, regardless of cache hit
+        const networkFetch = fetch(event.request)
+          .then((networkResponse) => {
+            if (networkResponse && networkResponse.ok) {
+              cache.put(event.request, networkResponse.clone());
+            }
+            return networkResponse;
+          })
+          .catch(() => null);
+
+        // Return cached response instantly if available; else wait for network
+        return cached || networkFetch;
+      }),
+    ),
   );
 });

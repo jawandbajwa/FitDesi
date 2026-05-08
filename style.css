@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+/* Inter font loaded via <link rel="preload"> in each HTML page — not here */
 
 :root {
   --bg: #0a0f0c;

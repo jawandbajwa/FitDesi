@@ -443,12 +443,14 @@ function renderMeals(log) {
 }
 
 async function refreshTracker() {
-  const profile = await getProfile();
+  const [profile, log, recipes] = await Promise.all([
+    getProfile(),
+    getTodayLog(),
+    getRecipesFromDB("indian"),
+  ]);
   if (!profile) return;
   const macros = calculateMacros(profile);
-  const log = await getTodayLog();
   const consumed = getMealTotals(log);
-  const recipes = await getRecipesFromDB("indian");
 
   renderMacroRings(macros, consumed);
   renderMeals(log);
@@ -487,8 +489,10 @@ async function openFoodModal(meal) {
 }
 
 async function renderFoodList(query) {
-  const indianRecipes = await getRecipesFromDB("indian");
-  const canadianRecipes = await getRecipesFromDB("canadian");
+  const [indianRecipes, canadianRecipes] = await Promise.all([
+    getRecipesFromDB("indian"),
+    getRecipesFromDB("canadian"),
+  ]);
   const recipes = [...indianRecipes, ...canadianRecipes];
   const filtered = recipes.filter((r) =>
     r.name.toLowerCase().includes(query.toLowerCase()),
@@ -1170,8 +1174,10 @@ document.addEventListener("click", async function (e) {
 
 });
 
-document.getElementById("foodSearch").addEventListener("input", async (e) => {
-  await renderFoodList(e.target.value);
+let _foodSearchTimer = null;
+document.getElementById("foodSearch").addEventListener("input", (e) => {
+  clearTimeout(_foodSearchTimer);
+  _foodSearchTimer = setTimeout(() => renderFoodList(e.target.value), 300);
 });
 
 // ─── INIT ────────────────────────────────────────────────────
@@ -1219,8 +1225,11 @@ async function loadProgressHistory() {
     getProfile(),
   ]);
   if (profile) renderProgressStats(profile, history);
-  renderProgressCharts(history);
+  // Only render charts if Chart.js is loaded (lazy-loaded on Progress tab open)
+  if (typeof Chart !== "undefined") renderProgressCharts(history);
 }
+// Expose for lazy Chart.js callback in tracker.html
+window._loadProgressHistory = loadProgressHistory;
 
 function renderProgressStats(profile, history) {
   const section = document.getElementById("progressStats");
