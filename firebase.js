@@ -71,11 +71,13 @@ function isStandalonePWA() {
 
 async function signInWithGoogle() {
   try {
-    // In standalone PWA mode on BOTH iOS and Android, use signInWithRedirect.
-    // - iOS: signInWithPopup is blocked by the OS in standalone WKWebView
-    // - Android: redirect is more reliable and avoids popup-blocker edge cases
-    // In normal browser mode, signInWithPopup gives a better UX (stays on page).
-    if (isStandalonePWA()) {
+    // iOS standalone (Add to Home Screen) blocks popups in WKWebView — must redirect.
+    // Android PWA uses a Chrome Custom Tab for signInWithPopup, which works perfectly
+    // even when installed. Using redirect on Android causes silent failures because
+    // Google's redirect can open a new browser tab instead of the PWA instance,
+    // leaving getRedirectResult() in a context that never sees the credential.
+    const isIOSStandalone = window.navigator.standalone === true;
+    if (isIOSStandalone) {
       await signInWithRedirect(auth, provider);
       return null; // page will navigate; result handled via getRedirectResult()
     }
