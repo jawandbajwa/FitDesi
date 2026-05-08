@@ -89,6 +89,11 @@ async function signInWithGoogle() {
   }
 }
 
+// Explicit redirect sign-in — used as a fallback when popup is blocked on Android
+async function signInWithGoogleRedirect() {
+  await signInWithRedirect(auth, provider);
+}
+
 async function signOutUser() {
   try {
     await signOut(auth);
@@ -581,6 +586,7 @@ export {
   ADMIN_EMAIL,
   onAuthStateChanged,
   signInWithGoogle,
+  signInWithGoogleRedirect,
   signOutUser,
   isAdmin,
   isStandalonePWA,

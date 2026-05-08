@@ -229,6 +229,7 @@
     <script type="module">
       import {
         signInWithGoogle,
+        signInWithGoogleRedirect,
         onAuthStateChanged,
         auth,
         getRedirectResult,
@@ -245,9 +246,13 @@
         spinner.style.display = on ? "block" : "none";
       }
 
-      // ── Handle iOS redirect result ──────────────────────────
-      // After signInWithRedirect() on iOS standalone, Google bounces
-      // back here — getRedirectResult() captures the credential.
+      function showError(msg) {
+        setLoading(false);
+        errorEl.style.display = "block";
+        errorEl.textContent = msg;
+      }
+
+      // ── Handle redirect result (iOS standalone + popup-blocked fallback) ──
       (async () => {
         try {
           setLoading(true);
@@ -257,7 +262,11 @@
             return;
           }
         } catch (e) {
-          // No redirect in flight — normal first load
+          // Redirect error — show it
+          if (e.code && e.code !== "auth/no-auth-event") {
+            showError("Sign in failed (" + e.code + "). Try again.");
+            return;
+          }
         }
         setLoading(false);
       })();
@@ -273,16 +282,27 @@
         errorEl.style.display = "none";
         try {
           const user = await signInWithGoogle();
-          // On iOS standalone, signInWithGoogle triggers a redirect and
-          // returns null — result is handled above by getRedirectResult.
+          // iOS standalone: triggers redirect, returns null — handled above
           if (user) window.location.href = "index.html";
         } catch (error) {
-          setLoading(false);
-          errorEl.style.display = "block";
-          errorEl.textContent =
-            error.code === "auth/popup-blocked"
-              ? "Popup blocked. Please allow popups or try a different browser."
-              : "Sign in failed. Please try again.";
+          // If popup was blocked, fall back to redirect flow
+          if (
+            error.code === "auth/popup-blocked" ||
+            error.code === "auth/cancelled-popup-request"
+          ) {
+            try {
+              await signInWithGoogleRedirect();
+              // navigates away — no return
+            } catch (e2) {
+              showError("Sign in failed (" + e2.code + "). Try again.");
+            }
+          } else {
+            showError(
+              error.code
+                ? "Sign in failed (" + error.code + "). Try again."
+                : "Sign in failed. Check your connection and try again.",
+            );
+          }
         }
       });
     </script>
