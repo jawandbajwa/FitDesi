@@ -55,6 +55,8 @@ This updates `manifest.json`, `profile.html` (About section), and `sw.js` cache 
 | `ingredients.js` | Indian ingredient database (used by admin) |
 | `ingredients_canada.js` | Canadian ingredient database |
 | `recipes_canada.js` | Canadian recipe database |
+| `onboarding.js` | First-time intro slides — shown once ever, flag persisted in Firestore |
+| `onboarding-preview.html` | Dev-only preview of all 4 onboarding slides side by side (not in SW cache) |
 | `coach-config.js` | **Gitignored** — local dev overrides (e.g. `GEMINI_PROXY_URL`) |
 | `coach-config.example.js` | Template for coach-config.js |
 
@@ -82,6 +84,7 @@ Auth: Google Sign-In only. `isAdmin: true` on the user profile doc grants admin 
 **Coach-related profile fields:**
 - `coachEnabled: boolean` — set by admin to grant coach access to a user
 - `chosenCoach: "vegeta"|"hinata"|"levi"|"allmight"|"gojo"` — set by the user on first open
+- `onboardingDone: boolean` — set to `true` after user dismisses or completes onboarding slides
 
 ---
 
@@ -135,20 +138,21 @@ wrangler deploy
 - `getAllUsers()` — fetches all user profile docs for admin panel
 - `assignCoach(uid, enabled)` — sets `coachEnabled` on a user's profile
 - `saveCoachChoice(uid, coachId)` — sets `chosenCoach` on a user's profile
+- `markOnboardingDone(uid)` — sets `onboardingDone: true` on a user's profile (merge)
 
 ---
 
 ## Versioning
 
 Version is stored in two places: `manifest.json` and `profile.html` (About section).
-Current version: **2.1.0**
+Current version: **2.2.3**
 
 Rules:
 - Small change → `node bump-version.js patch` (+1 patch, 0–9, rolls to minor at 10)
 - Notable update → `node bump-version.js minor` (+1 minor, 0–9, rolls to major at 10)
 - Big release → `node bump-version.js major` (+1 major)
 
-The script also bumps `sw.js` cache version automatically (current: `fitdesi-v28`).
+The script also bumps `sw.js` cache version automatically (current: `fitdesi-v33`).
 
 ---
 
@@ -172,6 +176,7 @@ The script also bumps `sw.js` cache version automatically (current: `fitdesi-v28
 - All Firebase operations go through `firebase.js`. Never import Firebase SDK directly in other files.
 - `localStorage` keys in use:
   - `fitdesi_theme` — `"dark"` or `"light"`
+  - `fitdesi_onboarding_done` — `"true"` fast-path cache so onboarding skips the Firestore read on repeat visits (source of truth is `onboardingDone` in Firestore)
   - `fitdesi_cycle_ack` — date string `"YYYY-MM-DD"`, prevents cycle popup from re-showing same day
   - `proteinGoal` — user's daily protein target (used by nav ring on all pages)
   - `carbsGoal`, `fatGoal`, `caloriesGoal` — full macro targets
@@ -207,6 +212,39 @@ Profile stores: `age`, `weight` (kg or lbs), `height` (cm or ft/in), `gender`, `
 
 ---
 
+## Onboarding Slides
+
+First-time user intro shown once, ever. Implemented in `onboarding.js`, triggered from `index.html`.
+
+### How it works
+1. `initOnboarding()` is called from `index.html` after page load via a dynamic `import()`
+2. Checks `localStorage("fitdesi_onboarding_done")` first — if set, returns immediately (fast path)
+3. Otherwise waits for `onAuthStateChanged`, then reads the user's Firestore profile
+4. If `profile.onboardingDone` is true → sets localStorage cache and returns
+5. If not → calls `buildOnboarding(uid)` to show the slides overlay
+
+### Dismissing
+- Skip button (slide 1) or "Let's Go" button (slide 4) calls `dismiss()`
+- `dismiss()` sets `localStorage("fitdesi_onboarding_done") = "true"` immediately
+- Then calls `markOnboardingDone(uid)` to write `onboardingDone: true` to Firestore
+- This means it will never show again, even after sign-out, device change, or browser data clear
+
+### Slide structure
+4 slides, each with: tag pill, title, body text, and a visual area
+| Slide | Tag | Visual |
+|-------|-----|--------|
+| 1 — Welcome | green | 2×2 macro grid (Protein, Carbs, Fat, Calories) — each card `height: 60px` |
+| 2 — Nutrition | teal | 3 recipe cards (Dal Tadka, Greek Yogurt, Peanut Butter) |
+| 3 — Workouts | orange | 5-day rolling split strip with today highlighted |
+| 4 — AI Coach | purple | 5 coach avatars, Gojo center + larger |
+
+### Navigation
+- Left button: "Skip" on slide 1, "← Back" on slides 2–4
+- Dots: all 4 are clickable and jump directly to that slide
+- Right button: "Next →" on slides 1–3, "Let's Go 🚀" (purple) on slide 4
+
+---
+
 ## Common Gotchas
 
 1. **Service worker caching** — always run `node bump-version.js patch` (or `minor`/`major`) before pushing JS/CSS changes.
@@ -217,6 +255,7 @@ Profile stores: `age`, `weight` (kg or lbs), `height` (cm or ft/in), `gender`, `
 6. **`startDate` must never be reset** — see Workout/Cycle System above.
 7. **Coach is not admin-only anymore** — any user with `coachEnabled: true` on their profile sees the coach button. Admin still sees it via the `isAdmin()` check.
 8. **Cloudflare Worker is separate from GitHub** — changes to `cloudflare-worker.js` must be manually deployed via `wrangler deploy`. Pushing to GitHub does not update the live worker.
+9. **Onboarding source of truth is Firestore, not localStorage** — localStorage is only a fast-path cache. If you need to reset onboarding for a user (e.g. for testing), clear `onboardingDone` from their Firestore profile doc AND delete `fitdesi_onboarding_done` from localStorage.
 
 ---
 
