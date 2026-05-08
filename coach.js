@@ -291,7 +291,7 @@ async function sendMessage(text = null) {
 
   // Call Anthropic API
   try {
-    const response = await callAnthropicAPI([...conversationHistory], context);
+    const response = await callGeminiAPI([...conversationHistory], context);
 
     // Parse response
     const lines = response.split("\n");
@@ -484,7 +484,7 @@ import("./coach-config.js")
   .then((cfg) => { if (cfg.GEMINI_API_KEY) GEMINI_API_KEY = cfg.GEMINI_API_KEY; })
   .catch(() => {});
 
-async function callAnthropicAPI(messages, context) {
+async function callGeminiAPI(messages, context) {
   if (!GEMINI_API_KEY) {
     throw new Error("API key not configured");
   }
