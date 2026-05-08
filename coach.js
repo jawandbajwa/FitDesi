@@ -125,9 +125,9 @@ function createChatSheet() {
     background: #0d150f;
     border-radius: 20px 20px 0 0;
     z-index: 1001;
+    display: none;
     transform: translateY(100%);
     transition: transform 0.3s ease;
-    display: flex;
     flex-direction: column;
     box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
   `;
@@ -173,6 +173,7 @@ function createChatSheet() {
   `;
   closeBtn.addEventListener("click", () => {
     chatSheet.style.transform = "translateY(100%)";
+    setTimeout(() => { chatSheet.style.display = "none"; }, 310);
   });
 
   const switchBtn = chatSheet.querySelector(".coach-switch-btn");
@@ -288,10 +289,21 @@ function createChatSheet() {
 
 // ─── TOGGLE CHAT ───────────────────────────────────────────────
 function toggleChat() {
-  const isOpen = chatSheet.style.transform === "translateY(0%)";
-  chatSheet.style.transform = isOpen ? "translateY(100%)" : "translateY(0%)";
+  const isOpen = chatSheet.style.display !== "none";
 
-  if (!isOpen) {
+  if (isOpen) {
+    // Close: animate out then hide
+    chatSheet.style.transform = "translateY(100%)";
+    setTimeout(() => { chatSheet.style.display = "none"; }, 310);
+  } else {
+    // Open: show first, then animate in next frame
+    chatSheet.style.display = "flex";
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        chatSheet.style.transform = "translateY(0%)";
+      });
+    });
+
     if (!currentCoach) {
       showCoachPicker();
     } else if (!welcomeShown) {
