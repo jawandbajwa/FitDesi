@@ -1,6 +1,6 @@
 {
   "name": "FitDesi - Personal Fitness Tracker",
-  "version": "1.0.80",
+  "version": "1.0.90",
   "short_name": "FitDesi",
   "description": "Indian vegetarian fitness app with meal tracking and workout routines",
   "start_url": "./index.html",

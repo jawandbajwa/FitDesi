@@ -8,11 +8,15 @@ import {
   saveRecipe,
   getRecipes,
   deleteRecipe,
+  getAllUsers,
+  assignCoach,
 } from "./firebase.js";
+import { COACHES } from "./coaches.js";
 
 let currentUser = null;
 let allIngredients = [];
 let allRecipes = [];
+let allUsers = [];
 let editingIngredientId = null;
 let editingRecipeId = null;
 let addedIngredients = [];
@@ -79,26 +83,116 @@ function getCatEmoji(cat) {
 
 // ─── STATS ───────────────────────────────────────────────────
 function updateStats() {
-  document.getElementById("statIngredients").textContent =
-    allIngredients.length;
+  document.getElementById("statIngredients").textContent = allIngredients.length;
   document.getElementById("statRecipes").textContent = allRecipes.length;
+  document.getElementById("statUsers").textContent = allUsers.length;
 }
 
 // ─── TAB SWITCHING ───────────────────────────────────────────
 document.querySelectorAll(".tab-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
-    document
-      .querySelectorAll(".tab-btn")
-      .forEach((b) => b.classList.remove("active"));
-    document
-      .querySelectorAll(".tab-content")
-      .forEach((c) => c.classList.add("hidden"));
+    document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
+    document.querySelectorAll(".tab-content").forEach((c) => c.classList.add("hidden"));
     btn.classList.add("active");
-    document
-      .getElementById(`tab-${btn.dataset.tab}`)
-      .classList.remove("hidden");
+    document.getElementById(`tab-${btn.dataset.tab}`).classList.remove("hidden");
+    if (btn.dataset.tab === "users") loadUsers();
   });
 });
+
+// ─── USERS ───────────────────────────────────────────────────
+async function loadUsers() {
+  const list = document.getElementById("userList");
+  list.innerHTML = `<div style="text-align:center;color:rgba(255,255,255,0.3);padding:40px;font-size:13px;">Loading members…</div>`;
+  allUsers = await getAllUsers();
+  updateStats();
+  renderUsers();
+}
+
+function renderUsers() {
+  const list = document.getElementById("userList");
+
+  if (!allUsers.length) {
+    list.innerHTML = `<div style="text-align:center;color:rgba(255,255,255,0.2);font-size:12px;padding:40px;">No members yet — users appear here when they sign in with Google</div>`;
+    return;
+  }
+
+  list.innerHTML = "";
+  allUsers.forEach((user) => {
+    const coach = user.chosenCoach ? COACHES[user.chosenCoach] : null;
+    const enabled = !!user.coachEnabled;
+
+    const row = document.createElement("div");
+    row.style.cssText = `
+      display: flex; align-items: center; gap: 14px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 14px; padding: 14px 16px; margin-bottom: 10px;
+    `;
+
+    // Avatar / initials
+    const avatar = document.createElement("div");
+    const initials = (user.name || user.email || "?").charAt(0).toUpperCase();
+    avatar.textContent = initials;
+    avatar.style.cssText = `
+      width: 42px; height: 42px; border-radius: 50%;
+      background: rgba(126,217,154,0.15); color: #7ed99a;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 700; flex-shrink: 0;
+    `;
+
+    // Info
+    const info = document.createElement("div");
+    info.style.cssText = `flex: 1; min-width: 0;`;
+
+    const name = document.createElement("div");
+    name.textContent = user.name || "Unnamed";
+    name.style.cssText = `font-size: 14px; font-weight: 600; color: #fff;`;
+
+    const email = document.createElement("div");
+    email.textContent = user.email || user.uid;
+    email.style.cssText = `font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 1px;`;
+
+    const coachBadge = document.createElement("div");
+    coachBadge.textContent = enabled
+      ? coach ? `${coach.emoji} Coach ${coach.name}` : "✅ Coach Enabled (not chosen yet)"
+      : "No Coach";
+    coachBadge.style.cssText = `
+      font-size: 11px; margin-top: 4px;
+      color: ${enabled ? "#7ed99a" : "rgba(255,255,255,0.25)"};
+    `;
+
+    info.appendChild(name);
+    info.appendChild(email);
+    info.appendChild(coachBadge);
+
+    // Toggle button
+    const toggleBtn = document.createElement("button");
+    toggleBtn.textContent = enabled ? "Remove Coach" : "Assign Coach";
+    toggleBtn.style.cssText = `
+      padding: 8px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
+      cursor: pointer; border: 1.5px solid;
+      flex-shrink: 0;
+      background: ${enabled ? "rgba(239,68,68,0.1)" : "rgba(126,217,154,0.1)"};
+      border-color: ${enabled ? "#f87171" : "#7ed99a"};
+      color: ${enabled ? "#f87171" : "#7ed99a"};
+    `;
+
+    toggleBtn.addEventListener("click", async () => {
+      toggleBtn.disabled = true;
+      toggleBtn.textContent = "Saving…";
+      const newState = !enabled;
+      await assignCoach(user.uid, newState);
+      // Update local state and re-render
+      user.coachEnabled = newState;
+      renderUsers();
+    });
+
+    row.appendChild(avatar);
+    row.appendChild(info);
+    row.appendChild(toggleBtn);
+    list.appendChild(row);
+  });
+}
 
 // ─── CUISINE TOGGLE ──────────────────────────────────────────
 document.querySelectorAll(".cuisine-tab").forEach((btn) => {

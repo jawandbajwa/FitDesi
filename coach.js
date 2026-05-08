@@ -1,18 +1,20 @@
 // ─── COACH.JS ──────────────────────────────────────────────────
-// AI Personal Coach for FitDesi - Admin Only
+// AI Personal Coach for FitDesi
 
 import {
   onAuthStateChanged,
   isAdmin,
   getUserProfile,
+  saveCoachChoice,
   addMealToLog,
   completeWorkout,
   swapExercise,
   auth,
 } from "./firebase.js";
+import { COACHES, getCoach, getCoachPersonality } from "./coaches.js";
 
 // ─── STATE ──────────────────────────────────────────────────────
-let coachIsAdmin = false;
+let currentCoach = null; // the chosen coach object
 let conversationHistory = [];
 let welcomeShown = false;
 let isListening = false;
@@ -28,39 +30,24 @@ let quickRepliesContainer = null;
 
 // ─── INIT ──────────────────────────────────────────────────────
 export function initCoach() {
-  console.log("🤖 Coach: initCoach called");
-
-  if (coachButton) {
-    console.log("🤖 Coach: already initialized");
-    return;
-  }
+  if (coachButton) return;
 
   onAuthStateChanged(auth, async (user) => {
-    if (!user) {
-      console.log("🤖 Coach: No user logged in");
-      return;
-    }
+    if (!user) return;
 
-    console.log("🤖 Coach: User logged in, checking profile...");
     const profile = await getUserProfile(user.uid);
-    console.log("🤖 Coach: User profile:", profile);
-    console.log("🤖 Coach: Email admin check:", isAdmin(user));
 
-    if (!profile || (!profile.isAdmin && !isAdmin(user))) {
-      console.log("🤖 Coach: User is not admin");
-      return;
+    // Show coach if admin OR if admin has enabled coach for this user
+    const hasAccess = isAdmin(user) || profile?.isAdmin || profile?.coachEnabled;
+    if (!profile || !hasAccess) return;
+
+    // If user already chose a coach, load it — otherwise picker will show on first open
+    if (profile.chosenCoach) {
+      currentCoach = getCoach(profile.chosenCoach);
     }
 
-    console.log("🤖 Coach: User is admin, initializing coach...");
-    coachIsAdmin = true;
-
-    // Create floating button
     createFloatingButton();
-
-    // Create chat sheet
     createChatSheet();
-
-    // Setup voice recognition
     setupVoiceRecognition();
   });
 }
@@ -249,26 +236,147 @@ function toggleChat() {
   const isOpen = chatSheet.style.transform === "translateY(0%)";
   chatSheet.style.transform = isOpen ? "translateY(100%)" : "translateY(0%)";
 
-  if (!isOpen && !welcomeShown) {
-    sendWelcomeMessage();
+  if (!isOpen) {
+    if (!currentCoach) {
+      showCoachPicker();
+    } else if (!welcomeShown) {
+      sendWelcomeMessage();
+    }
   }
+}
+
+// ─── COACH PICKER ──────────────────────────────────────────────
+function showCoachPicker() {
+  messagesContainer.innerHTML = "";
+  quickRepliesContainer.innerHTML = "";
+
+  const picker = document.createElement("div");
+  picker.style.cssText = `padding: 16px 0; display: flex; flex-direction: column; gap: 0;`;
+
+  const title = document.createElement("div");
+  title.textContent = "Choose Your Coach";
+  title.style.cssText = `font-size: 18px; font-weight: 700; color: #7ed99a; text-align: center; margin-bottom: 4px;`;
+
+  const sub = document.createElement("div");
+  sub.textContent = "Pick a style that fits you";
+  sub.style.cssText = `font-size: 12px; color: rgba(255,255,255,0.4); text-align: center; margin-bottom: 16px;`;
+
+  picker.appendChild(title);
+  picker.appendChild(sub);
+
+  let selectedId = null;
+
+  Object.values(COACHES).forEach((coach) => {
+    const card = document.createElement("div");
+    card.style.cssText = `
+      display: flex; align-items: center; gap: 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1.5px solid rgba(126,217,154,0.15);
+      border-radius: 14px; padding: 14px; margin-bottom: 10px;
+      cursor: pointer; transition: all 0.2s; position: relative;
+    `;
+
+    const avatar = document.createElement("div");
+    avatar.textContent = coach.emoji;
+    avatar.style.cssText = `
+      width: 48px; height: 48px; border-radius: 50%;
+      background: ${coach.avatarBg};
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; flex-shrink: 0;
+    `;
+
+    const info = document.createElement("div");
+    info.style.cssText = `flex: 1; min-width: 0;`;
+
+    const name = document.createElement("div");
+    name.textContent = coach.name;
+    name.style.cssText = `font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 3px;`;
+
+    const tag = document.createElement("span");
+    tag.textContent = coach.tag;
+    tag.style.cssText = `
+      display: inline-block; font-size: 10px; font-weight: 600;
+      padding: 2px 8px; border-radius: 20px; margin-bottom: 4px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      background: ${coach.tagColor.bg}; color: ${coach.tagColor.text};
+    `;
+
+    const desc = document.createElement("div");
+    desc.textContent = coach.description;
+    desc.style.cssText = `font-size: 12px; color: rgba(255,255,255,0.45); line-height: 1.4;`;
+
+    info.appendChild(name);
+    info.appendChild(tag);
+    info.appendChild(document.createElement("br"));
+    info.appendChild(desc);
+    card.appendChild(avatar);
+    card.appendChild(info);
+
+    card.addEventListener("click", () => {
+      // Deselect all
+      picker.querySelectorAll(".coach-pick-card").forEach((c) => {
+        c.style.borderColor = "rgba(126,217,154,0.15)";
+        c.style.background = "rgba(255,255,255,0.04)";
+        const chk = c.querySelector(".pick-check");
+        if (chk) chk.remove();
+      });
+
+      // Select this
+      card.style.borderColor = "#7ed99a";
+      card.style.background = "rgba(126,217,154,0.1)";
+      const check = document.createElement("div");
+      check.className = "pick-check";
+      check.textContent = "✓";
+      check.style.cssText = `
+        position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+        width: 22px; height: 22px; background: #7ed99a; color: #0d150f;
+        border-radius: 50%; display: flex; align-items: center;
+        justify-content: center; font-size: 12px; font-weight: 700; line-height: 22px; text-align: center;
+      `;
+      card.appendChild(check);
+      selectedId = coach.id;
+      ctaBtn.style.opacity = "1";
+      ctaBtn.style.pointerEvents = "auto";
+    });
+
+    card.className = "coach-pick-card";
+    picker.appendChild(card);
+  });
+
+  const ctaBtn = document.createElement("button");
+  ctaBtn.textContent = "Let's Go →";
+  ctaBtn.style.cssText = `
+    width: 100%; padding: 14px; background: #7ed99a; color: #0d150f;
+    font-size: 15px; font-weight: 700; border: none; border-radius: 12px;
+    cursor: pointer; opacity: 0.4; pointer-events: none; margin-top: 4px;
+    transition: opacity 0.2s;
+  `;
+
+  ctaBtn.addEventListener("click", async () => {
+    if (!selectedId || !auth.currentUser) return;
+    ctaBtn.textContent = "Saving…";
+    ctaBtn.style.opacity = "0.6";
+    await saveCoachChoice(auth.currentUser.uid, selectedId);
+    currentCoach = getCoach(selectedId);
+    messagesContainer.innerHTML = "";
+    welcomeShown = false;
+    sendWelcomeMessage();
+  });
+
+  picker.appendChild(ctaBtn);
+  messagesContainer.appendChild(picker);
 }
 
 // ─── WELCOME MESSAGE ───────────────────────────────────────────
 function sendWelcomeMessage() {
   welcomeShown = true;
-  const message = {
-    role: "assistant",
-    content:
-      "Hey Jawand! I'm your personal coach. How's your day going? Ready to crush some goals?",
-  };
+  const coach = currentCoach;
+  const greeting = coach
+    ? `${coach.emoji} Hey! I'm Coach ${coach.name}. Ready to get to work?`
+    : "Hey! I'm your personal coach. Ready to crush some goals?";
 
-  addMessage(message);
-  showQuickReplies([
-    "Great, feeling strong!",
-    "A bit tired today",
-    "Need meal ideas",
-  ]);
+  addMessage({ role: "assistant", content: greeting });
+  showQuickReplies(["Great, feeling strong!", "A bit tired today", "Need meal ideas"]);
 }
 
 // ─── SEND MESSAGE ──────────────────────────────────────────────
@@ -458,19 +566,26 @@ async function getContext() {
   const proteinData = JSON.parse(localStorage.getItem("proteinData") || "{}");
   const today = new Date().toDateString();
   context.todayProtein = proteinData[today] || 0;
-  context.proteinGoal = localStorage.getItem("proteinGoal") || "169";
+  context.proteinGoal = parseInt(localStorage.getItem("proteinGoal") || "0");
+  context.carbsGoal   = parseInt(localStorage.getItem("carbsGoal")   || "0");
+  context.fatGoal     = parseInt(localStorage.getItem("fatGoal")      || "0");
+  context.caloriesGoal = parseInt(localStorage.getItem("caloriesGoal") || "0");
   context.todayWorkout = localStorage.getItem("todayWorkout") || "Rest day";
 
   // From Firebase
   if (auth.currentUser) {
     const profile = await getUserProfile(auth.currentUser.uid);
     if (profile) {
-      context.weight = profile.weight || 0;
-      context.goal = profile.goal || "recomp";
+      context.name           = profile.name || auth.currentUser.displayName || "there";
+      context.weight         = profile.weight || 0;
+      context.height         = profile.height || 0;
+      context.age            = profile.age || 0;
+      context.gender         = profile.gender || "male";
+      context.goal           = profile.goal || "recomp";
+      context.activityLevel  = profile.activity || "moderate";
+      context.weightUnit     = profile.weightUnit || "kg";
     }
-
-    // Current streak - simplified, assume from workout logs
-    context.streak = 0; // Would need to calculate from Firestore
+    context.streak = 0;
   }
 
   return context;
@@ -487,17 +602,34 @@ import("./coach-config.js")
   .catch(() => {});
 
 async function callGeminiAPI(messages, context) {
-  const systemPrompt = `You are Jawand's personal fitness coach inside FitDesi. You know him well: body recomposition goal, 169g protein daily, 300g carbs, 69g fat, 2496 calories. Indian vegetarian and Canadian plant-based food. Workouts 5 days a week.
-Personality: direct, warm, like a knowledgeable friend who knows fitness. Maximum 2 sentences per response. No bullet points. Talk like a real person not a bot.
-When user mentions eating something, estimate macros from your knowledge. When they are tired suggest the fastest high protein option. When they want to swap food or exercise, do it.
-If you take an action include this exact JSON on a new line at the end of your response:
-{"action":"add_meal","name":"...","protein":0,"carbs":0,"fat":0,"calories":0,"meal_type":"breakfast"}
-or
-{"action":"complete_workout"}
-or
-{"action":"swap_exercise","old":"...","new":"..."}`;
+  const goalLabels = { recomp: "body recomposition", muscle: "muscle gain", fatloss: "fat loss" };
+  const activityLabels = { sedentary: "sedentary", light: "lightly active", moderate: "moderately active", active: "very active" };
 
-  const contextText = `Context: Today protein: ${context.todayProtein}g, Goal: ${context.proteinGoal}g, Today's workout: ${context.todayWorkout}, Weight: ${context.weight}kg, Goal: ${context.goal}, Streak: ${context.streak} days`;
+  const personalityLayer = currentCoach
+    ? getCoachPersonality(currentCoach.id)
+    : "Be direct, warm, and helpful. Max 2 sentences per response. No bullet points.";
+
+  const systemPrompt = `${personalityLayer}
+
+USER PROFILE — ${context.name}:
+- Age: ${context.age}, Gender: ${context.gender}
+- Weight: ${context.weight}${context.weightUnit}, Height: ${context.height}cm
+- Activity: ${activityLabels[context.activityLevel] || "moderately active"}
+- Fitness goal: ${goalLabels[context.goal] || context.goal}
+- Daily targets: ${context.caloriesGoal} cal, ${context.proteinGoal}g protein, ${context.carbsGoal}g carbs, ${context.fatGoal}g fat
+- Diet: Indian vegetarian and Canadian plant-based foods. Workouts 5 days a week.
+
+RULES:
+- Always address them by name (${context.name})
+- When they mention eating something, estimate macros from your knowledge
+- Suggest fast high-protein options when tired
+- Swap food or exercises on request
+- If you take an action include this exact JSON on a new line at the end:
+{"action":"add_meal","name":"...","protein":0,"carbs":0,"fat":0,"calories":0,"meal_type":"breakfast"}
+or {"action":"complete_workout"}
+or {"action":"swap_exercise","old":"...","new":"..."}`;
+
+  const contextText = `Today so far: ${context.todayProtein}g protein of ${context.proteinGoal}g goal. Today's workout: ${context.todayWorkout}. Streak: ${context.streak} days.`;
 
   // Keep last 10 messages for history
   if (messages.length > 10) {

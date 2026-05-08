@@ -529,6 +529,44 @@ async function swapExercise(uid, date, oldName, newName) {
   }
 }
 
+// ─── COACH FUNCTIONS ─────────────────────────────────────────
+async function saveCoachChoice(uid, coachId) {
+  try {
+    const profileRef = doc(db, "users", uid, "data", "profile");
+    await setDoc(profileRef, { chosenCoach: coachId }, { merge: true });
+  } catch (error) {
+    console.error("Error saving coach choice:", error);
+    throw error;
+  }
+}
+
+async function assignCoach(uid, enabled) {
+  try {
+    const profileRef = doc(db, "users", uid, "data", "profile");
+    await setDoc(profileRef, { coachEnabled: enabled }, { merge: true });
+  } catch (error) {
+    console.error("Error assigning coach:", error);
+    throw error;
+  }
+}
+
+async function getAllUsers() {
+  try {
+    const usersSnap = await getDocs(collection(db, "users"));
+    const users = [];
+    for (const userDoc of usersSnap.docs) {
+      const profileSnap = await getDoc(doc(db, "users", userDoc.id, "data", "profile"));
+      if (profileSnap.exists()) {
+        users.push({ uid: userDoc.id, ...profileSnap.data() });
+      }
+    }
+    return users;
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    return [];
+  }
+}
+
 // ─── EXPORT ──────────────────────────────────────────────────
 export {
   auth,
@@ -566,4 +604,7 @@ export {
   addMealToLog,
   completeWorkout,
   swapExercise,
+  saveCoachChoice,
+  assignCoach,
+  getAllUsers,
 };
