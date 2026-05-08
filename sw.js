@@ -1,7 +1,7 @@
 // FitDesi Service Worker — Network-first, auto-update on every deploy
 // Bump this version whenever you want to force a full cache wipe.
 // With network-first below, normal file changes don't need a version bump.
-const CACHE_NAME = "fitdesi-v29";
+const CACHE_NAME = "fitdesi-v30";
 
 const STATIC_ASSETS = [
   "./",
@@ -11,6 +11,7 @@ const STATIC_ASSETS = [
   "./firebase.js",
   "./coach.js",
   "./coaches.js",
+  "./onboarding.js",
   "./coach-config.example.js",
   "./db.js",
   "./manifest.json",

@@ -677,7 +677,17 @@
         }
       }
 
+      async function loadOnboarding() {
+        try {
+          const m = await import("./onboarding.js");
+          m.initOnboarding();
+        } catch (error) {
+          console.warn("FitDesi onboarding module not loaded:", error);
+        }
+      }
+
       loadCoach();
+      loadOnboarding();
 
       const PROTEIN_CIRC = 339.3;
       const MINI_CIRC = 87.96;
