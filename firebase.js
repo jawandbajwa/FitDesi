@@ -208,32 +208,26 @@ async function saveRecipe(recipe, cuisine = "indian") {
 
 async function getRecipes(cuisine = "indian") {
   try {
-    // Try Firebase first if online
-    if (navigator.onLine) {
-      const col =
-        cuisine === "canadian" ? "recipes_canadian" : "recipes_indian";
-      const snap = await getDocs(collection(db, "shared", col, "items"));
-      // Tag each recipe with its cuisine so the cache stays separated
-      const recipes = snap.docs.map((d) => ({
-        id: d.id,
-        ...d.data(),
-        _cuisine: cuisine,
-      }));
-      // Cache for offline (keyed by cuisine)
-      await cacheRecipes(recipes, cuisine);
-      return recipes;
-    } else {
-      // Offline: use cached data filtered to the requested cuisine
-      return await getCachedRecipes(cuisine);
-    }
+    // Always try Firestore first — navigator.onLine is unreliable on mobile
+    // networks and cellular connections, so we let the fetch itself fail
+    // and fall back to cache only when it genuinely can't reach Firebase.
+    const col = cuisine === "canadian" ? "recipes_canadian" : "recipes_indian";
+    const snap = await getDocs(collection(db, "shared", col, "items"));
+    const recipes = snap.docs.map((d) => ({
+      id: d.id,
+      ...d.data(),
+      _cuisine: cuisine,
+    }));
+    // Update the offline cache with fresh data
+    await cacheRecipes(recipes, cuisine);
+    return recipes;
   } catch (error) {
-    console.error("Error getting recipes:", error);
-    // Fallback to cache
+    console.error("Error getting recipes, falling back to cache:", error);
     try {
       return await getCachedRecipes(cuisine);
     } catch (cacheError) {
       console.error("Cache error:", cacheError);
-      throw error;
+      return [];
     }
   }
 }
