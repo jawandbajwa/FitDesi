@@ -1,12 +1,28 @@
 // ─── ONBOARDING.JS ─────────────────────────────────────────────
-// First-time user intro slides — shown once after first sign-in.
-// Triggered from index.html inside onAuthStateChanged.
+// First-time user intro slides — shown once, ever.
+// Flag stored in Firestore so it persists across sign-outs, devices,
+// and browser data clears. localStorage used only as a fast-path cache.
 
-const DONE_KEY = "fitdesi_onboarding_done";
+import { onAuthStateChanged, auth, getUserProfile, markOnboardingDone } from "./firebase.js";
+
+const CACHE_KEY = "fitdesi_onboarding_done";
 
 export function initOnboarding() {
-  if (localStorage.getItem(DONE_KEY)) return;
-  buildOnboarding();
+  // Fast local cache — skip Firestore read if already confirmed on this device
+  if (localStorage.getItem(CACHE_KEY)) return;
+
+  // Wait for auth then check Firestore profile
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) return;
+
+    const profile = await getUserProfile(user.uid);
+    if (profile?.onboardingDone) {
+      localStorage.setItem(CACHE_KEY, "true"); // cache for future loads
+      return;
+    }
+
+    buildOnboarding(user.uid);
+  });
 }
 
 // ─── SLIDE DEFINITIONS ─────────────────────────────────────────
@@ -43,7 +59,7 @@ const SLIDES = [
 ];
 
 // ─── BUILD ─────────────────────────────────────────────────────
-function buildOnboarding() {
+function buildOnboarding(uid) {
   let current = 0;
 
   // Overlay
@@ -204,7 +220,8 @@ function buildOnboarding() {
   }
 
   function dismiss() {
-    localStorage.setItem(DONE_KEY, "true");
+    localStorage.setItem(CACHE_KEY, "true");
+    markOnboardingDone(uid).catch(() => {}); // persist to Firestore
     overlay.style.opacity = "0";
     card.style.transform = "translateY(20px)";
     setTimeout(() => overlay.remove(), 350);

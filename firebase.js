@@ -529,6 +529,16 @@ async function swapExercise(uid, date, oldName, newName) {
   }
 }
 
+// ─── ONBOARDING ──────────────────────────────────────────────
+async function markOnboardingDone(uid) {
+  try {
+    const profileRef = doc(db, "users", uid, "data", "profile");
+    await setDoc(profileRef, { onboardingDone: true }, { merge: true });
+  } catch (error) {
+    console.error("Error marking onboarding done:", error);
+  }
+}
+
 // ─── COACH FUNCTIONS ─────────────────────────────────────────
 async function saveCoachChoice(uid, coachId) {
   try {
@@ -607,4 +617,5 @@ export {
   saveCoachChoice,
   assignCoach,
   getAllUsers,
+  markOnboardingDone,
 };
