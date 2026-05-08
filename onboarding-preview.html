@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FitDesi Onboarding Preview</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  /* Simulate phone screen */
+  .phone {
+    width: 390px;
+    height: 844px;
+    background: #0d1f10;
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+    border: 2px solid #2a2a2a;
+  }
+
+  /* App behind the popup */
+  .app-bg {
+    width: 100%;
+    height: 100%;
+    background: #0d1f10;
+    display: flex;
+    flex-direction: column;
+    padding: 24px 20px;
+    gap: 12px;
+    filter: blur(1px);
+    opacity: 0.4;
+  }
+  .app-bg .header { color: #7ed99a; font-size: 18px; font-weight: 700; }
+  .app-bg .ring {
+    width: 80px; height: 80px; border-radius: 50%;
+    border: 6px solid #7ed99a; display: flex; align-items: center;
+    justify-content: center; color: #7ed99a; font-size: 11px; font-weight: 600;
+  }
+  .app-bg .card {
+    background: #1a3020; border-radius: 16px; height: 60px;
+    border: 1px solid rgba(126,217,154,0.15);
+  }
+
+  /* Overlay */
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 44px;
+  }
+
+  /* Popup card */
+  .popup {
+    width: 340px;
+    background: #122518;
+    border-radius: 28px;
+    border: 1px solid rgba(126,217,154,0.2);
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    position: relative;
+  }
+
+  /* Slide content area */
+  .slide {
+    padding: 36px 28px 24px;
+    min-height: 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .slide-icon {
+    width: 100px; height: 100px;
+    border-radius: 28px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 48px;
+    margin-bottom: 28px;
+    position: relative;
+  }
+
+  .slide-tag {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+  }
+
+  .slide-title {
+    font-size: 26px;
+    font-weight: 800;
+    color: #fff;
+    text-align: center;
+    line-height: 1.2;
+    margin-bottom: 14px;
+  }
+
+  .slide-body {
+    font-size: 14px;
+    color: rgba(255,255,255,0.55);
+    text-align: center;
+    line-height: 1.65;
+    max-width: 260px;
+  }
+
+  .slide-visual {
+    margin-top: 24px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  /* Bottom bar */
+  .bottom-bar {
+    padding: 16px 24px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid rgba(126,217,154,0.1);
+    position: relative;
+  }
+
+  .skip-btn {
+    font-size: 13px;
+    color: rgba(255,255,255,0.35);
+    background: none; border: none; cursor: pointer;
+    font-weight: 500;
+  }
+
+  .dots {
+    position: absolute;
+    left: 50%; transform: translateX(-50%);
+    display: flex; gap: 7px; align-items: center;
+  }
+  .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: rgba(126,217,154,0.25);
+    transition: all 0.3s;
+  }
+  .dot.active {
+    width: 22px; border-radius: 4px;
+    background: #7ed99a;
+  }
+
+  .next-btn {
+    background: #7ed99a; color: #0d1f10;
+    border: none; border-radius: 50px;
+    padding: 10px 22px;
+    font-size: 14px; font-weight: 700;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  /* ── Slide-specific visuals ── */
+
+  /* Slide 1 — macro 2×2 grid */
+  .macro-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    width: 100%;
+  }
+  .macro-card {
+    background: rgba(126,217,154,0.07);
+    border: 1px solid rgba(126,217,154,0.2);
+    border-radius: 14px;
+    text-align: center;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    height: 60px;
+  }
+  .macro-card .micon { font-size: 20px; }
+  .macro-card .val { color: #7ed99a; font-size: 15px; font-weight: 800; line-height: 1; }
+  .macro-card .lbl { color: rgba(255,255,255,0.4); font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .phone-sm .macro-card { border-radius: 10px; height: 40px; gap: 2px; }
+  .phone-sm .macro-card .micon { font-size: 13px; }
+  .phone-sm .macro-card .val { font-size: 11px; }
+  .phone-sm .macro-card .lbl { font-size: 7px; }
+
+  /* Slide 2 — recipe cards */
+  .recipe-row { display: flex; gap: 10px; width: 100%; }
+  .recipe-card {
+    flex: 1;
+    background: rgba(126,217,154,0.06);
+    border: 1px solid rgba(126,217,154,0.15);
+    border-radius: 14px; padding: 12px 10px;
+    text-align: center;
+  }
+  .recipe-card .ricon { font-size: 26px; margin-bottom: 6px; }
+  .recipe-card .rname { color: #fff; font-size: 11px; font-weight: 600; }
+  .recipe-card .rmacro { color: rgba(126,217,154,0.7); font-size: 10px; margin-top: 3px; }
+
+  /* Slide 3 — workout split */
+  .split-row { display: flex; gap: 8px; width: 100%; }
+  .split-day {
+    flex: 1;
+    background: rgba(126,217,154,0.06);
+    border: 1px solid rgba(126,217,154,0.15);
+    border-radius: 12px;
+    padding: 10px 6px;
+    text-align: center;
+  }
+  .split-day.today {
+    background: rgba(126,217,154,0.15);
+    border-color: #7ed99a;
+  }
+  .split-day .dname { color: rgba(255,255,255,0.5); font-size: 9px; font-weight: 600; text-transform: uppercase; }
+  .split-day.today .dname { color: #7ed99a; }
+  .split-day .dicon { font-size: 18px; margin: 4px 0; }
+  .split-day .dlabel { color: rgba(255,255,255,0.35); font-size: 8px; }
+  .split-day.today .dlabel { color: #7ed99a; font-weight: 600; }
+
+  /* Slide 4 — coach avatars */
+  .coach-row { display: flex; gap: 10px; align-items: flex-end; }
+  .coach-av {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+  }
+  .coach-circle {
+    width: 52px; height: 52px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    border: 2px solid rgba(126,217,154,0.2);
+  }
+  .coach-circle.big {
+    width: 68px; height: 68px; font-size: 30px;
+    border-color: #7ed99a;
+    box-shadow: 0 0 20px rgba(126,217,154,0.3);
+  }
+  .coach-name { font-size: 10px; color: rgba(255,255,255,0.45); font-weight: 600; }
+  .coach-name.big { color: #7ed99a; }
+
+  /* Nav arrows between phone previews */
+  .slides-nav {
+    display: flex; gap: 20px; margin-top: 24px; justify-content: center;
+  }
+  .nav-pill {
+    background: #1e3a24; border: 1px solid rgba(126,217,154,0.3);
+    color: #7ed99a; padding: 8px 20px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; cursor: pointer; border: none;
+    font-family: inherit;
+  }
+  .nav-pill.active { background: #7ed99a; color: #0d1f10; }
+
+  /* All 4 phones side by side */
+  .all-slides {
+    display: flex; gap: 32px; align-items: flex-start;
+  }
+  .slide-wrapper { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .slide-label {
+    color: rgba(255,255,255,0.4); font-size: 12px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+
+  .phone-sm {
+    width: 220px; height: 476px;
+    background: #0d1f10;
+    border-radius: 30px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    border: 1.5px solid #2a2a2a;
+    transform: scale(1);
+    transition: transform 0.2s;
+  }
+  .phone-sm:hover { transform: scale(1.02); }
+
+  .phone-sm .overlay { border-radius: 30px; }
+
+  .phone-sm .popup {
+    width: 190px;
+    height: 360px;
+    display: flex;
+    flex-direction: column;
+  }
+  .phone-sm .slide {
+    padding: 22px 18px 14px;
+    flex: 1;
+    min-height: 0;
+  }
+  .phone-sm .slide-icon {
+    width: 64px; height: 64px; border-radius: 18px;
+    font-size: 30px; margin-bottom: 14px;
+  }
+  .phone-sm .slide-tag { font-size: 9px; padding: 3px 9px; margin-bottom: 10px; }
+  .phone-sm .slide-title { font-size: 16px; margin-bottom: 8px; }
+  .phone-sm .slide-body { font-size: 11px; max-width: 160px; }
+  .phone-sm .slide-visual { margin-top: 14px; gap: 6px; }
+  .phone-sm .bottom-bar { padding: 10px 14px 14px; }
+  .phone-sm .skip-btn { font-size: 11px; }
+  .phone-sm .next-btn { padding: 7px 14px; font-size: 11px; }
+  .phone-sm .dot { width: 5px; height: 5px; }
+  .phone-sm .dot.active { width: 14px; }
+  .phone-sm .dots { gap: 5px; }
+
+  /* Slide-specific small */
+  .phone-sm .recipe-card { border-radius: 10px; padding: 8px 6px; }
+  .phone-sm .recipe-card .ricon { font-size: 18px; margin-bottom: 4px; }
+  .phone-sm .recipe-card .rname { font-size: 9px; }
+  .phone-sm .recipe-card .rmacro { font-size: 8px; }
+  .phone-sm .split-day { border-radius: 9px; padding: 7px 3px; }
+  .phone-sm .split-day .dname { font-size: 7px; }
+  .phone-sm .split-day .dicon { font-size: 13px; margin: 2px 0; }
+  .phone-sm .split-day .dlabel { font-size: 6px; }
+  .phone-sm .coach-circle { width: 34px; height: 34px; font-size: 16px; }
+  .phone-sm .coach-circle.big { width: 44px; height: 44px; font-size: 20px; }
+  .phone-sm .coach-name { font-size: 8px; }
+  .phone-sm .coach-row { gap: 6px; }
+</style>
+</head>
+<body>
+
+<div style="display:flex;flex-direction:column;align-items:center;gap:28px;padding:40px 20px;">
+  <div style="color:#7ed99a;font-size:22px;font-weight:800;letter-spacing:0.5px;">FitDesi — Onboarding Slides Preview</div>
+  <div style="color:rgba(255,255,255,0.4);font-size:13px;">Hover over a slide to zoom</div>
+
+  <div class="all-slides">
+
+    <!-- ── SLIDE 1: Welcome ── -->
+    <div class="slide-wrapper">
+      <div class="slide-label">Slide 1</div>
+      <div class="phone-sm">
+        <div class="app-bg">
+          <div class="header">FITDESI</div>
+          <div class="ring">0g<br>protein</div>
+          <div class="card"></div><div class="card"></div>
+        </div>
+        <div class="overlay">
+          <div class="popup">
+            <div class="slide">
+              <div class="slide-tag" style="background:rgba(126,217,154,0.12);color:#7ed99a;">Welcome</div>
+              <div class="slide-title">Welcome to FitDesi</div>
+              <div class="slide-body">Track your macros, meals, and workouts — all in one place.</div>
+              <div class="slide-visual">
+                <div class="macro-grid">
+                  <div class="macro-card"><div class="micon">🥩</div><div class="val">165g</div><div class="lbl">Protein</div></div>
+                  <div class="macro-card"><div class="micon">🍚</div><div class="val">285g</div><div class="lbl">Carbs</div></div>
+                  <div class="macro-card"><div class="micon">🥑</div><div class="val">66g</div><div class="lbl">Fat</div></div>
+                  <div class="macro-card"><div class="micon">🔥</div><div class="val">2393</div><div class="lbl">Calories</div></div>
+                </div>
+              </div>
+            </div>
+            <div class="bottom-bar">
+              <button class="skip-btn">Skip</button>
+              <div class="dots">
+                <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+              </div>
+              <button class="next-btn">Next →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SLIDE 2: Nutrition ── -->
+    <div class="slide-wrapper">
+      <div class="slide-label">Slide 2</div>
+      <div class="phone-sm">
+        <div class="app-bg">
+          <div class="header">FITDESI</div>
+          <div class="card"></div><div class="card"></div><div class="card"></div>
+        </div>
+        <div class="overlay">
+          <div class="popup">
+            <div class="slide">
+              <div class="slide-icon" style="background:rgba(52,211,153,0.12);">🥗</div>
+              <div class="slide-tag" style="background:rgba(52,211,153,0.12);color:#34d399;">Nutrition</div>
+              <div class="slide-title">Track Every Meal</div>
+              <div class="slide-body">Log Indian and Canadian dishes. Watch your protein, carbs and calories update in real time.</div>
+              <div class="slide-visual">
+                <div class="recipe-row">
+                  <div class="recipe-card">
+                    <div class="ricon">🍛</div>
+                    <div class="rname">Dal Tadka</div>
+                    <div class="rmacro">18g protein</div>
+                  </div>
+                  <div class="recipe-card">
+                    <div class="ricon">🫙</div>
+                    <div class="rname">Greek Yogurt</div>
+                    <div class="rmacro">17g protein</div>
+                  </div>
+                  <div class="recipe-card">
+                    <div class="ricon">🥜</div>
+                    <div class="rname">Peanut Butter</div>
+                    <div class="rmacro">8g protein</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="bottom-bar">
+              <button class="skip-btn">Skip</button>
+              <div class="dots">
+                <div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+              </div>
+              <button class="next-btn">Next →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SLIDE 3: Workouts ── -->
+    <div class="slide-wrapper">
+      <div class="slide-label">Slide 3</div>
+      <div class="phone-sm">
+        <div class="app-bg">
+          <div class="header">FITDESI</div>
+          <div class="card"></div><div class="card"></div><div class="card"></div>
+        </div>
+        <div class="overlay">
+          <div class="popup">
+            <div class="slide">
+              <div class="slide-icon" style="background:rgba(251,146,60,0.12);">💪</div>
+              <div class="slide-tag" style="background:rgba(251,146,60,0.12);color:#fb923c;">Workouts</div>
+              <div class="slide-title">Never Skip a Day</div>
+              <div class="slide-body">Follow your personalized rolling split. Log every set and build an unbreakable routine.</div>
+              <div class="slide-visual">
+                <div class="split-row">
+                  <div class="split-day"><div class="dname">Mon</div><div class="dicon">🏋️</div><div class="dlabel">Push</div></div>
+                  <div class="split-day today"><div class="dname">Tue</div><div class="dicon">🦵</div><div class="dlabel">Legs</div></div>
+                  <div class="split-day"><div class="dname">Wed</div><div class="dicon">🔙</div><div class="dlabel">Pull</div></div>
+                  <div class="split-day"><div class="dname">Thu</div><div class="dicon">😴</div><div class="dlabel">Rest</div></div>
+                  <div class="split-day"><div class="dname">Fri</div><div class="dicon">🏋️</div><div class="dlabel">Push</div></div>
+                </div>
+              </div>
+            </div>
+            <div class="bottom-bar">
+              <button class="skip-btn">Skip</button>
+              <div class="dots">
+                <div class="dot"></div><div class="dot"></div><div class="dot active"></div><div class="dot"></div>
+              </div>
+              <button class="next-btn">Next →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SLIDE 4: AI Coach ── -->
+    <div class="slide-wrapper">
+      <div class="slide-label">Slide 4</div>
+      <div class="phone-sm">
+        <div class="app-bg">
+          <div class="header">FITDESI</div>
+          <div class="card"></div><div class="card"></div><div class="card"></div>
+        </div>
+        <div class="overlay">
+          <div class="popup">
+            <div class="slide">
+              <div class="slide-icon" style="background:rgba(167,139,250,0.12);">✨</div>
+              <div class="slide-tag" style="background:rgba(167,139,250,0.12);color:#a78bfa;">AI Coach</div>
+              <div class="slide-title">Meet Your Coach</div>
+              <div class="slide-body">5 personality-driven AI coaches always ready to guide, push, and motivate you.</div>
+              <div class="slide-visual">
+                <div class="coach-row">
+                  <div class="coach-av">
+                    <div class="coach-circle" style="background:rgba(239,68,68,0.12);">🔥</div>
+                    <div class="coach-name">Vegeta</div>
+                  </div>
+                  <div class="coach-av">
+                    <div class="coach-circle" style="background:rgba(126,217,154,0.12);">🌿</div>
+                    <div class="coach-name">Hinata</div>
+                  </div>
+                  <div class="coach-av" style="margin-bottom:0;">
+                    <div class="coach-circle big" style="background:rgba(99,179,237,0.15);">✨</div>
+                    <div class="coach-name big">Gojo</div>
+                  </div>
+                  <div class="coach-av">
+                    <div class="coach-circle" style="background:rgba(251,191,36,0.12);">⚡</div>
+                    <div class="coach-name">Levi</div>
+                  </div>
+                  <div class="coach-av">
+                    <div class="coach-circle" style="background:rgba(167,139,250,0.12);">💪</div>
+                    <div class="coach-name">All Might</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="bottom-bar">
+              <button class="skip-btn">Skip</button>
+              <div class="dots">
+                <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot active"></div>
+              </div>
+              <button class="next-btn" style="background:#a78bfa;">Let's Go 🚀</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end all-slides -->
+</div>
+
+</body>
+</html>

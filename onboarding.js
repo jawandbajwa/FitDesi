@@ -266,14 +266,14 @@ function buildMacroGrid() {
     card.style.cssText = `
       background: rgba(126,217,154,0.07);
       border: 1px solid rgba(126,217,154,0.2);
-      border-radius: 16px; aspect-ratio: 1/1;
+      border-radius: 14px; height: 60px;
       display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 6px;
+      align-items: center; justify-content: center; gap: 4px;
     `;
     card.innerHTML = `
-      <div style="font-size:26px">${icon}</div>
-      <div style="color:#7ed99a;font-size:20px;font-weight:800;line-height:1">${val}</div>
-      <div style="color:rgba(255,255,255,0.4);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px">${lbl}</div>
+      <div style="font-size:20px">${icon}</div>
+      <div style="color:#7ed99a;font-size:15px;font-weight:800;line-height:1">${val}</div>
+      <div style="color:rgba(255,255,255,0.4);font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px">${lbl}</div>
     `;
     grid.appendChild(card);
   });
