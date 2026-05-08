@@ -95,6 +95,7 @@ function createChatSheet() {
   chatSheet.id = "chatSheet";
   chatSheet.innerHTML = `
     <div class="chat-header">
+      <button class="coach-switch-btn">🔄 Switch</button>
       <div class="chat-handle"></div>
       <button class="chat-close">✕</button>
     </div>
@@ -168,6 +169,38 @@ function createChatSheet() {
   closeBtn.addEventListener("click", () => {
     chatSheet.style.transform = "translateY(100%)";
   });
+
+  const switchBtn = chatSheet.querySelector(".coach-switch-btn");
+  switchBtn.style.cssText = `
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 5px 10px;
+    border-radius: 20px;
+    background: rgba(126,217,154,0.1);
+    border: 1px solid rgba(126,217,154,0.3);
+    color: #7ed99a;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  `;
+  switchBtn.addEventListener("click", () => {
+    conversationHistory = [];
+    welcomeShown = false;
+    showCoachPicker();
+  });
+
+  // Keep switch button label in sync with chosen coach
+  function refreshSwitchBtn() {
+    switchBtn.textContent = currentCoach
+      ? `${currentCoach.emoji} ${currentCoach.name}`
+      : "🔄 Pick Coach";
+  }
+  refreshSwitchBtn();
+  // Expose so showCoachPicker can call it after selection
+  chatSheet._refreshSwitchBtn = refreshSwitchBtn;
 
   messagesContainer = chatSheet.querySelector(".messages-container");
   messagesContainer.style.cssText = `
@@ -358,6 +391,7 @@ function showCoachPicker() {
     ctaBtn.style.opacity = "0.6";
     await saveCoachChoice(auth.currentUser.uid, selectedId);
     currentCoach = getCoach(selectedId);
+    if (chatSheet._refreshSwitchBtn) chatSheet._refreshSwitchBtn();
     messagesContainer.innerHTML = "";
     welcomeShown = false;
     sendWelcomeMessage();
