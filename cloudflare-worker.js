@@ -1,9 +1,14 @@
 // FitDesi — Gemini Proxy Worker
-// Deploy this to Cloudflare Workers, then add GEMINI_API_KEY as a secret:
-//   wrangler secret put GEMINI_API_KEY
+// Round-robin across all available keys + automatic fallback if one hits rate limit.
 //
-// The worker only accepts requests from the live site and localhost,
-// so the key is never exposed to the browser.
+// Add keys as secrets (existing key becomes key 1):
+//   wrangler secret put GEMINI_API_KEY_1
+//   wrangler secret put GEMINI_API_KEY_2
+//   wrangler secret put GEMINI_API_KEY_3
+//   wrangler secret put GEMINI_API_KEY_4
+//   wrangler secret put GEMINI_API_KEY_5
+//
+// You can add fewer than 5 — the worker uses however many are configured.
 
 const ALLOWED_ORIGINS = [
   "https://jawandbajwa.github.io",
@@ -24,12 +29,10 @@ export default {
       "Access-Control-Allow-Headers": "Content-Type",
     };
 
-    // Handle preflight
     if (request.method === "OPTIONS") {
       return new Response(null, { headers: corsHeaders });
     }
 
-    // Block non-allowed origins
     if (!allowed) {
       return new Response("Forbidden", { status: 403 });
     }
@@ -45,20 +48,54 @@ export default {
       return new Response("Bad Request", { status: 400 });
     }
 
-    const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${env.GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      }
+    // Build list of available keys from secrets
+    const keys = [
+      env.GEMINI_API_KEY_1,
+      env.GEMINI_API_KEY_2,
+      env.GEMINI_API_KEY_3,
+      env.GEMINI_API_KEY_4,
+      env.GEMINI_API_KEY_5,
+    ].filter(Boolean);
+
+    if (!keys.length) {
+      return new Response(JSON.stringify({ error: { message: "No API keys configured" } }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Round-robin: pick starting key based on current second so load
+    // spreads evenly over time across all keys.
+    const startIndex = Math.floor(Date.now() / 1000) % keys.length;
+
+    // Try each key starting from startIndex, wrapping around.
+    // On 429 (rate limit) move to the next key automatically.
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[(startIndex + i) % keys.length];
+
+      const geminiRes = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${key}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        }
+      );
+
+      // On rate limit, try the next key
+      if (geminiRes.status === 429) continue;
+
+      const data = await geminiRes.json();
+      return new Response(JSON.stringify(data), {
+        status: geminiRes.status,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // All keys rate-limited
+    return new Response(
+      JSON.stringify({ error: { message: "All API keys are currently rate-limited. Try again in a minute." } }),
+      { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
-
-    const data = await geminiRes.json();
-
-    return new Response(JSON.stringify(data), {
-      status: geminiRes.status,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
   },
 };
