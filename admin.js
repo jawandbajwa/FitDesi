@@ -10,6 +10,7 @@ import {
   deleteRecipe,
   getAllUsers,
   assignCoach,
+  saveCoachChoice,
 } from "./firebase.js";
 import { COACHES } from "./coaches.js";
 
@@ -182,15 +183,79 @@ function renderUsers() {
       toggleBtn.textContent = "Saving…";
       const newState = !enabled;
       await assignCoach(user.uid, newState);
-      // Update local state and re-render
       user.coachEnabled = newState;
       renderUsers();
     });
 
-    row.appendChild(avatar);
-    row.appendChild(info);
+    // Edit button — lets admin change the user's chosen coach
+    const editBtn = document.createElement("button");
+    editBtn.textContent = "✏️";
+    editBtn.title = "Change coach personality";
+    editBtn.style.cssText = `
+      padding: 8px 10px; border-radius: 20px; font-size: 13px;
+      cursor: pointer; border: 1.5px solid rgba(255,255,255,0.15);
+      flex-shrink: 0; margin-left: 6px;
+      background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.5);
+    `;
+
+    // Inline coach picker that expands below the row
+    const picker = document.createElement("div");
+    picker.style.cssText = `
+      display: none; grid-template-columns: 1fr 1fr;
+      gap: 8px; padding: 12px 0 4px; width: 100%;
+    `;
+
+    Object.values(COACHES).forEach((c) => {
+      const opt = document.createElement("button");
+      const isActive = user.chosenCoach === c.id;
+      opt.style.cssText = `
+        display: flex; align-items: center; gap: 8px;
+        padding: 10px 12px; border-radius: 12px; cursor: pointer;
+        border: 1.5px solid ${isActive ? "#7ed99a" : "rgba(255,255,255,0.1)"};
+        background: ${isActive ? "rgba(126,217,154,0.1)" : "rgba(255,255,255,0.03)"};
+        color: #fff; font-size: 13px; text-align: left;
+      `;
+      opt.innerHTML = `<span style="font-size:18px">${c.emoji}</span><div>
+        <div style="font-weight:600;font-size:13px">${c.name}</div>
+        <div style="font-size:10px;color:${c.tagColor.text};text-transform:uppercase;letter-spacing:0.5px">${c.tag}</div>
+      </div>`;
+
+      opt.addEventListener("click", async () => {
+        opt.textContent = "Saving…";
+        await saveCoachChoice(user.uid, c.id);
+        user.chosenCoach = c.id;
+        renderUsers();
+      });
+
+      picker.appendChild(opt);
+    });
+
+    editBtn.addEventListener("click", () => {
+      const open = picker.style.display === "grid";
+      picker.style.display = open ? "none" : "grid";
+      editBtn.style.borderColor = open ? "rgba(255,255,255,0.15)" : "#7ed99a";
+      editBtn.style.color = open ? "rgba(255,255,255,0.5)" : "#7ed99a";
+    });
+
+    // Wrap row + picker in a container
+    const container = document.createElement("div");
+    container.style.cssText = `margin-bottom: 10px;`;
+
+    row.style.marginBottom = "0";
+    const pickerWrap = document.createElement("div");
+    pickerWrap.style.cssText = `
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-top: none; border-radius: 0 0 14px 14px;
+      padding: 0 16px 0;
+    `;
+    pickerWrap.appendChild(picker);
+
     row.appendChild(toggleBtn);
-    list.appendChild(row);
+    row.appendChild(editBtn);
+    container.appendChild(row);
+    container.appendChild(pickerWrap);
+    list.appendChild(container);
   });
 }
 
