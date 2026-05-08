@@ -435,18 +435,20 @@ async function sendMessage(text = null) {
   try {
     const response = await callGeminiAPI([...conversationHistory], context);
 
-    // Parse response
+    // Parse response — only strip last line if it explicitly looks like an action JSON
     const lines = response.split("\n");
-    const lastLine = lines[lines.length - 1];
+    const lastLine = lines[lines.length - 1].trim();
 
     let action = null;
     let messageContent = response;
 
-    try {
-      action = JSON.parse(lastLine);
-      messageContent = lines.slice(0, -1).join("\n");
-    } catch (e) {
-      // No action JSON
+    if (lastLine.startsWith('{"action"')) {
+      try {
+        action = JSON.parse(lastLine);
+        messageContent = lines.slice(0, -1).join("\n").trim();
+      } catch (e) {
+        // Malformed action JSON — use full response
+      }
     }
 
     // Add assistant message
@@ -481,7 +483,12 @@ async function sendMessage(text = null) {
 function addMessage(message) {
   const messageEl = document.createElement("div");
   messageEl.className = `message ${message.role}`;
-  messageEl.innerHTML = `<div class="message-content">${message.content}</div>`;
+
+  const contentDiv = document.createElement("div");
+  contentDiv.className = "message-content";
+  contentDiv.textContent = message.content; // textContent prevents HTML injection / rendering bugs
+  contentDiv.style.cssText = "white-space: pre-wrap; word-wrap: break-word;";
+  messageEl.appendChild(contentDiv);
 
   messageEl.style.cssText = `
     align-self: ${message.role === "user" ? "flex-end" : "flex-start"};
@@ -491,6 +498,7 @@ function addMessage(message) {
     background: ${message.role === "user" ? "#7ed99a" : "#1e3a24"};
     color: ${message.role === "user" ? "#1e3a24" : "#7ed99a"};
     border: 1px solid ${message.role === "user" ? "#7ed99a" : "rgba(126,217,154,0.3)"};
+    overflow-wrap: break-word;
   `;
 
   messagesContainer.appendChild(messageEl);
