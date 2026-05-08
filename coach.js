@@ -1,5 +1,6 @@
 // ─── COACH.JS ──────────────────────────────────────────────────
 // AI Personal Coach for FitDesi
+// Styles live in coach.css — this file handles logic only.
 
 import {
   onAuthStateChanged,
@@ -14,7 +15,7 @@ import {
 import { COACHES, getCoach, getCoachPersonality } from "./coaches.js";
 
 // ─── STATE ──────────────────────────────────────────────────────
-let currentCoach = null; // the chosen coach object
+let currentCoach = null;
 let conversationHistory = [];
 let welcomeShown = false;
 let isListening = false;
@@ -37,11 +38,9 @@ export function initCoach() {
 
     const profile = await getUserProfile(user.uid);
 
-    // Show coach if admin OR if admin has enabled coach for this user
     const hasAccess = isAdmin(user) || profile?.isAdmin || profile?.coachEnabled;
     if (!profile || !hasAccess) return;
 
-    // If user already chose a coach, load it — otherwise picker will show on first open
     if (profile.chosenCoach) {
       currentCoach = getCoach(profile.chosenCoach);
     }
@@ -64,25 +63,6 @@ function createFloatingButton() {
       <path d="M12 15c-1.5 0-2.5 1-2.5 2.5" stroke="#1e3a24" stroke-width="2" stroke-linecap="round"/>
     </svg>
   `;
-  coachButton.style.cssText = `
-    position: fixed;
-    bottom: 160px;
-    right: 16px;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: #1e3a24;
-    border: 2px solid #7ed99a;
-    color: #7ed99a;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 1000;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    transition: all 0.3s ease;
-  `;
-
   coachButton.addEventListener("click", toggleChat);
   document.body.appendChild(coachButton);
 }
@@ -93,7 +73,7 @@ function createChatSheet() {
   chatSheet.id = "chatSheet";
   chatSheet.innerHTML = `
     <div class="chat-header">
-      <button class="coach-switch-btn">🔄 Switch</button>
+      <button class="coach-switch-btn">🔄 Pick Coach</button>
       <div class="chat-handle"></div>
       <button class="chat-close">✕</button>
     </div>
@@ -114,172 +94,40 @@ function createChatSheet() {
       </button>
     </div>
   `;
-  chatSheet.style.cssText = `
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 60vh;
-    background: #0d150f;
-    border-radius: 20px 20px 0 0;
-    z-index: 1001;
-    display: none;
-    transform: translateY(100%);
-    transition: transform 0.3s ease;
-    flex-direction: column;
-    box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
-  `;
-
-  // Style inner elements
-  const header = chatSheet.querySelector(".chat-header");
-  header.style.cssText = `
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 12px 20px 4px;
-    flex-shrink: 0;
-  `;
-
-  const handle = chatSheet.querySelector(".chat-handle");
-  handle.style.cssText = `
-    width: 40px;
-    height: 4px;
-    background: #7ed99a;
-    border-radius: 2px;
-    cursor: grab;
-  `;
 
   const closeBtn = chatSheet.querySelector(".chat-close");
-  closeBtn.style.cssText = `
-    position: absolute;
-    right: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: rgba(126,217,154,0.1);
-    border: 1px solid rgba(126,217,154,0.3);
-    color: #7ed99a;
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    line-height: 1;
-  `;
   closeBtn.addEventListener("click", () => {
     chatSheet.style.transform = "translateY(100%)";
     setTimeout(() => { chatSheet.style.display = "none"; }, 310);
   });
 
   const switchBtn = chatSheet.querySelector(".coach-switch-btn");
-  switchBtn.style.cssText = `
-    position: absolute;
-    left: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    padding: 5px 10px;
-    border-radius: 20px;
-    background: rgba(126,217,154,0.1);
-    border: 1px solid rgba(126,217,154,0.3);
-    color: #7ed99a;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    white-space: nowrap;
-  `;
-  switchBtn.addEventListener("click", () => {
-    conversationHistory = [];
-    welcomeShown = false;
-    showCoachPicker();
-  });
-
-  // Keep switch button label in sync with chosen coach
   function refreshSwitchBtn() {
     switchBtn.textContent = currentCoach
       ? `${currentCoach.emoji} ${currentCoach.name}`
       : "🔄 Pick Coach";
   }
   refreshSwitchBtn();
-  // Expose so showCoachPicker can call it after selection
   chatSheet._refreshSwitchBtn = refreshSwitchBtn;
 
-  messagesContainer = chatSheet.querySelector(".messages-container");
-  messagesContainer.style.cssText = `
-    flex: 1;
-    overflow-y: auto;
-    padding: 12px 20px 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    min-height: 0;
-  `;
+  switchBtn.addEventListener("click", () => {
+    conversationHistory = [];
+    welcomeShown = false;
+    showCoachPicker();
+  });
 
+  messagesContainer = chatSheet.querySelector(".messages-container");
   quickRepliesContainer = chatSheet.querySelector(".quick-replies");
-  quickRepliesContainer.style.cssText = `
-    padding: 8px 20px;
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    flex-shrink: 0;
-  `;
 
   const inputArea = chatSheet.querySelector(".input-area");
-  inputArea.style.cssText = `
-    padding: 16px 20px;
-    border-top: 1px solid rgba(126,217,154,0.2);
-    display: flex;
-    gap: 12px;
-    align-items: center;
-  `;
-
   inputField = inputArea.querySelector("input");
-  inputField.style.cssText = `
-    flex: 1;
-    padding: 12px 16px;
-    border: 1px solid rgba(126,217,154,0.3);
-    border-radius: 24px;
-    background: rgba(255,255,255,0.05);
-    color: #7ed99a;
-    font-size: 16px;
-  `;
 
-  const sendButton = inputArea.querySelector(".send-btn");
-  sendButton.style.cssText = `
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: #7ed99a;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    flex-shrink: 0;
-  `;
-  sendButton.addEventListener("click", () => sendMessage());
-
+  inputArea.querySelector(".send-btn").addEventListener("click", () => sendMessage());
   micButton = inputArea.querySelector(".mic-btn");
-  micButton.style.cssText = `
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: #1e3a24;
-    border: 2px solid #7ed99a;
-    color: #7ed99a;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-  `;
 
-  // Event listeners
   inputField.addEventListener("keypress", (e) => {
     if (e.key === "Enter") sendMessage();
   });
-
   micButton.addEventListener("click", toggleVoiceInput);
 
   document.body.appendChild(chatSheet);
@@ -290,11 +138,9 @@ function toggleChat() {
   const isOpen = chatSheet.style.display !== "none";
 
   if (isOpen) {
-    // Close: animate out then hide
     chatSheet.style.transform = "translateY(100%)";
     setTimeout(() => { chatSheet.style.display = "none"; }, 310);
   } else {
-    // Open: show first, then animate in next frame
     chatSheet.style.display = "flex";
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
@@ -316,15 +162,15 @@ function showCoachPicker() {
   quickRepliesContainer.innerHTML = "";
 
   const picker = document.createElement("div");
-  picker.style.cssText = `padding: 16px 0; display: flex; flex-direction: column; gap: 0;`;
+  picker.className = "coach-picker";
 
   const title = document.createElement("div");
+  title.className = "coach-picker-title";
   title.textContent = "Choose Your Coach";
-  title.style.cssText = `font-size: 18px; font-weight: 700; color: #7ed99a; text-align: center; margin-bottom: 4px;`;
 
   const sub = document.createElement("div");
+  sub.className = "coach-picker-sub";
   sub.textContent = "Pick a style that fits you";
-  sub.style.cssText = `font-size: 12px; color: rgba(255,255,255,0.4); text-align: center; margin-bottom: 16px;`;
 
   picker.appendChild(title);
   picker.appendChild(sub);
@@ -333,42 +179,29 @@ function showCoachPicker() {
 
   Object.values(COACHES).forEach((coach) => {
     const card = document.createElement("div");
-    card.style.cssText = `
-      display: flex; align-items: center; gap: 14px;
-      background: rgba(255,255,255,0.04);
-      border: 1.5px solid rgba(126,217,154,0.15);
-      border-radius: 14px; padding: 14px; margin-bottom: 10px;
-      cursor: pointer; transition: all 0.2s; position: relative;
-    `;
+    card.className = "coach-pick-card";
 
     const avatar = document.createElement("div");
+    avatar.className = "coach-pick-avatar";
     avatar.textContent = coach.emoji;
-    avatar.style.cssText = `
-      width: 48px; height: 48px; border-radius: 50%;
-      background: ${coach.avatarBg};
-      display: flex; align-items: center; justify-content: center;
-      font-size: 22px; flex-shrink: 0;
-    `;
+    avatar.style.background = coach.avatarBg; // data-driven, stays inline
 
     const info = document.createElement("div");
-    info.style.cssText = `flex: 1; min-width: 0;`;
+    info.className = "coach-pick-info";
 
     const name = document.createElement("div");
+    name.className = "coach-pick-name";
     name.textContent = coach.name;
-    name.style.cssText = `font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 3px;`;
 
     const tag = document.createElement("span");
+    tag.className = "coach-pick-tag";
     tag.textContent = coach.tag;
-    tag.style.cssText = `
-      display: inline-block; font-size: 10px; font-weight: 600;
-      padding: 2px 8px; border-radius: 20px; margin-bottom: 4px;
-      text-transform: uppercase; letter-spacing: 0.5px;
-      background: ${coach.tagColor.bg}; color: ${coach.tagColor.text};
-    `;
+    tag.style.background = coach.tagColor.bg;   // data-driven, stays inline
+    tag.style.color = coach.tagColor.text;        // data-driven, stays inline
 
     const desc = document.createElement("div");
+    desc.className = "coach-pick-desc";
     desc.textContent = coach.description;
-    desc.style.cssText = `font-size: 12px; color: rgba(255,255,255,0.45); line-height: 1.4;`;
 
     info.appendChild(name);
     info.appendChild(tag);
@@ -380,47 +213,31 @@ function showCoachPicker() {
     card.addEventListener("click", () => {
       // Deselect all
       picker.querySelectorAll(".coach-pick-card").forEach((c) => {
-        c.style.borderColor = "rgba(126,217,154,0.15)";
-        c.style.background = "rgba(255,255,255,0.04)";
-        const chk = c.querySelector(".pick-check");
-        if (chk) chk.remove();
+        c.classList.remove("selected");
+        c.querySelector(".pick-check")?.remove();
       });
 
-      // Select this
-      card.style.borderColor = "#7ed99a";
-      card.style.background = "rgba(126,217,154,0.1)";
+      // Select this card
+      card.classList.add("selected");
       const check = document.createElement("div");
       check.className = "pick-check";
       check.textContent = "✓";
-      check.style.cssText = `
-        position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
-        width: 22px; height: 22px; background: #7ed99a; color: #0d150f;
-        border-radius: 50%; display: flex; align-items: center;
-        justify-content: center; font-size: 12px; font-weight: 700; line-height: 22px; text-align: center;
-      `;
       card.appendChild(check);
       selectedId = coach.id;
-      ctaBtn.style.opacity = "1";
-      ctaBtn.style.pointerEvents = "auto";
+      ctaBtn.classList.add("active");
     });
 
-    card.className = "coach-pick-card";
     picker.appendChild(card);
   });
 
   const ctaBtn = document.createElement("button");
+  ctaBtn.className = "coach-cta-btn";
   ctaBtn.textContent = "Let's Go →";
-  ctaBtn.style.cssText = `
-    width: 100%; padding: 14px; background: #7ed99a; color: #0d150f;
-    font-size: 15px; font-weight: 700; border: none; border-radius: 12px;
-    cursor: pointer; opacity: 0.4; pointer-events: none; margin-top: 4px;
-    transition: opacity 0.2s;
-  `;
 
   ctaBtn.addEventListener("click", async () => {
     if (!selectedId || !auth.currentUser) return;
     ctaBtn.textContent = "Saving…";
-    ctaBtn.style.opacity = "0.6";
+    ctaBtn.classList.remove("active");
     await saveCoachChoice(auth.currentUser.uid, selectedId);
     currentCoach = getCoach(selectedId);
     if (chatSheet._refreshSwitchBtn) chatSheet._refreshSwitchBtn();
@@ -452,51 +269,23 @@ async function sendMessage(text = null) {
 
   inputField.value = "";
 
-  // Add user message
   const userMessage = { role: "user", content: messageText };
   addMessage(userMessage);
   conversationHistory.push(userMessage);
 
-  // Show typing indicator (keep quick replies visible until response arrives)
-  quickRepliesContainer.style.opacity = "0.4";
-  quickRepliesContainer.style.pointerEvents = "none";
+  // Show typing indicator
+  quickRepliesContainer.classList.add("dimmed");
   const typingEl = document.createElement("div");
   typingEl.id = "coach-typing";
   typingEl.innerHTML = `<span></span><span></span><span></span>`;
-  typingEl.style.cssText = `
-    align-self: flex-start;
-    padding: 14px 18px;
-    border-radius: 18px;
-    background: #1e3a24;
-    border: 1px solid rgba(126,217,154,0.3);
-    display: flex;
-    gap: 5px;
-    align-items: center;
-  `;
-  typingEl.querySelectorAll("span").forEach((dot, i) => {
-    dot.style.cssText = `
-      width: 7px; height: 7px; border-radius: 50%;
-      background: #7ed99a; opacity: 0.4;
-      animation: coachDot 1.2s ease-in-out ${i * 0.2}s infinite;
-    `;
-  });
-  if (!document.getElementById("coach-dot-style")) {
-    const s = document.createElement("style");
-    s.id = "coach-dot-style";
-    s.textContent = `@keyframes coachDot { 0%,80%,100%{opacity:0.4;transform:scale(1)} 40%{opacity:1;transform:scale(1.3)} }`;
-    document.head.appendChild(s);
-  }
   messagesContainer.appendChild(typingEl);
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-  // Get context
   const context = await getContext();
 
-  // Call Anthropic API
   try {
     const response = await callGeminiAPI([...conversationHistory], context);
 
-    // Parse response — only strip last line if it explicitly looks like an action JSON
     const lines = response.split("\n");
     const lastLine = lines[lines.length - 1].trim();
 
@@ -512,37 +301,23 @@ async function sendMessage(text = null) {
       }
     }
 
-    // Remove typing indicator and add assistant message
     document.getElementById("coach-typing")?.remove();
     const assistantMessage = { role: "assistant", content: messageContent };
     addMessage(assistantMessage);
     conversationHistory.push(assistantMessage);
 
-    // Execute action if present
-    if (action) {
-      await executeAction(action);
-    }
+    if (action) await executeAction(action);
 
-    // Replace quick replies with contextual ones
-    quickRepliesContainer.style.opacity = "1";
-    quickRepliesContainer.style.pointerEvents = "auto";
+    quickRepliesContainer.classList.remove("dimmed");
     showQuickReplies(getQuickRepliesForContext(messageContent));
   } catch (error) {
     document.getElementById("coach-typing")?.remove();
-    quickRepliesContainer.style.opacity = "1";
-    quickRepliesContainer.style.pointerEvents = "auto";
-    console.error("Coach API error:", error);
+    quickRepliesContainer.classList.remove("dimmed");
     let errorMsg = "Sorry, I'm having trouble connecting. Try again?";
-    if (
-      error.message.includes("API key") ||
-      error.message.includes("not configured")
-    ) {
+    if (error.message.includes("API key") || error.message.includes("not configured")) {
       errorMsg = "⚠️ Coach proxy not reachable. Make sure the Cloudflare Worker is deployed.";
     }
-    addMessage({
-      role: "assistant",
-      content: errorMsg,
-    });
+    addMessage({ role: "assistant", content: errorMsg });
   }
 }
 
@@ -553,20 +328,8 @@ function addMessage(message) {
 
   const contentDiv = document.createElement("div");
   contentDiv.className = "message-content";
-  contentDiv.textContent = message.content; // textContent prevents HTML injection / rendering bugs
-  contentDiv.style.cssText = "white-space: pre-wrap; word-wrap: break-word;";
+  contentDiv.textContent = message.content;
   messageEl.appendChild(contentDiv);
-
-  messageEl.style.cssText = `
-    align-self: ${message.role === "user" ? "flex-end" : "flex-start"};
-    max-width: 80%;
-    padding: 12px 16px;
-    border-radius: 18px;
-    background: ${message.role === "user" ? "#7ed99a" : "#1e3a24"};
-    color: ${message.role === "user" ? "#1e3a24" : "#7ed99a"};
-    border: 1px solid ${message.role === "user" ? "#7ed99a" : "rgba(126,217,154,0.3)"};
-    overflow-wrap: break-word;
-  `;
 
   messagesContainer.appendChild(messageEl);
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -575,124 +338,71 @@ function addMessage(message) {
 // ─── QUICK REPLIES ────────────────────────────────────────────
 function showQuickReplies(replies) {
   quickRepliesContainer.innerHTML = "";
-
   replies.forEach((reply) => {
     const button = document.createElement("button");
+    button.className = "quick-reply-btn";
     button.textContent = reply;
-    button.style.cssText = `
-      padding: 8px 16px;
-      border: 1px solid rgba(126,217,154,0.3);
-      border-radius: 16px;
-      background: rgba(126,217,154,0.1);
-      color: #7ed99a;
-      cursor: pointer;
-      font-size: 14px;
-    `;
-
     button.addEventListener("click", () => sendMessage(reply));
     quickRepliesContainer.appendChild(button);
   });
 }
 
 function getQuickRepliesForContext(message) {
-  // Simple context detection
-  if (
-    message.toLowerCase().includes("tired") ||
-    message.toLowerCase().includes("rest")
-  ) {
-    return [
-      "Need a quick protein hit",
-      "Skip workout today",
-      "Light cardio instead",
-    ];
-  }
-  if (
-    message.toLowerCase().includes("meal") ||
-    message.toLowerCase().includes("eat")
-  ) {
+  const msg = message.toLowerCase();
+  if (msg.includes("tired") || msg.includes("rest"))
+    return ["Need a quick protein hit", "Skip workout today", "Light cardio instead"];
+  if (msg.includes("meal") || msg.includes("eat"))
     return ["Already ate", "Give me options", "Too busy right now"];
-  }
-  if (
-    message.toLowerCase().includes("workout") ||
-    message.toLowerCase().includes("exercise")
-  ) {
+  if (msg.includes("workout") || msg.includes("exercise"))
     return ["Too tired", "Sounds good", "Swap for something else"];
-  }
   return ["Thanks!", "Tell me more", "Got any tips?"];
 }
 
 // ─── VOICE RECOGNITION ─────────────────────────────────────────
 function setupVoiceRecognition() {
-  if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
-    recognition = new SpeechRecognition();
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.lang = "en-US";
+  if (!("webkitSpeechRecognition" in window || "SpeechRecognition" in window)) return;
 
-    recognition.onstart = () => {
-      isListening = true;
-      micButton.style.borderColor = "#7ed99a";
-      micButton.style.boxShadow = "0 0 0 3px rgba(126,217,154,0.3)";
-    };
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SpeechRecognition();
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.lang = "en-US";
 
-    recognition.onend = () => {
-      isListening = false;
-      micButton.style.borderColor = "#7ed99a";
-      micButton.style.boxShadow = "none";
-    };
-
-    recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-      sendMessage(transcript);
-    };
-
-    recognition.onerror = (event) => {
-      console.error("Speech recognition error:", event.error);
-      isListening = false;
-      micButton.style.borderColor = "#7ed99a";
-      micButton.style.boxShadow = "none";
-    };
-  }
+  recognition.onstart  = () => { isListening = true;  micButton.classList.add("listening"); };
+  recognition.onend    = () => { isListening = false; micButton.classList.remove("listening"); };
+  recognition.onerror  = ()  => { isListening = false; micButton.classList.remove("listening"); };
+  recognition.onresult = (e) => sendMessage(e.results[0][0].transcript);
 }
 
 function toggleVoiceInput() {
   if (!recognition) return;
-
-  if (isListening) {
-    recognition.stop();
-  } else {
-    recognition.start();
-  }
+  isListening ? recognition.stop() : recognition.start();
 }
 
 // ─── GET CONTEXT ───────────────────────────────────────────────
 async function getContext() {
   const context = {};
-
-  // From localStorage
   const proteinData = JSON.parse(localStorage.getItem("proteinData") || "{}");
   const today = new Date().toDateString();
-  context.todayProtein = proteinData[today] || 0;
-  context.proteinGoal = parseInt(localStorage.getItem("proteinGoal") || "0");
-  context.carbsGoal   = parseInt(localStorage.getItem("carbsGoal")   || "0");
-  context.fatGoal     = parseInt(localStorage.getItem("fatGoal")      || "0");
-  context.caloriesGoal = parseInt(localStorage.getItem("caloriesGoal") || "0");
-  context.todayWorkout = localStorage.getItem("todayWorkout") || "Rest day";
 
-  // From Firebase
+  context.todayProtein  = proteinData[today] || 0;
+  context.proteinGoal   = parseInt(localStorage.getItem("proteinGoal")   || "0");
+  context.carbsGoal     = parseInt(localStorage.getItem("carbsGoal")     || "0");
+  context.fatGoal       = parseInt(localStorage.getItem("fatGoal")       || "0");
+  context.caloriesGoal  = parseInt(localStorage.getItem("caloriesGoal")  || "0");
+  context.todayWorkout  = localStorage.getItem("todayWorkout") || "Rest day";
+
   if (auth.currentUser) {
     const profile = await getUserProfile(auth.currentUser.uid);
     if (profile) {
-      context.name           = profile.name || auth.currentUser.displayName || "there";
-      context.weight         = profile.weight || 0;
-      context.height         = profile.height || 0;
-      context.age            = profile.age || 0;
-      context.gender         = profile.gender || "male";
-      context.goal           = profile.goal || "recomp";
-      context.activityLevel  = profile.activity || "moderate";
-      context.weightUnit     = profile.weightUnit || "kg";
+      context.name          = profile.name || auth.currentUser.displayName || "there";
+      context.weight        = profile.weight || 0;
+      context.height        = profile.height || 0;
+      context.age           = profile.age || 0;
+      context.gender        = profile.gender || "male";
+      context.goal          = profile.goal || "recomp";
+      context.activityLevel = profile.activity || "moderate";
+      context.weightUnit    = profile.weightUnit || "kg";
     }
     context.streak = 0;
   }
@@ -701,9 +411,6 @@ async function getContext() {
 }
 
 // ─── GOOGLE GEMINI API ──────────────────────────────────────────
-// On the live site all requests go through the Cloudflare Worker proxy
-// (key is stored as a Worker secret — never exposed to the browser).
-// For local dev, coach-config.js can export GEMINI_PROXY_URL to override.
 const LIVE_PROXY_URL = "https://fitdesi-gemini.jawandbajwa.workers.dev";
 let PROXY_URL = LIVE_PROXY_URL;
 import("./coach-config.js")
@@ -711,7 +418,7 @@ import("./coach-config.js")
   .catch(() => {});
 
 async function callGeminiAPI(messages, context) {
-  const goalLabels = { recomp: "body recomposition", muscle: "muscle gain", fatloss: "fat loss" };
+  const goalLabels     = { recomp: "body recomposition", muscle: "muscle gain", fatloss: "fat loss" };
   const activityLabels = { sedentary: "sedentary", light: "lightly active", moderate: "moderately active", active: "very active" };
 
   const personalityLayer = currentCoach
@@ -740,25 +447,14 @@ or {"action":"swap_exercise","old":"...","new":"..."}`;
 
   const contextText = `Today so far: ${context.todayProtein}g protein of ${context.proteinGoal}g goal. Today's workout: ${context.todayWorkout}. Streak: ${context.streak} days.`;
 
-  // Keep last 10 messages for history
-  if (messages.length > 10) {
-    messages = messages.slice(-10);
-  }
+  if (messages.length > 10) messages = messages.slice(-10);
 
-  // Build proper Gemini multi-turn conversation format
   const contents = messages.map((msg, i) => {
     let text = msg.content;
-    // Inject context into the first user message
-    if (i === 0 && msg.role === "user") {
-      text = `${contextText}\n\n${text}`;
-    }
-    return {
-      role: msg.role === "user" ? "user" : "model",
-      parts: [{ text }],
-    };
+    if (i === 0 && msg.role === "user") text = `${contextText}\n\n${text}`;
+    return { role: msg.role === "user" ? "user" : "model", parts: [{ text }] };
   });
 
-  // Gemini requires the conversation to start with a user turn
   if (!contents.length || contents[0].role !== "user") {
     contents.unshift({ role: "user", parts: [{ text: contextText }] });
   }
@@ -766,10 +462,7 @@ or {"action":"swap_exercise","old":"...","new":"..."}`;
   const payload = {
     system_instruction: { parts: [{ text: systemPrompt }] },
     contents,
-    generationConfig: {
-      maxOutputTokens: 600,
-      temperature: 0.7,
-    },
+    generationConfig: { maxOutputTokens: 600, temperature: 0.7 },
   };
 
   const response = await fetch(PROXY_URL, {
@@ -787,45 +480,23 @@ or {"action":"swap_exercise","old":"...","new":"..."}`;
   }
 
   const data = await response.json();
+  if (!data.candidates?.[0]?.content) throw new Error("Invalid API response");
 
-  if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
-    throw new Error("Invalid API response");
-  }
-
-  const candidate = data.candidates[0];
-  console.log("[Coach] finishReason:", candidate.finishReason);
-  console.log("[Coach] parts:", JSON.stringify(candidate.content.parts));
-
-  // Join all parts in case Gemini splits the response across multiple parts
-  const fullText = candidate.content.parts.map((p) => p.text || "").join("");
-  console.log("[Coach] full text:", fullText);
-  return fullText;
+  return data.candidates[0].content.parts.map((p) => p.text || "").join("");
 }
 
 // ─── EXECUTE ACTION ────────────────────────────────────────────
 async function executeAction(action) {
   if (!auth.currentUser) return;
-
   try {
-    const uid = auth.currentUser.uid;
+    const uid   = auth.currentUser.uid;
     const today = new Date().toISOString().split("T")[0];
-
     switch (action.action) {
-      case "add_meal":
-        await addMealToLog(uid, action);
-        showToast("Added to your log");
-        break;
-      case "complete_workout":
-        await completeWorkout(uid, today);
-        showToast("Workout marked done");
-        break;
-      case "swap_exercise":
-        await swapExercise(uid, today, action.old, action.new);
-        showToast("Exercise swapped");
-        break;
+      case "add_meal":        await addMealToLog(uid, action);              showToast("Added to your log");  break;
+      case "complete_workout": await completeWorkout(uid, today);           showToast("Workout marked done"); break;
+      case "swap_exercise":   await swapExercise(uid, today, action.old, action.new); showToast("Exercise swapped"); break;
     }
-  } catch (error) {
-    console.error("Action execution error:", error);
+  } catch (e) {
     showToast("Action failed");
   }
 }
@@ -833,20 +504,8 @@ async function executeAction(action) {
 // ─── TOAST ────────────────────────────────────────────────────
 function showToast(message) {
   const toast = document.createElement("div");
+  toast.className = "coach-toast";
   toast.textContent = message;
-  toast.style.cssText = `
-    position: fixed;
-    bottom: 100px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #7ed99a;
-    color: #1e3a24;
-    padding: 12px 24px;
-    border-radius: 24px;
-    z-index: 1002;
-    font-weight: bold;
-  `;
-
   document.body.appendChild(toast);
-  setTimeout(() => document.body.removeChild(toast), 3000);
+  setTimeout(() => toast.remove(), 3000);
 }
