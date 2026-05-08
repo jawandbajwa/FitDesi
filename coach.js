@@ -103,6 +103,11 @@ function createChatSheet() {
     <div class="quick-replies"></div>
     <div class="input-area">
       <input type="text" placeholder="Ask your coach..." />
+      <button class="send-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M2 12L22 2L12 22L10 14L2 12Z" fill="#0d150f"/>
+        </svg>
+      </button>
       <button class="mic-btn">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
           <path d="M12 1a4 4 0 0 0-4 4v6a4 4 0 0 0 8 0V5a4 4 0 0 0-4-4z" fill="#7ed99a"/>
@@ -206,18 +211,21 @@ function createChatSheet() {
   messagesContainer.style.cssText = `
     flex: 1;
     overflow-y: auto;
-    padding: 0 20px;
+    padding: 12px 20px 4px;
     display: flex;
     flex-direction: column;
     gap: 12px;
+    justify-content: flex-end;
+    min-height: 0;
   `;
 
   quickRepliesContainer = chatSheet.querySelector(".quick-replies");
   quickRepliesContainer.style.cssText = `
-    padding: 0 20px;
+    padding: 8px 20px;
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
+    flex-shrink: 0;
   `;
 
   const inputArea = chatSheet.querySelector(".input-area");
@@ -239,6 +247,21 @@ function createChatSheet() {
     color: #7ed99a;
     font-size: 16px;
   `;
+
+  const sendButton = inputArea.querySelector(".send-btn");
+  sendButton.style.cssText = `
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #7ed99a;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+  `;
+  sendButton.addEventListener("click", () => sendMessage());
 
   micButton = inputArea.querySelector(".mic-btn");
   micButton.style.cssText = `
@@ -700,7 +723,7 @@ or {"action":"swap_exercise","old":"...","new":"..."}`;
     system_instruction: { parts: [{ text: systemPrompt }] },
     contents,
     generationConfig: {
-      maxOutputTokens: 300,
+      maxOutputTokens: 600,
       temperature: 0.7,
     },
   };
@@ -725,7 +748,13 @@ or {"action":"swap_exercise","old":"...","new":"..."}`;
     throw new Error("Invalid API response");
   }
 
-  return data.candidates[0].content.parts[0].text;
+  const candidate = data.candidates[0];
+  if (candidate.finishReason === "MAX_TOKENS") {
+    console.warn("Coach: response truncated by token limit — increase maxOutputTokens");
+  }
+
+  // Join all parts in case Gemini splits the response across multiple parts
+  return candidate.content.parts.map((p) => p.text || "").join("");
 }
 
 // ─── EXECUTE ACTION ────────────────────────────────────────────
