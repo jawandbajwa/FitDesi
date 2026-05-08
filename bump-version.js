@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // Usage:
-//   node bump-version.js patch   → 1.0.10 → 1.0.20  (small change)
-//   node bump-version.js major   → 1.0.20 → 2.0.0   (big change)
+//   node bump-version.js patch   → 2.0.10 → 2.0.20   (small change; auto-rolls to minor at patch 100)
+//   node bump-version.js minor   → 2.0.100 → 2.1.0   (notable update)
+//   node bump-version.js major   → 2.1.0 → 3.0.0     (big release)
 
 const fs = require("fs");
 const path = require("path");
@@ -11,8 +12,8 @@ const PROFILE  = path.join(__dirname, "profile.html");
 const SW       = path.join(__dirname, "sw.js");
 
 const type = process.argv[2];
-if (!type || !["patch", "major"].includes(type)) {
-  console.error("Usage: node bump-version.js [patch|major]");
+if (!type || !["patch", "minor", "major"].includes(type)) {
+  console.error("Usage: node bump-version.js [patch|minor|major]");
   process.exit(1);
 }
 
@@ -25,8 +26,16 @@ const [maj, min, pat] = current.split(".").map(Number);
 let next;
 if (type === "major") {
   next = `${maj + 1}.0.0`;
+} else if (type === "minor") {
+  next = `${maj}.${min + 1}.0`;
 } else {
-  next = `${maj}.${min}.${pat + 10}`;
+  const newPat = pat + 10;
+  // Auto-rollover: patch >= 100 bumps minor instead
+  if (newPat >= 100) {
+    next = `${maj}.${min + 1}.0`;
+  } else {
+    next = `${maj}.${min}.${newPat}`;
+  }
 }
 
 // ── Update manifest.json ──────────────────────────────────────────
