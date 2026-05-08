@@ -326,8 +326,7 @@ async function sendMessage(text = null) {
       error.message.includes("API key") ||
       error.message.includes("not configured")
     ) {
-      errorMsg =
-        "⚠️ Coach not configured. Add your key to coach-config.js (local) or run localStorage.setItem('fitdesi_gemini_key','YOUR_KEY') in the console.";
+      errorMsg = "⚠️ Coach proxy not reachable. Make sure the Cloudflare Worker is deployed.";
     }
     addMessage({
       role: "assistant",
@@ -478,16 +477,16 @@ async function getContext() {
 }
 
 // ─── GOOGLE GEMINI API ──────────────────────────────────────────
-// Load key from coach-config.js if present (local dev), otherwise localStorage (live site)
-let GEMINI_API_KEY = localStorage.getItem("fitdesi_gemini_key") || "";
+// On the live site all requests go through the Cloudflare Worker proxy
+// (key is stored as a Worker secret — never exposed to the browser).
+// For local dev, coach-config.js can export GEMINI_PROXY_URL to override.
+const LIVE_PROXY_URL = "https://fitdesi-gemini.jawandbajwa.workers.dev";
+let PROXY_URL = LIVE_PROXY_URL;
 import("./coach-config.js")
-  .then((cfg) => { if (cfg.GEMINI_API_KEY) GEMINI_API_KEY = cfg.GEMINI_API_KEY; })
+  .then((cfg) => { if (cfg.GEMINI_PROXY_URL) PROXY_URL = cfg.GEMINI_PROXY_URL; })
   .catch(() => {});
 
 async function callGeminiAPI(messages, context) {
-  if (!GEMINI_API_KEY) {
-    throw new Error("API key not configured");
-  }
   const systemPrompt = `You are Jawand's personal fitness coach inside FitDesi. You know him well: body recomposition goal, 169g protein daily, 300g carbs, 69g fat, 2496 calories. Indian vegetarian and Canadian plant-based food. Workouts 5 days a week.
 Personality: direct, warm, like a knowledgeable friend who knows fitness. Maximum 2 sentences per response. No bullet points. Talk like a real person not a bot.
 When user mentions eating something, estimate macros from your knowledge. When they are tired suggest the fastest high protein option. When they want to swap food or exercise, do it.
@@ -532,9 +531,7 @@ or
     },
   };
 
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${GEMINI_API_KEY}`,
-    {
+  const response = await fetch(PROXY_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
