@@ -749,12 +749,13 @@ or {"action":"swap_exercise","old":"...","new":"..."}`;
   }
 
   const candidate = data.candidates[0];
-  if (candidate.finishReason === "MAX_TOKENS") {
-    console.warn("Coach: response truncated by token limit — increase maxOutputTokens");
-  }
+  console.log("[Coach] finishReason:", candidate.finishReason);
+  console.log("[Coach] parts:", JSON.stringify(candidate.content.parts));
 
   // Join all parts in case Gemini splits the response across multiple parts
-  return candidate.content.parts.map((p) => p.text || "").join("");
+  const fullText = candidate.content.parts.map((p) => p.text || "").join("");
+  console.log("[Coach] full text:", fullText);
+  return fullText;
 }
 
 // ─── EXECUTE ACTION ────────────────────────────────────────────
