@@ -69,18 +69,26 @@ function isStandalonePWA() {
   );
 }
 
+function isMobileOrPWA() {
+  // Covers: iOS "Add to Home Screen", Android PWA, and any mobile browser.
+  // On mobile, window.open() is unreliable for OAuth popups even in Chrome,
+  // so we always use redirect on mobile regardless of PWA vs browser context.
+  if (window.navigator.standalone === true) return true; // iOS standalone
+  if (window.matchMedia("(display-mode: standalone)").matches) return true; // Android PWA
+  return /android|iphone|ipad|ipod/i.test(navigator.userAgent);
+}
+
 async function signInWithGoogle() {
   try {
-    // iOS standalone (Add to Home Screen) blocks popups in WKWebView — must redirect.
-    // Android PWA uses a Chrome Custom Tab for signInWithPopup, which works perfectly
-    // even when installed. Using redirect on Android causes silent failures because
-    // Google's redirect can open a new browser tab instead of the PWA instance,
-    // leaving getRedirectResult() in a context that never sees the credential.
-    const isIOSStandalone = window.navigator.standalone === true;
-    if (isIOSStandalone) {
+    if (isMobileOrPWA()) {
+      // Mobile (PWA or browser): always use redirect — popups are unreliable.
+      // The redirect lands on login.html (possibly in Chrome browser on Android),
+      // getRedirectResult() captures the credential, and the auth state is written
+      // to IndexedDB which is shared between Chrome and the installed PWA.
       await signInWithRedirect(auth, provider);
-      return null; // page will navigate; result handled via getRedirectResult()
+      return null; // page navigates away; result handled via getRedirectResult()
     }
+    // Desktop browser: popup gives best UX (stays on page, no redirect round-trip).
     const result = await signInWithPopup(auth, provider);
     return result.user;
   } catch (error) {
@@ -89,7 +97,7 @@ async function signInWithGoogle() {
   }
 }
 
-// Explicit redirect sign-in — used as a fallback when popup is blocked on Android
+// Explicit redirect sign-in — used as a manual fallback in login.html
 async function signInWithGoogleRedirect() {
   await signInWithRedirect(auth, provider);
 }
@@ -225,17 +233,20 @@ async function getRecipes(cuisine = "indian") {
       ...d.data(),
       _cuisine: cuisine,
     }));
-    // Update the offline cache with fresh data
-    await cacheRecipes(recipes, cuisine);
+    // Fire-and-forget cache update — never let a cache write failure
+    // mask a successful Firestore read (was a bug: if cacheRecipes threw,
+    // the entire catch block ran and returned [] instead of the fresh data).
+    cacheRecipes(recipes, cuisine).catch(() => {});
     return recipes;
   } catch (error) {
-    console.error("Error getting recipes, falling back to cache:", error);
+    console.error("Firestore recipes failed, falling back to cache:", error);
     try {
-      return await getCachedRecipes(cuisine);
+      const cached = await getCachedRecipes(cuisine);
+      if (cached && cached.length > 0) return cached;
     } catch (cacheError) {
-      console.error("Cache error:", cacheError);
-      return [];
+      console.error("Cache also failed:", cacheError);
     }
+    return [];
   }
 }
 

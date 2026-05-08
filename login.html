@@ -226,6 +226,34 @@
       </div>
     </div>
 
+    <style>
+      .open-app-card {
+        display: none;
+        background: rgba(126, 217, 154, 0.08);
+        border: 0.5px solid rgba(126, 217, 154, 0.3);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 16px;
+        text-align: center;
+      }
+      .open-app-card p {
+        font-size: 13px;
+        color: rgba(255,255,255,0.6);
+        margin: 0 0 16px;
+        line-height: 1.5;
+      }
+      .open-app-btn {
+        display: inline-block;
+        background: #7ed99a;
+        color: #0d1f10;
+        font-size: 14px;
+        font-weight: 600;
+        padding: 12px 24px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-family: Inter, sans-serif;
+      }
+    </style>
     <script type="module">
       import {
         signInWithGoogle,
@@ -240,6 +268,11 @@
       const spinner = document.getElementById("spinner");
       const errorEl = document.getElementById("loginError");
 
+      function isStandalone() {
+        return window.navigator.standalone === true ||
+               window.matchMedia("(display-mode: standalone)").matches;
+      }
+
       function setLoading(on) {
         btn.disabled = on;
         btnText.textContent = on ? "Signing in…" : "Continue with Google";
@@ -252,17 +285,36 @@
         errorEl.textContent = msg;
       }
 
-      // ── Handle redirect result (iOS standalone + popup-blocked fallback) ──
+      function showOpenAppUI() {
+        // Auth succeeded in Chrome browser (Android redirect landed here, not in PWA).
+        // Auth state is in IndexedDB — shared with the PWA — so opening the app
+        // from the home screen will log the user in automatically.
+        btn.style.display = "none";
+        const card = document.createElement("div");
+        card.className = "open-app-card";
+        card.innerHTML = `
+          <p>✅ You're signed in!<br>Tap below to open the FitDesi app.</p>
+          <a class="open-app-btn" href="./index.html">Open FitDesi →</a>
+        `;
+        card.style.display = "block";
+        btn.parentNode.insertBefore(card, btn);
+      }
+
+      // ── Handle redirect result on page load ─────────────────
       (async () => {
         try {
           setLoading(true);
           const result = await getRedirectResult(auth);
           if (result && result.user) {
-            window.location.href = "index.html";
+            // Redirect captured — go to app (or show open-app UI if in browser)
+            if (isStandalone()) {
+              window.location.href = "index.html";
+            } else {
+              showOpenAppUI();
+            }
             return;
           }
         } catch (e) {
-          // Redirect error — show it
           if (e.code && e.code !== "auth/no-auth-event") {
             showError("Sign in failed (" + e.code + "). Try again.");
             return;
@@ -273,7 +325,14 @@
 
       // ── Already signed in → go straight to app ─────────────
       onAuthStateChanged(auth, (user) => {
-        if (user) window.location.href = "index.html";
+        if (user) {
+          if (isStandalone()) {
+            window.location.href = "index.html";
+          } else {
+            // In browser after redirect — show open-app UI
+            showOpenAppUI();
+          }
+        }
       });
 
       // ── Sign-in button ──────────────────────────────────────
@@ -282,19 +341,19 @@
         errorEl.style.display = "none";
         try {
           const user = await signInWithGoogle();
-          // iOS standalone: triggers redirect, returns null — handled above
+          // Mobile: triggers redirect (returns null) — result handled above.
+          // Desktop: returns user immediately.
           if (user) window.location.href = "index.html";
         } catch (error) {
-          // If popup was blocked, fall back to redirect flow
+          // Popup blocked on desktop → fall back to redirect
           if (
             error.code === "auth/popup-blocked" ||
             error.code === "auth/cancelled-popup-request"
           ) {
             try {
               await signInWithGoogleRedirect();
-              // navigates away — no return
             } catch (e2) {
-              showError("Sign in failed (" + e2.code + "). Try again.");
+              showError("Sign in failed (" + (e2.code || "unknown") + "). Try again.");
             }
           } else {
             showError(
