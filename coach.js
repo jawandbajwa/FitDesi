@@ -448,8 +448,36 @@ async function sendMessage(text = null) {
   addMessage(userMessage);
   conversationHistory.push(userMessage);
 
-  // Clear quick replies
+  // Clear quick replies and show typing indicator
   quickRepliesContainer.innerHTML = "";
+  const typingEl = document.createElement("div");
+  typingEl.id = "coach-typing";
+  typingEl.innerHTML = `<span></span><span></span><span></span>`;
+  typingEl.style.cssText = `
+    align-self: flex-start;
+    padding: 14px 18px;
+    border-radius: 18px;
+    background: #1e3a24;
+    border: 1px solid rgba(126,217,154,0.3);
+    display: flex;
+    gap: 5px;
+    align-items: center;
+  `;
+  typingEl.querySelectorAll("span").forEach((dot, i) => {
+    dot.style.cssText = `
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #7ed99a; opacity: 0.4;
+      animation: coachDot 1.2s ease-in-out ${i * 0.2}s infinite;
+    `;
+  });
+  if (!document.getElementById("coach-dot-style")) {
+    const s = document.createElement("style");
+    s.id = "coach-dot-style";
+    s.textContent = `@keyframes coachDot { 0%,80%,100%{opacity:0.4;transform:scale(1)} 40%{opacity:1;transform:scale(1.3)} }`;
+    document.head.appendChild(s);
+  }
+  messagesContainer.appendChild(typingEl);
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
   // Get context
   const context = await getContext();
@@ -474,7 +502,8 @@ async function sendMessage(text = null) {
       }
     }
 
-    // Add assistant message
+    // Remove typing indicator and add assistant message
+    document.getElementById("coach-typing")?.remove();
     const assistantMessage = { role: "assistant", content: messageContent };
     addMessage(assistantMessage);
     conversationHistory.push(assistantMessage);
@@ -487,6 +516,7 @@ async function sendMessage(text = null) {
     // Show quick replies
     showQuickReplies(getQuickRepliesForContext(messageContent));
   } catch (error) {
+    document.getElementById("coach-typing")?.remove();
     console.error("Coach API error:", error);
     let errorMsg = "Sorry, I'm having trouble connecting. Try again?";
     if (
