@@ -68,10 +68,10 @@ function createFloatingButton() {
   `;
   coachButton.style.cssText = `
     position: fixed;
-    bottom: 85px;
-    right: 20px;
-    width: 56px;
-    height: 56px;
+    bottom: 160px;
+    right: 16px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     background: #1e3a24;
     border: 2px solid #7ed99a;
