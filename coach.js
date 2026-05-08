@@ -14,6 +14,7 @@ import {
 // ─── STATE ──────────────────────────────────────────────────────
 let coachIsAdmin = false;
 let conversationHistory = [];
+let welcomeShown = false;
 let isListening = false;
 let recognition = null;
 
@@ -248,16 +249,14 @@ function toggleChat() {
   const isOpen = chatSheet.style.transform === "translateY(0%)";
   chatSheet.style.transform = isOpen ? "translateY(100%)" : "translateY(0%)";
 
-  if (!isOpen) {
-    // First open - send welcome message
-    if (conversationHistory.length === 0) {
-      sendWelcomeMessage();
-    }
+  if (!isOpen && !welcomeShown) {
+    sendWelcomeMessage();
   }
 }
 
 // ─── WELCOME MESSAGE ───────────────────────────────────────────
 function sendWelcomeMessage() {
+  welcomeShown = true;
   const message = {
     role: "assistant",
     content:
