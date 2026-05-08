@@ -756,6 +756,13 @@
           if (tab) tab.classList.remove("hidden");
         });
       });
+
+      // Deep-link: ?tab=plan opens Meal Plan tab directly
+      const urlTab = new URLSearchParams(window.location.search).get("tab");
+      if (urlTab) {
+        const targetBtn = document.querySelector(`.seg-btn[data-tab="${urlTab}"]`);
+        if (targetBtn) targetBtn.click();
+      }
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

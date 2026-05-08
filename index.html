@@ -175,6 +175,13 @@
         gap: 5px;
       }
 
+      .streak-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+      }
+
       .streak-dot {
         width: 8px;
         height: 8px;
@@ -187,6 +194,18 @@
       .streak-dot.filled {
         background: #f5a623;
         border-color: #f5a623;
+      }
+
+      .streak-day-lbl {
+        font-size: 8px;
+        color: rgba(255, 255, 255, 0.25);
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        line-height: 1;
+      }
+
+      .streak-item:last-child .streak-day-lbl {
+        color: rgba(245, 166, 35, 0.6);
       }
 
       /* Workout card */
@@ -465,13 +484,13 @@
         <div class="streak-label">Workouts this week</div>
       </div>
       <div class="streak-dots" id="streakDots">
-        <div class="streak-dot"></div>
-        <div class="streak-dot"></div>
-        <div class="streak-dot"></div>
-        <div class="streak-dot"></div>
-        <div class="streak-dot"></div>
-        <div class="streak-dot"></div>
-        <div class="streak-dot"></div>
+        <div class="streak-item"><div class="streak-dot"></div><div class="streak-day-lbl"></div></div>
+        <div class="streak-item"><div class="streak-dot"></div><div class="streak-day-lbl"></div></div>
+        <div class="streak-item"><div class="streak-dot"></div><div class="streak-day-lbl"></div></div>
+        <div class="streak-item"><div class="streak-dot"></div><div class="streak-day-lbl"></div></div>
+        <div class="streak-item"><div class="streak-dot"></div><div class="streak-day-lbl"></div></div>
+        <div class="streak-item"><div class="streak-dot"></div><div class="streak-day-lbl"></div></div>
+        <div class="streak-item"><div class="streak-dot"></div><div class="streak-day-lbl"></div></div>
       </div>
     </div>
 
@@ -501,7 +520,7 @@
         <span class="quick-btn-icon">💪</span>
         Workout
       </a>
-      <a href="tracker.html" class="quick-btn" id="planDayBtn">
+      <a href="tracker.html?tab=plan" class="quick-btn" id="planDayBtn">
         <span class="quick-btn-icon">🗓️</span>
         Plan Day
       </a>
@@ -838,8 +857,8 @@
 
           // Sign out button (small, in header)
           const signOutBtn = document.createElement("button");
-          signOutBtn.textContent = "Out";
-          signOutBtn.style.cssText = `font-size:11px;color:rgba(255,255,255,0.25);background:none;border:0.5px solid rgba(255,255,255,0.08);padding:4px 10px;border-radius:20px;cursor:pointer;font-family:Inter,sans-serif;`;
+          signOutBtn.textContent = "Sign Out";
+          signOutBtn.style.cssText = `font-size:11px;color:rgba(255,255,255,0.3);background:none;border:0.5px solid rgba(255,255,255,0.1);padding:4px 10px;border-radius:20px;cursor:pointer;font-family:Inter,sans-serif;`;
           signOutBtn.addEventListener("click", async () => {
             try {
               const { signOutUser } = await import("./firebase.js");
@@ -964,14 +983,16 @@
               }
             });
             document.getElementById("workoutsDone").textContent = weekCount;
-            // Fill streak dots
-            const dots = document.querySelectorAll(".streak-dot");
+            // Fill streak dots + day labels
+            const DAY_INITIALS = ["Su","Mo","Tu","We","Th","Fr","Sa"];
+            const items = document.querySelectorAll(".streak-item");
             for (let i = 6; i >= 0; i--) {
               const day = new Date(today);
               day.setDate(today.getDate() - i);
-              const dayStr = day.toDateString();
-              const done = doneDays.some((d) => d.toDateString() === dayStr);
-              if (done) dots[6 - i].classList.add("filled");
+              const idx = 6 - i;
+              const done = doneDays.some((d) => d.toDateString() === day.toDateString());
+              if (done) items[idx].querySelector(".streak-dot").classList.add("filled");
+              items[idx].querySelector(".streak-day-lbl").textContent = DAY_INITIALS[day.getDay()];
             }
           } catch (e) {}
 

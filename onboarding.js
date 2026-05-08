@@ -332,7 +332,7 @@ function buildWorkoutVisual() {
 
 function buildCoachVisual() {
   const row = document.createElement("div");
-  row.style.cssText = "display:flex;gap:8px;align-items:flex-end;justify-content:center;";
+  row.style.cssText = "display:flex;gap:6px;align-items:flex-end;justify-content:center;width:100%;";
   [
     { emoji: "🔥", name: "Vegeta",    bg: "rgba(239,68,68,0.12)",   big: false },
     { emoji: "🌿", name: "Hinata",    bg: "rgba(126,217,154,0.12)", big: false },
@@ -341,18 +341,19 @@ function buildCoachVisual() {
     { emoji: "💪", name: "All Might", bg: "rgba(167,139,250,0.12)", big: false },
   ].forEach(({ emoji, name, bg, big }) => {
     const wrap = document.createElement("div");
-    wrap.style.cssText = "display:flex;flex-direction:column;align-items:center;gap:6px;";
-    const size = big ? "68px" : "50px";
-    const fs   = big ? "30px" : "22px";
+    const size = big ? "64px" : "46px";
+    const fs   = big ? "28px" : "20px";
+    const w    = big ? "72px" : "54px";
+    wrap.style.cssText = `display:flex;flex-direction:column;align-items:center;gap:5px;width:${w};flex-shrink:0;`;
     wrap.innerHTML = `
       <div style="
         width:${size};height:${size};border-radius:50%;
         background:${bg};
         border:${big ? "2px solid #7ed99a" : "1.5px solid rgba(126,217,154,0.2)"};
-        box-shadow:${big ? "0 0 20px rgba(126,217,154,0.3)" : "none"};
+        box-shadow:${big ? "0 0 18px rgba(126,217,154,0.3)" : "none"};
         display:flex;align-items:center;justify-content:center;font-size:${fs};
       ">${emoji}</div>
-      <div style="font-size:10px;color:${big ? "#7ed99a" : "rgba(255,255,255,0.45)"};font-weight:600;text-align:center">${name}</div>
+      <div style="font-size:9px;color:${big ? "#7ed99a" : "rgba(255,255,255,0.45)"};font-weight:600;text-align:center;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${name}</div>
     `;
     row.appendChild(wrap);
   });
