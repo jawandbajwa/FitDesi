@@ -88,29 +88,39 @@ function buildOnboarding() {
     position: relative;
   `;
 
-  // Skip button
-  const skipBtn = document.createElement("button");
-  skipBtn.textContent = "Skip";
-  skipBtn.style.cssText = `
+  // Left button — Skip on slide 1, ← back on slides 2-4
+  const leftBtn = document.createElement("button");
+  leftBtn.style.cssText = `
     font-size: 14px; color: rgba(255,255,255,0.35);
     background: none; border: none; cursor: pointer;
-    font-weight: 500; font-family: inherit; padding: 8px 0;
+    font-weight: 500; font-family: inherit; padding: 8px 4px;
+    min-width: 44px; text-align: left;
+    transition: color 0.2s;
   `;
-  skipBtn.addEventListener("click", dismiss);
+  leftBtn.addEventListener("click", () => {
+    if (current === 0) {
+      dismiss();
+    } else {
+      current--;
+      renderSlide();
+    }
+  });
 
-  // Dots container
+  // Dots container — each dot is clickable
   const dotsEl = document.createElement("div");
   dotsEl.style.cssText = `
     position: absolute; left: 50%; transform: translateX(-50%);
     display: flex; gap: 7px; align-items: center;
   `;
-  const dots = SLIDES.map(() => {
+  const dots = SLIDES.map((_, i) => {
     const d = document.createElement("div");
     d.style.cssText = `
       height: 7px; border-radius: 4px;
       background: rgba(126,217,154,0.25);
       transition: all 0.3s ease; width: 7px;
+      cursor: pointer;
     `;
+    d.addEventListener("click", () => { current = i; renderSlide(); });
     dotsEl.appendChild(d);
     return d;
   });
@@ -172,6 +182,15 @@ function buildOnboarding() {
       d.style.background = i === current ? "#7ed99a" : "rgba(126,217,154,0.25)";
     });
 
+    // Sync left button
+    if (current === 0) {
+      leftBtn.textContent = "Skip";
+      leftBtn.style.color = "rgba(255,255,255,0.35)";
+    } else {
+      leftBtn.textContent = "← Back";
+      leftBtn.style.color = "rgba(255,255,255,0.6)";
+    }
+
     // Sync button
     if (s.isLast) {
       nextBtn.textContent = "Let's Go 🚀";
@@ -191,7 +210,7 @@ function buildOnboarding() {
     setTimeout(() => overlay.remove(), 350);
   }
 
-  bottomBar.appendChild(skipBtn);
+  bottomBar.appendChild(leftBtn);
   bottomBar.appendChild(dotsEl);
   bottomBar.appendChild(nextBtn);
   card.appendChild(slideArea);
