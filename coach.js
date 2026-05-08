@@ -698,13 +698,13 @@ or {"action":"swap_exercise","old":"...","new":"..."}`;
   };
 
   const response = await fetch(PROXY_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Is-Admin": isAdmin(auth.currentUser) ? "true" : "false",
     },
-  );
+    body: JSON.stringify(payload),
+  });
 
   if (!response.ok) {
     const error = await response.json();
