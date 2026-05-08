@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 // Usage:
-//   node bump-version.js patch   → 2.0.10 → 2.0.20   (small change; auto-rolls to minor at patch 100)
-//   node bump-version.js minor   → 2.0.100 → 2.1.0   (notable update)
-//   node bump-version.js major   → 2.1.0 → 3.0.0     (big release)
+//   node bump-version.js patch   → 2.1.3 → 2.1.4   (small change; rolls to minor at 10)
+//   node bump-version.js minor   → 2.1.9 → 2.2.0   (notable update; rolls to major at 10)
+//   node bump-version.js major   → 2.9.x → 3.0.0   (big release)
 
 const fs = require("fs");
 const path = require("path");
@@ -23,16 +23,18 @@ const current = manifest.version || "1.0.0";
 const [maj, min, pat] = current.split(".").map(Number);
 
 // ── Calculate next version ────────────────────────────────────────
+// Each number rolls over at 10 — patch stays 0-9, minor stays 0-9
 let next;
 if (type === "major") {
   next = `${maj + 1}.0.0`;
 } else if (type === "minor") {
-  next = `${maj}.${min + 1}.0`;
+  const newMin = min + 1;
+  next = newMin >= 10 ? `${maj + 1}.0.0` : `${maj}.${newMin}.0`;
 } else {
-  const newPat = pat + 10;
-  // Auto-rollover: patch >= 100 bumps minor instead
-  if (newPat >= 100) {
-    next = `${maj}.${min + 1}.0`;
+  const newPat = pat + 1;
+  if (newPat >= 10) {
+    const newMin = min + 1;
+    next = newMin >= 10 ? `${maj + 1}.0.0` : `${maj}.${newMin}.0`;
   } else {
     next = `${maj}.${min}.${newPat}`;
   }
