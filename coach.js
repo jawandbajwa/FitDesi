@@ -106,7 +106,10 @@ function createChatSheet() {
   chatSheet = document.createElement("div");
   chatSheet.id = "chatSheet";
   chatSheet.innerHTML = `
-    <div class="chat-handle"></div>
+    <div class="chat-header">
+      <div class="chat-handle"></div>
+      <button class="chat-close">✕</button>
+    </div>
     <div class="messages-container"></div>
     <div class="quick-replies"></div>
     <div class="input-area">
@@ -136,15 +139,47 @@ function createChatSheet() {
   `;
 
   // Style inner elements
+  const header = chatSheet.querySelector(".chat-header");
+  header.style.cssText = `
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 20px 4px;
+    flex-shrink: 0;
+  `;
+
   const handle = chatSheet.querySelector(".chat-handle");
   handle.style.cssText = `
     width: 40px;
     height: 4px;
     background: #7ed99a;
     border-radius: 2px;
-    margin: 12px auto;
     cursor: grab;
   `;
+
+  const closeBtn = chatSheet.querySelector(".chat-close");
+  closeBtn.style.cssText = `
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(126,217,154,0.1);
+    border: 1px solid rgba(126,217,154,0.3);
+    color: #7ed99a;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    line-height: 1;
+  `;
+  closeBtn.addEventListener("click", () => {
+    chatSheet.style.transform = "translateY(100%)";
+  });
 
   messagesContainer = chatSheet.querySelector(".messages-container");
   messagesContainer.style.cssText = `
@@ -464,37 +499,34 @@ or
 or
 {"action":"swap_exercise","old":"...","new":"..."}`;
 
-  // Build conversation history for Gemini
-  const conversationParts = [];
-
-  // Add system prompt as first message
-  conversationParts.push({
-    text: systemPrompt,
-  });
-
-  // Add context
-  conversationParts.push({
-    text: `Context: Today protein: ${context.todayProtein}g, Goal: ${context.proteinGoal}g, Today's workout: ${context.todayWorkout}, Weight: ${context.weight}kg, Goal: ${context.goal}, Streak: ${context.streak} days`,
-  });
+  const contextText = `Context: Today protein: ${context.todayProtein}g, Goal: ${context.proteinGoal}g, Today's workout: ${context.todayWorkout}, Weight: ${context.weight}kg, Goal: ${context.goal}, Streak: ${context.streak} days`;
 
   // Keep last 10 messages for history
   if (messages.length > 10) {
     messages = messages.slice(-10);
   }
 
-  // Add conversation history
-  messages.forEach((msg) => {
-    conversationParts.push({
-      text: msg.content,
-    });
+  // Build proper Gemini multi-turn conversation format
+  const contents = messages.map((msg, i) => {
+    let text = msg.content;
+    // Inject context into the first user message
+    if (i === 0 && msg.role === "user") {
+      text = `${contextText}\n\n${text}`;
+    }
+    return {
+      role: msg.role === "user" ? "user" : "model",
+      parts: [{ text }],
+    };
   });
 
+  // Gemini requires the conversation to start with a user turn
+  if (!contents.length || contents[0].role !== "user") {
+    contents.unshift({ role: "user", parts: [{ text: contextText }] });
+  }
+
   const payload = {
-    contents: [
-      {
-        parts: conversationParts,
-      },
-    ],
+    system_instruction: { parts: [{ text: systemPrompt }] },
+    contents,
     generationConfig: {
       maxOutputTokens: 300,
       temperature: 0.7,
