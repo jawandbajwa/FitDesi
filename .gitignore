@@ -1,6 +1,7 @@
 github_token.txt
 node_modules/
 *.log
+*.txt
 .DS_Store
 .claude/
 coach-config.js
