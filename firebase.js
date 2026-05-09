@@ -575,6 +575,9 @@ async function getAllUsers() {
       const profileSnap = await getDoc(doc(db, "users", userDoc.id, "data", "profile"));
       if (profileSnap.exists()) {
         users.push({ uid: userDoc.id, ...profileSnap.data() });
+      } else {
+        // User exists in auth/Firestore but has no profile doc yet — still show them
+        users.push({ uid: userDoc.id, name: "Unknown User", email: "" });
       }
     }
     return users;
