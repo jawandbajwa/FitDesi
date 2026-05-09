@@ -100,12 +100,15 @@ Auth: Google Sign-In only. `isAdmin: true` on the user profile doc grants admin 
 ### Chat UI details
 - **Floating button**: 48×48px, `bottom: 160px, right: 16px` — positioned above bottom nav and page content
 - **Chat sheet**: 60vh bottom sheet, slides up on button tap
-- **Header**: coach name/emoji button (left) → switch coach | drag handle (center) | ✕ close (right)
+- **Header**: 3-column CSS grid (`1fr auto 1fr`) — coach name/emoji pill (left, `justify-self: start`) | drag handle dot (center) | ✕ close (right, `justify-self: end`). Border-bottom separates from messages.
+- **Backdrop**: `#coachBackdrop` fixed overlay, click to close, fades in/out with `.visible` class
+- **Swipe to close**: touch listeners on `.chat-header` (full header, not just the dot). Closes if drag >50px down OR velocity >0.4px/ms. Springs back otherwise.
 - **Messages**: `textContent` rendering (not innerHTML) — safe against HTML injection from AI
 - **Typing indicator**: animated three-dot pulse bubble shown while Gemini responds
 - **Quick replies**: stay visible (dimmed) while coach thinks, replaced when reply arrives
 - **Input area**: text field + send button (green circle) + mic button (voice input)
 - **Action JSON**: coach can append `{"action":"add_meal"|"complete_workout"|"swap_exercise",...}` on a new line — only stripped if line starts with `{"action"`
+- **Name display**: coach addresses user by first name only — `fullName.split(" ")[0]` extracted in `getContext()`
 
 ### The 5 coaches (defined in `coaches.js`)
 | ID | Name | Tag | Personality |
@@ -124,7 +127,7 @@ Auth: Google Sign-In only. `isAdmin: true` on the user profile doc grants admin 
   - User requests → `GEMINI_API_KEY_1..4` with round-robin + auto-fallback on 429
 - **Worker source**: `cloudflare-worker.js` in repo — deploy manually via `wrangler deploy` from `C:\Users\jawan\fitdesi-gemini`
 - **Secrets**: stored in Cloudflare dashboard, never in code
-- **`maxOutputTokens`**: 600 (set in `generationConfig` — prevents mid-sentence cutoff)
+- **`maxOutputTokens`**: 800 (set in `generationConfig` — prevents mid-sentence cutoff, especially on first response)
 - **Response parsing**: joins all `parts[].text` in case Gemini splits response across multiple parts
 
 ### To redeploy the worker after changes
@@ -135,7 +138,7 @@ wrangler deploy
 ```
 
 ### firebase.js coach functions
-- `getAllUsers()` — fetches all user profile docs for admin panel
+- `getAllUsers()` — fetches all user docs; includes users without a profile doc (shows as "Unknown User") so no one is silently missing from admin panel
 - `assignCoach(uid, enabled)` — sets `coachEnabled` on a user's profile
 - `saveCoachChoice(uid, coachId)` — sets `chosenCoach` on a user's profile
 - `markOnboardingDone(uid)` — sets `onboardingDone: true` on a user's profile (merge)
@@ -145,14 +148,14 @@ wrangler deploy
 ## Versioning
 
 Version is stored in two places: `manifest.json` and `profile.html` (About section).
-Current version: **2.2.3**
+Current version: **2.8.3**
 
 Rules:
 - Small change → `node bump-version.js patch` (+1 patch, 0–9, rolls to minor at 10)
 - Notable update → `node bump-version.js minor` (+1 minor, 0–9, rolls to major at 10)
 - Big release → `node bump-version.js major` (+1 major)
 
-The script also bumps `sw.js` cache version automatically (current: `fitdesi-v33`).
+The script also bumps `sw.js` cache version automatically (current: `fitdesi-v60`).
 
 ---
 
@@ -182,6 +185,7 @@ The script also bumps `sw.js` cache version automatically (current: `fitdesi-v33
   - `carbsGoal`, `fatGoal`, `caloriesGoal` — full macro targets
   - `proteinData` — `{ "Mon May 04 2026": 120 }` — today's protein for nav ring
   - `todayWorkout` — `{ name, icon, isCardio }` — synced from exercise.js to home page
+  - `fitdesi_admin_users` — JSON array of all user objects, cached by admin.js for offline fallback
 - Every page's bottom nav has a protein ring script (inline `<script>` at bottom of body).
 - Input validation: use `min`/`max` HTML attributes + the `validateField(id, required)` helper (defined inline in each page's script or in the JS file). Shows `.field-error` below the input, adds `.input-error` class on the element.
 
