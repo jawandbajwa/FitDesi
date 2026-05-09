@@ -447,7 +447,8 @@ async function getContext() {
   if (auth.currentUser) {
     const profile = await getUserProfile(auth.currentUser.uid);
     if (profile) {
-      context.name          = profile.name || auth.currentUser.displayName || "there";
+      const fullName        = profile.name || auth.currentUser.displayName || "there";
+      context.name          = fullName.split(" ")[0];
       context.weight        = profile.weight || 0;
       context.height        = profile.height || 0;
       context.age           = profile.age || 0;
@@ -514,7 +515,7 @@ or {"action":"swap_exercise","old":"...","new":"..."}`;
   const payload = {
     system_instruction: { parts: [{ text: systemPrompt }] },
     contents,
-    generationConfig: { maxOutputTokens: 600, temperature: 0.7 },
+    generationConfig: { maxOutputTokens: 800, temperature: 0.7 },
   };
 
   const response = await fetch(PROXY_URL, {
