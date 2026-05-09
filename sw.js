@@ -1,7 +1,7 @@
 // FitDesi Service Worker — Network-first, auto-update on every deploy
 // Bump this version whenever you want to force a full cache wipe.
 // With network-first below, normal file changes don't need a version bump.
-const CACHE_NAME = "fitdesi-v61";
+const CACHE_NAME = "fitdesi-v62";
 
 const STATIC_ASSETS = [
   "./",
