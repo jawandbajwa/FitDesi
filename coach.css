@@ -60,57 +60,58 @@
 
 /* ── Header ──────────────────────────────────────────────────── */
 .chat-header {
-  position: relative;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: center;
-  padding: 12px 20px 4px;
+  padding: 14px 16px 14px;
+  border-bottom: 1px solid rgba(126, 217, 154, 0.15);
   flex-shrink: 0;
+  gap: 8px;
 }
 
 .chat-handle {
-  width: 40px;
+  width: 36px;
   height: 4px;
-  background: #7ed99a;
+  background: rgba(126, 217, 154, 0.4);
   border-radius: 2px;
   cursor: grab;
+  justify-self: center;
+  touch-action: none;
 }
 
 .chat-close {
-  position: absolute;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 32px;
-  height: 32px;
+  justify-self: end;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  background: rgba(126,217,154,0.1);
-  border: 1px solid rgba(126,217,154,0.3);
+  background: rgba(126,217,154,0.08);
+  border: 1px solid rgba(126,217,154,0.25);
   color: #7ed99a;
-  font-size: 16px;
+  font-size: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   line-height: 1;
   font-family: inherit;
+  flex-shrink: 0;
 }
 
 .coach-switch-btn {
-  position: absolute;
-  left: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  padding: 5px 10px;
+  justify-self: start;
+  padding: 5px 12px;
   border-radius: 20px;
-  background: rgba(126,217,154,0.1);
-  border: 1px solid rgba(126,217,154,0.3);
+  background: rgba(126,217,154,0.08);
+  border: 1px solid rgba(126,217,154,0.25);
   color: #7ed99a;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
   font-family: inherit;
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ── Messages area ───────────────────────────────────────────── */
