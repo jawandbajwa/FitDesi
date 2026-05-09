@@ -101,12 +101,41 @@ document.querySelectorAll(".tab-btn").forEach((btn) => {
 });
 
 // ─── USERS ───────────────────────────────────────────────────
+const USERS_CACHE_KEY = "fitdesi_admin_users";
+
+function saveUsersCache(users) {
+  try { localStorage.setItem(USERS_CACHE_KEY, JSON.stringify(users)); } catch (e) {}
+}
+
+function loadUsersCache() {
+  try { return JSON.parse(localStorage.getItem(USERS_CACHE_KEY) || "null"); } catch (e) { return null; }
+}
+
 async function loadUsers() {
   const list = document.getElementById("userList");
-  list.innerHTML = `<div style="text-align:center;color:rgba(255,255,255,0.3);padding:40px;font-size:13px;">Loading members…</div>`;
-  allUsers = await getAllUsers();
-  updateStats();
-  renderUsers();
+
+  // Show cached data immediately
+  const cached = loadUsersCache();
+  if (cached) {
+    allUsers = cached;
+    updateStats();
+    renderUsers();
+  } else {
+    list.innerHTML = `<div style="text-align:center;color:rgba(255,255,255,0.3);padding:40px;font-size:13px;">Loading members…</div>`;
+  }
+
+  // Then fetch fresh from Firebase
+  try {
+    const fresh = await getAllUsers();
+    allUsers = fresh;
+    saveUsersCache(fresh);
+    updateStats();
+    renderUsers();
+  } catch (e) {
+    if (!cached) {
+      list.innerHTML = `<div style="text-align:center;color:rgba(255,255,255,0.3);padding:40px;font-size:13px;">Offline — no cached data yet</div>`;
+    }
+  }
 }
 
 function renderUsers() {
@@ -691,6 +720,8 @@ onAuthStateChanged(auth, async (user) => {
   allRecipes = await getRecipes(activeCuisine);
   renderIngredients();
   renderRecipes();
-  allUsers = await getAllUsers();
-  updateStats();
+  // Show cached user count immediately, refresh in background
+  const cachedUsers = loadUsersCache();
+  if (cachedUsers) { allUsers = cachedUsers; updateStats(); }
+  getAllUsers().then((fresh) => { allUsers = fresh; saveUsersCache(fresh); updateStats(); }).catch(() => {});
 });
