@@ -116,31 +116,34 @@ function createChatSheet() {
   const closeBtn = chatSheet.querySelector(".chat-close");
   closeBtn.addEventListener("click", closeChat);
 
-  // ── Drag handle — swipe down to close ──────────────────────
-  const handle = chatSheet.querySelector(".chat-handle");
+  // ── Drag to close — whole header is the target ─────────────
+  const dragTarget = chatSheet.querySelector(".chat-header");
   let dragStartY = 0;
+  let dragStartTime = 0;
   let dragging = false;
 
-  handle.addEventListener("touchstart", (e) => {
+  dragTarget.addEventListener("touchstart", (e) => {
     dragStartY = e.touches[0].clientY;
+    dragStartTime = Date.now();
     dragging = true;
-    chatSheet.style.transition = "none"; // disable transition while dragging
+    chatSheet.style.transition = "none";
   }, { passive: true });
 
-  handle.addEventListener("touchmove", (e) => {
+  dragTarget.addEventListener("touchmove", (e) => {
     if (!dragging) return;
     const dy = e.touches[0].clientY - dragStartY;
     if (dy > 0) chatSheet.style.transform = `translateY(${dy}px)`;
   }, { passive: true });
 
-  handle.addEventListener("touchend", (e) => {
+  dragTarget.addEventListener("touchend", (e) => {
     if (!dragging) return;
     dragging = false;
     const dy = e.changedTouches[0].clientY - dragStartY;
-    if (dy > 80) {
-      closeChat(); // dragged far enough — close
+    const elapsed = Date.now() - dragStartTime;
+    const velocity = dy / Math.max(elapsed, 1); // px/ms
+    if (dy > 50 || velocity > 0.4) {
+      closeChat();
     } else {
-      // spring back
       chatSheet.style.transition = "transform 0.3s ease";
       chatSheet.style.transform = "translateY(0%)";
     }
