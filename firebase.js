@@ -69,26 +69,32 @@ function isStandalonePWA() {
   );
 }
 
-function isMobileOrPWA() {
-  // Covers: iOS "Add to Home Screen", Android PWA, and any mobile browser.
-  // On mobile, window.open() is unreliable for OAuth popups even in Chrome,
-  // so we always use redirect on mobile regardless of PWA vs browser context.
-  if (window.navigator.standalone === true) return true; // iOS standalone
-  if (window.matchMedia("(display-mode: standalone)").matches) return true; // Android PWA
-  return /android|iphone|ipad|ipod/i.test(navigator.userAgent);
+function isIOS() {
+  return /iphone|ipad|ipod/i.test(navigator.userAgent);
+}
+
+function isAndroidStandalone() {
+  // Android PWA or any Android browser (redirect is needed; popup blocked)
+  return /android/i.test(navigator.userAgent) ||
+    window.matchMedia("(display-mode: standalone)").matches;
 }
 
 async function signInWithGoogle() {
   try {
-    if (isMobileOrPWA()) {
-      // Mobile (PWA or browser): always use redirect — popups are unreliable.
-      // The redirect lands on login.html (possibly in Chrome browser on Android),
-      // getRedirectResult() captures the credential, and the auth state is written
-      // to IndexedDB which is shared between Chrome and the installed PWA.
-      await signInWithRedirect(auth, provider);
-      return null; // page navigates away; result handled via getRedirectResult()
+    if (isIOS()) {
+      // iOS: signInWithRedirect opens Google in Safari and the redirect back
+      // lands in Safari — NOT in the PWA — so the PWA never captures the result.
+      // Popup works correctly in both Safari browser and iOS standalone (Add to Home).
+      const result = await signInWithPopup(auth, provider);
+      return result.user;
     }
-    // Desktop browser: popup gives best UX (stays on page, no redirect round-trip).
+    if (isAndroidStandalone() || window.navigator.standalone === true) {
+      // Android PWA / standalone: popup is blocked, must use redirect.
+      // getRedirectResult() on login.html captures the credential.
+      await signInWithRedirect(auth, provider);
+      return null;
+    }
+    // Desktop browser: popup.
     const result = await signInWithPopup(auth, provider);
     return result.user;
   } catch (error) {
