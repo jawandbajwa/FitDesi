@@ -114,7 +114,13 @@ function loadUsersCache() {
 async function loadUsers() {
   const list = document.getElementById("userList");
 
-  // Show cached data immediately
+  // Already loaded on init — just render, no second Firestore read
+  if (allUsers.length) {
+    renderUsers();
+    return;
+  }
+
+  // First tab open before init finished — show cache while waiting
   const cached = loadUsersCache();
   if (cached) {
     allUsers = cached;
@@ -122,17 +128,13 @@ async function loadUsers() {
     renderUsers();
   } else {
     list.innerHTML = `<div style="text-align:center;color:rgba(255,255,255,0.3);padding:40px;font-size:13px;">Loading members…</div>`;
-  }
-
-  // Then fetch fresh from Firebase
-  try {
-    const fresh = await getAllUsers();
-    allUsers = fresh;
-    saveUsersCache(fresh);
-    updateStats();
-    renderUsers();
-  } catch (e) {
-    if (!cached) {
+    try {
+      const fresh = await getAllUsers();
+      allUsers = fresh;
+      saveUsersCache(fresh);
+      updateStats();
+      renderUsers();
+    } catch (e) {
       list.innerHTML = `<div style="text-align:center;color:rgba(255,255,255,0.3);padding:40px;font-size:13px;">Offline — no cached data yet</div>`;
     }
   }
