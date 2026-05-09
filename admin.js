@@ -691,5 +691,6 @@ onAuthStateChanged(auth, async (user) => {
   allRecipes = await getRecipes(activeCuisine);
   renderIngredients();
   renderRecipes();
+  allUsers = await getAllUsers();
   updateStats();
 });
