@@ -1,7 +1,7 @@
 // FitDesi Service Worker — Network-first, auto-update on every deploy
 // Bump this version whenever you want to force a full cache wipe.
 // With network-first below, normal file changes don't need a version bump.
-const CACHE_NAME = "fitdesi-v51";
+const CACHE_NAME = "fitdesi-v52";
 
 const STATIC_ASSETS = [
   "./",
@@ -39,20 +39,23 @@ const STATIC_ASSETS = [
 ];
 
 // ─── INSTALL ─────────────────────────────────────────────────
-// Cache files individually so one missing file doesn't break the entire SW.
+// Skip waiting immediately so the new SW activates without needing
+// all tabs closed — critical for iOS PWA which doesn't fully terminate.
 self.addEventListener("install", (event) => {
+  self.skipWaiting(); // take over right away, don't wait for old SW to die
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) =>
       Promise.allSettled(
         STATIC_ASSETS.map((url) => cache.add(url).catch(() => {}))
       )
-    ).then(() => self.skipWaiting()),
+    )
   );
 });
 
 // ─── ACTIVATE ────────────────────────────────────────────────
-// Delete every cache that isn't the current version, then
-// immediately take control of all open tabs (clients.claim).
+// Delete every cache that isn't the current version, claim all
+// open tabs immediately, then tell them to reload so they get
+// the new files instead of the stale cached versions.
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches
@@ -64,7 +67,15 @@ self.addEventListener("activate", (event) => {
             .map((key) => caches.delete(key)),
         ),
       )
-      .then(() => self.clients.claim()), // ← control open tabs immediately
+      .then(() => self.clients.claim())
+      .then(() => {
+        // Tell every open tab to reload so it picks up the new files.
+        // Without this, tabs keep running the old JS/CSS even after the
+        // new SW activates (especially noticeable on iOS PWA).
+        return self.clients.matchAll({ type: "window" }).then((clients) => {
+          clients.forEach((client) => client.navigate(client.url));
+        });
+      })
   );
 });
 

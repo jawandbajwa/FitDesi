@@ -82,14 +82,13 @@ body {
   bottom: 0;
   left: 0;
   right: 0;
-  /* Grow nav to include iPhone home indicator area */
+  /* Grow to include iPhone home indicator — items stay in top 72px */
   height: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px));
   background: #0c1510;
   border-top: 1px solid var(--border);
   display: flex;
   align-items: flex-start;
   justify-content: space-around;
-  padding-top: 10px;
   z-index: 100;
 }
 
@@ -98,12 +97,12 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-end;
-  gap: 3px;
-  height: 100%;
+  justify-content: center;
+  gap: 4px;
+  /* Lock items to the visible 72px zone, not the full height */
+  height: var(--nav-h);
   text-decoration: none;
   color: var(--green-dark);
-  padding-bottom: 10px;
   transition: color 0.15s;
   position: relative;
 }
@@ -1829,12 +1828,11 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-end;
-  gap: 3px;
-  height: 100%;
+  justify-content: center;
+  gap: 4px;
+  height: var(--nav-h);
   text-decoration: none;
   color: var(--green-dark);
-  padding-bottom: 10px;
   transition: color 0.15s;
   position: relative;
 }
