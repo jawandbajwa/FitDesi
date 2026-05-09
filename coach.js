@@ -24,6 +24,7 @@ let recognition = null;
 // ─── DOM ELEMENTS ──────────────────────────────────────────────
 let coachButton = null;
 let chatSheet = null;
+let backdrop = null;
 let messagesContainer = null;
 let inputField = null;
 let micButton = null;
@@ -67,8 +68,25 @@ function createFloatingButton() {
   document.body.appendChild(coachButton);
 }
 
+// ─── CLOSE SHEET HELPER ────────────────────────────────────────
+function closeChat() {
+  chatSheet.style.transition = "transform 0.3s ease";
+  chatSheet.style.transform = "translateY(100%)";
+  backdrop.classList.remove("visible");
+  setTimeout(() => {
+    chatSheet.style.display = "none";
+    backdrop.style.display = "none";
+  }, 310);
+}
+
 // ─── CHAT SHEET ────────────────────────────────────────────────
 function createChatSheet() {
+  // Backdrop — click outside sheet to close
+  backdrop = document.createElement("div");
+  backdrop.id = "coachBackdrop";
+  backdrop.addEventListener("click", closeChat);
+  document.body.appendChild(backdrop);
+
   chatSheet = document.createElement("div");
   chatSheet.id = "chatSheet";
   chatSheet.innerHTML = `
@@ -96,9 +114,36 @@ function createChatSheet() {
   `;
 
   const closeBtn = chatSheet.querySelector(".chat-close");
-  closeBtn.addEventListener("click", () => {
-    chatSheet.style.transform = "translateY(100%)";
-    setTimeout(() => { chatSheet.style.display = "none"; }, 310);
+  closeBtn.addEventListener("click", closeChat);
+
+  // ── Drag handle — swipe down to close ──────────────────────
+  const handle = chatSheet.querySelector(".chat-handle");
+  let dragStartY = 0;
+  let dragging = false;
+
+  handle.addEventListener("touchstart", (e) => {
+    dragStartY = e.touches[0].clientY;
+    dragging = true;
+    chatSheet.style.transition = "none"; // disable transition while dragging
+  }, { passive: true });
+
+  handle.addEventListener("touchmove", (e) => {
+    if (!dragging) return;
+    const dy = e.touches[0].clientY - dragStartY;
+    if (dy > 0) chatSheet.style.transform = `translateY(${dy}px)`;
+  }, { passive: true });
+
+  handle.addEventListener("touchend", (e) => {
+    if (!dragging) return;
+    dragging = false;
+    const dy = e.changedTouches[0].clientY - dragStartY;
+    if (dy > 80) {
+      closeChat(); // dragged far enough — close
+    } else {
+      // spring back
+      chatSheet.style.transition = "transform 0.3s ease";
+      chatSheet.style.transform = "translateY(0%)";
+    }
   });
 
   const switchBtn = chatSheet.querySelector(".coach-switch-btn");
@@ -138,9 +183,13 @@ function toggleChat() {
   const isOpen = chatSheet.style.display !== "none";
 
   if (isOpen) {
-    chatSheet.style.transform = "translateY(100%)";
-    setTimeout(() => { chatSheet.style.display = "none"; }, 310);
+    closeChat();
   } else {
+    // Show backdrop
+    backdrop.style.display = "block";
+    requestAnimationFrame(() => backdrop.classList.add("visible"));
+
+    chatSheet.style.transition = "transform 0.3s ease";
     chatSheet.style.display = "flex";
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
