@@ -105,10 +105,29 @@ Auth: Google Sign-In only. `isAdmin: true` on the user profile doc grants admin 
 - **Swipe to close**: touch listeners on `.chat-header` (full header, not just the dot). Closes if drag >50px down OR velocity >0.4px/ms. Springs back otherwise.
 - **Messages**: `textContent` rendering (not innerHTML) — safe against HTML injection from AI
 - **Typing indicator**: animated three-dot pulse bubble shown while Gemini responds
-- **Quick replies**: stay visible (dimmed) while coach thinks, replaced when reply arrives
+- **Quick replies**: contextual and time-of-day aware. Opening replies based on hour (morning/afternoon/evening/night). Follow-up replies based on coach message content. Generic replies rotate from a pool so they never feel repeated.
 - **Input area**: text field + send button (green circle) + mic button (voice input)
 - **Action JSON**: coach can append `{"action":"add_meal"|"complete_workout"|"swap_exercise",...}` on a new line — only stripped if line starts with `{"action"`
 - **Name display**: coach addresses user by first name only — `fullName.split(" ")[0]` extracted in `getContext()`
+
+### getContext() — what the coach knows every call
+Fetches in parallel via `Promise.all`:
+- `getUserProfile` — name, weight, height, age, gender, goal, activity, units
+- `getDailyLog` — today's meals by type (breakfast/lunch/snack/dinner), names, per-meal cal/protein summary
+- `getWorkoutCycle` — active split type, current set (A/B)
+- `getProgressHistory` — latest weight + body fat entry, weight trend vs previous entry
+Also from localStorage (instant): proteinGoal, carbsGoal, fatGoal, caloriesGoal, todayWorkout, time of day
+
+### Coach system prompt knowledge base (injected every call)
+- **Nutrition science**: Mifflin-St Jeor BMR, TDEE multipliers, deficit/surplus math, protein per kg targets, per-meal protein synthesis, carb/fat minimums
+- **Exercise science**: hypertrophy rep ranges (5–30, focus 8–15), weekly volume (10–20 sets/muscle), RPE, rest periods, progressive overload, deload frequency (every 4–8 weeks), recovery (48–72h per muscle)
+- **Bodybuilding splits**: PPL, Upper/Lower, Full Body, Bro Split, Arnold Split — what each targets and who it's for
+- **Exercises per muscle**: chest, back, shoulders, legs, biceps, triceps, core — full lists
+- **Indian food macros**: dal, paneer, chana, rajma, roti, rice, dahi — per 100g cooked with cal/protein/carb/fat
+- **Canadian foods**: oats, eggs, Greek yogurt, chicken, salmon, cottage cheese, peanut butter — same detail
+- **Supplements**: creatine (5g/day), protein powder, caffeine (3–6mg/kg), Vitamin D, Omega-3, Magnesium — evidence-based only, no hype
+- **Temperature**: 0.85 (more natural, less robotic responses)
+- **History**: last 16 messages kept for context
 
 ### The 5 coaches (defined in `coaches.js`)
 | ID | Name | Tag | Personality |
@@ -127,7 +146,7 @@ Auth: Google Sign-In only. `isAdmin: true` on the user profile doc grants admin 
   - User requests → `GEMINI_API_KEY_1..4` with round-robin + auto-fallback on 429
 - **Worker source**: `cloudflare-worker.js` in repo — deploy manually via `wrangler deploy` from `C:\Users\jawan\fitdesi-gemini`
 - **Secrets**: stored in Cloudflare dashboard, never in code
-- **`maxOutputTokens`**: 800 (set in `generationConfig` — prevents mid-sentence cutoff, especially on first response)
+- **`maxOutputTokens`**: 2048 (set in `generationConfig` — gives room for detailed nutrition/exercise explanations)
 - **Response parsing**: joins all `parts[].text` in case Gemini splits response across multiple parts
 
 ### To redeploy the worker after changes
@@ -148,14 +167,14 @@ wrangler deploy
 ## Versioning
 
 Version is stored in two places: `manifest.json` and `profile.html` (About section).
-Current version: **2.8.3**
+Current version: **3.0.0**
 
 Rules:
 - Small change → `node bump-version.js patch` (+1 patch, 0–9, rolls to minor at 10)
 - Notable update → `node bump-version.js minor` (+1 minor, 0–9, rolls to major at 10)
 - Big release → `node bump-version.js major` (+1 major)
 
-The script also bumps `sw.js` cache version automatically (current: `fitdesi-v60`).
+The script also bumps `sw.js` cache version automatically (current: `fitdesi-v62`).
 
 ---
 
