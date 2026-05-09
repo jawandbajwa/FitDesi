@@ -126,21 +126,16 @@ async function saveUserProfile(userId, profile) {
 
 async function getUserProfile(userId) {
   try {
-    if (navigator.onLine) {
-      const snap = await getDoc(doc(db, "users", userId, "data", "profile"));
-      const profile = snap.exists() ? snap.data() : null;
-      if (profile) await cacheUserProfile(userId, profile);
-      return profile;
-    } else {
-      return await getCachedUserProfile(userId);
-    }
+    const snap = await getDoc(doc(db, "users", userId, "data", "profile"));
+    const profile = snap.exists() ? snap.data() : null;
+    if (profile) cacheUserProfile(userId, profile).catch(() => {});
+    return profile;
   } catch (error) {
-    console.error("Error getting user profile:", error);
+    console.error("Firestore profile failed, falling back to cache:", error);
     try {
       return await getCachedUserProfile(userId);
-    } catch (cacheError) {
-      console.error("Cache error:", cacheError);
-      throw error;
+    } catch {
+      return null;
     }
   }
 }
@@ -156,26 +151,18 @@ async function saveDailyLog(userId, dateKey, log) {
 }
 
 async function getDailyLog(userId, dateKey) {
+  const empty = { breakfast: [], lunch: [], snack: [], dinner: [] };
   try {
-    if (navigator.onLine) {
-      const snap = await getDoc(doc(db, "users", userId, "logs", dateKey));
-      const log = snap.exists()
-        ? snap.data()
-        : { breakfast: [], lunch: [], snack: [], dinner: [] };
-      await cacheDailyLog(userId, dateKey, log);
-      return log;
-    } else {
-      const cached = await getCachedDailyLog(userId, dateKey);
-      return cached || { breakfast: [], lunch: [], snack: [], dinner: [] };
-    }
+    const snap = await getDoc(doc(db, "users", userId, "logs", dateKey));
+    const log = snap.exists() ? snap.data() : empty;
+    cacheDailyLog(userId, dateKey, log).catch(() => {});
+    return log;
   } catch (error) {
-    console.error("Error getting daily log:", error);
+    console.error("Firestore daily log failed, falling back to cache:", error);
     try {
-      const cached = await getCachedDailyLog(userId, dateKey);
-      return cached || { breakfast: [], lunch: [], snack: [], dinner: [] };
-    } catch (cacheError) {
-      console.error("Cache error:", cacheError);
-      throw error;
+      return (await getCachedDailyLog(userId, dateKey)) || empty;
+    } catch {
+      return empty;
     }
   }
 }
@@ -280,23 +267,18 @@ async function saveIngredient(ingredient) {
 
 async function getIngredients() {
   try {
-    if (navigator.onLine) {
-      const snap = await getDocs(
-        collection(db, "shared", "ingredients", "items"),
-      );
-      const ingredients = snap.docs.map((d) => d.data());
-      await cacheIngredients(ingredients);
-      return ingredients;
-    } else {
-      return await getCachedIngredients();
-    }
+    const snap = await getDocs(
+      collection(db, "shared", "ingredients", "items"),
+    );
+    const ingredients = snap.docs.map((d) => d.data());
+    cacheIngredients(ingredients).catch(() => {});
+    return ingredients;
   } catch (error) {
-    console.error("Error getting ingredients:", error);
+    console.error("Firestore ingredients failed, falling back to cache:", error);
     try {
       return await getCachedIngredients();
-    } catch (cacheError) {
-      console.error("Cache error:", cacheError);
-      throw error;
+    } catch {
+      return [];
     }
   }
 }
@@ -346,21 +328,16 @@ async function saveWorkoutCycle(userId, cycle) {
 
 async function getWorkoutCycle(userId) {
   try {
-    if (navigator.onLine) {
-      const snap = await getDoc(doc(db, "users", userId, "data", "cycle"));
-      const cycle = snap.exists() ? snap.data() : null;
-      if (cycle) await cacheWorkoutCycle(userId, cycle);
-      return cycle;
-    } else {
-      return await getCachedWorkoutCycle(userId);
-    }
+    const snap = await getDoc(doc(db, "users", userId, "data", "cycle"));
+    const cycle = snap.exists() ? snap.data() : null;
+    if (cycle) cacheWorkoutCycle(userId, cycle).catch(() => {});
+    return cycle;
   } catch (error) {
-    console.error("Error getting workout cycle:", error);
+    console.error("Firestore workout cycle failed, falling back to cache:", error);
     try {
       return await getCachedWorkoutCycle(userId);
-    } catch (cacheError) {
-      console.error("Cache error:", cacheError);
-      throw error;
+    } catch {
+      return null;
     }
   }
 }

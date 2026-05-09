@@ -232,13 +232,13 @@ document.addEventListener("click", async function (e) {
   // ── Cuisine toggle ──
   const cuisineBtn = e.target.closest(".cuisine-btn");
   if (cuisineBtn && cuisineBtn.dataset.cuisine) {
-    console.log("Cuisine clicked:", cuisineBtn.dataset.cuisine);
     document
       .querySelectorAll(".cuisine-btn")
       .forEach((b) => b.classList.remove("active"));
     cuisineBtn.classList.add("active");
     activeCuisine = cuisineBtn.dataset.cuisine;
     activeCategory = "all";
+    allRecipes = []; // clear stale data before new cuisine loads
     document
       .querySelectorAll(".cat-btn")
       .forEach((b) => b.classList.remove("active"));
@@ -251,7 +251,6 @@ document.addEventListener("click", async function (e) {
   // ── Category filter ──
   const catBtn = e.target.closest(".cat-btn");
   if (catBtn && catBtn.dataset.cat) {
-    console.log("Category clicked:", catBtn.dataset.cat);
     document
       .querySelectorAll(".cat-btn")
       .forEach((b) => b.classList.remove("active"));
