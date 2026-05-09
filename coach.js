@@ -6,6 +6,9 @@ import {
   onAuthStateChanged,
   isAdmin,
   getUserProfile,
+  getDailyLog,
+  getWorkoutCycle,
+  getProgressHistory,
   saveCoachChoice,
   addMealToLog,
   completeWorkout,
@@ -311,7 +314,15 @@ function sendWelcomeMessage() {
     : "Hey! I'm your personal coach. Ready to crush some goals?";
 
   addMessage({ role: "assistant", content: greeting });
-  showQuickReplies(["Great, feeling strong!", "A bit tired today", "Need meal ideas"]);
+  showQuickReplies(getOpeningQuickReplies());
+}
+
+function getOpeningQuickReplies() {
+  const hour = new Date().getHours();
+  if (hour < 11) return ["What should I eat for breakfast?", "How's my protein target?", "What's my workout today?"];
+  if (hour < 15) return ["What should I have for lunch?", "How am I doing today?", "Need a snack idea"];
+  if (hour < 20) return ["What's left for dinner?", "I just finished my workout", "How are my macros today?"];
+  return ["How'd I do today?", "What's my plan tomorrow?", "I'm feeling tired today"];
 }
 
 // ─── SEND MESSAGE ──────────────────────────────────────────────
@@ -401,13 +412,26 @@ function showQuickReplies(replies) {
 
 function getQuickRepliesForContext(message) {
   const msg = message.toLowerCase();
-  if (msg.includes("tired") || msg.includes("rest"))
-    return ["Need a quick protein hit", "Skip workout today", "Light cardio instead"];
-  if (msg.includes("meal") || msg.includes("eat"))
-    return ["Already ate", "Give me options", "Too busy right now"];
-  if (msg.includes("workout") || msg.includes("exercise"))
-    return ["Too tired", "Sounds good", "Swap for something else"];
-  return ["Thanks!", "Tell me more", "Got any tips?"];
+
+  if (msg.includes("tired") || msg.includes("rest") || msg.includes("exhausted") || msg.includes("sleep"))
+    return ["Still want to train light", "Taking the day off", "What should I eat when tired?"];
+  if (msg.includes("recipe") || msg.includes("dal") || msg.includes("paneer") || msg.includes("meal plan"))
+    return ["Add that to my log", "Give me something else", "What else is high protein?"];
+  if (msg.includes("protein") || msg.includes("macro") || msg.includes("calorie"))
+    return ["What should I eat now?", "Log something for me", "How do I hit my goal?"];
+  if (msg.includes("workout") || msg.includes("exercise") || msg.includes("train") || msg.includes("gym"))
+    return ["Log my workout done", "Swap an exercise", "What muscles am I hitting?"];
+  if (msg.includes("weight") || msg.includes("progress") || msg.includes("goal"))
+    return ["Am I on track?", "What should I focus on?", "How long will this take?"];
+
+  // Rotate through varied generic replies so it never feels the same
+  const pools = [
+    ["What should I eat next?", "How are my macros?", "Give me a tip"],
+    ["Log my meal", "Check my progress", "What's my workout?"],
+    ["I need motivation", "Give me a recipe idea", "How am I doing today?"],
+    ["What's high in protein?", "I feel good today", "Any adjustments?"],
+  ];
+  return pools[Math.floor(Date.now() / 60000) % pools.length];
 }
 
 // ─── VOICE RECOGNITION ─────────────────────────────────────────
@@ -434,30 +458,89 @@ function toggleVoiceInput() {
 // ─── GET CONTEXT ───────────────────────────────────────────────
 async function getContext() {
   const context = {};
-  const proteinData = JSON.parse(localStorage.getItem("proteinData") || "{}");
-  const today = new Date().toDateString();
+  const now = new Date();
+  const dateKey = now.toISOString().split("T")[0]; // YYYY-MM-DD
+  const hour = now.getHours();
 
-  context.todayProtein  = proteinData[today] || 0;
-  context.proteinGoal   = parseInt(localStorage.getItem("proteinGoal")   || "0");
-  context.carbsGoal     = parseInt(localStorage.getItem("carbsGoal")     || "0");
-  context.fatGoal       = parseInt(localStorage.getItem("fatGoal")       || "0");
-  context.caloriesGoal  = parseInt(localStorage.getItem("caloriesGoal")  || "0");
-  context.todayWorkout  = localStorage.getItem("todayWorkout") || "Rest day";
+  // From localStorage — instant, no network
+  context.proteinGoal  = parseInt(localStorage.getItem("proteinGoal")  || "0");
+  context.carbsGoal    = parseInt(localStorage.getItem("carbsGoal")    || "0");
+  context.fatGoal      = parseInt(localStorage.getItem("fatGoal")      || "0");
+  context.caloriesGoal = parseInt(localStorage.getItem("caloriesGoal") || "0");
+  context.todayWorkout = (() => {
+    try { return JSON.parse(localStorage.getItem("todayWorkout"))?.name || "Rest day"; } catch { return "Rest day"; }
+  })();
+  context.timeOfDay = hour < 12 ? "morning" : hour < 17 ? "afternoon" : "evening";
+  context.dateKey   = dateKey;
 
-  if (auth.currentUser) {
-    const profile = await getUserProfile(auth.currentUser.uid);
-    if (profile) {
-      const fullName        = profile.name || auth.currentUser.displayName || "there";
-      context.name          = fullName.split(" ")[0];
-      context.weight        = profile.weight || 0;
-      context.height        = profile.height || 0;
-      context.age           = profile.age || 0;
-      context.gender        = profile.gender || "male";
-      context.goal          = profile.goal || "recomp";
-      context.activityLevel = profile.activity || "moderate";
-      context.weightUnit    = profile.weightUnit || "kg";
+  if (!auth.currentUser) return context;
+  const uid = auth.currentUser.uid;
+
+  // Parallel Firestore reads — all at once, no waterfall
+  const [profile, dailyLog, cycle, progress] = await Promise.all([
+    getUserProfile(uid).catch(() => null),
+    getDailyLog(uid, dateKey).catch(() => ({ breakfast: [], lunch: [], snack: [], dinner: [] })),
+    getWorkoutCycle(uid).catch(() => null),
+    getProgressHistory(uid).catch(() => []),
+  ]);
+
+  // Profile
+  if (profile) {
+    const fullName       = profile.name || auth.currentUser.displayName || "there";
+    context.name         = fullName.split(" ")[0];
+    context.weight       = profile.weight || 0;
+    context.height       = profile.height || 0;
+    context.age          = profile.age || 0;
+    context.gender       = profile.gender || "male";
+    context.goal         = profile.goal || "recomp";
+    context.activityLevel = profile.activityLevel || profile.activity || "moderate";
+    context.weightUnit   = profile.weightUnit || "kg";
+    context.heightUnit   = profile.heightUnit || "cm";
+  }
+
+  // Today's food log — build a human-readable meal summary
+  let todayCal = 0, todayPro = 0, todayCarbs = 0, todayFat = 0;
+  const mealLines = [];
+  ["breakfast", "lunch", "snack", "dinner"].forEach((meal) => {
+    const items = dailyLog[meal] || [];
+    if (items.length) {
+      const names = items.map((i) => i.name).filter(Boolean).join(", ");
+      const cal   = items.reduce((s, i) => s + (i.calories || 0), 0);
+      const pro   = items.reduce((s, i) => s + (i.protein  || 0), 0);
+      mealLines.push(`${meal}: ${names} (${Math.round(cal)} cal, ${Math.round(pro)}g protein)`);
+      todayCal   += cal;
+      todayPro   += pro;
+      todayCarbs += items.reduce((s, i) => s + (i.carbs || 0), 0);
+      todayFat   += items.reduce((s, i) => s + (i.fat   || 0), 0);
     }
-    context.streak = 0;
+  });
+  context.mealsToday       = mealLines.length ? mealLines.join(" | ") : "nothing logged yet";
+  context.todayCalories    = Math.round(todayCal);
+  context.todayProtein     = Math.round(todayPro);
+  context.todayCarbs       = Math.round(todayCarbs);
+  context.todayFat         = Math.round(todayFat);
+  context.calRemaining     = Math.max(0, context.caloriesGoal - context.todayCalories);
+  context.proteinRemaining = Math.max(0, context.proteinGoal  - context.todayProtein);
+
+  // Workout split
+  if (cycle) {
+    context.splitType = cycle.activeSplit || "custom";
+    context.currentSet = cycle.currentSet || "A";
+  }
+
+  // Weight trend from progress history
+  if (progress.length) {
+    const latest = progress[progress.length - 1];
+    context.latestWeight    = latest.weight   || null;
+    context.latestBodyFat   = latest.bodyFat  || null;
+    context.latestWeightDate = latest.date    || null;
+    if (progress.length >= 2) {
+      const prev = progress[progress.length - 2];
+      const diff = (latest.weight || 0) - (prev.weight || 0);
+      context.weightTrend = Math.abs(diff) > 0.1
+        ? `${diff > 0 ? "+" : ""}${diff.toFixed(1)}${context.weightUnit} since ${prev.date}`
+        : "stable";
+    }
   }
 
   return context;
@@ -476,31 +559,50 @@ async function callGeminiAPI(messages, context) {
 
   const personalityLayer = currentCoach
     ? getCoachPersonality(currentCoach.id)
-    : "Be direct, warm, and helpful. Max 2 sentences per response. No bullet points.";
+    : "Be direct, warm, and helpful. Talk like a real person — not a chatbot.";
 
   const systemPrompt = `${personalityLayer}
 
-USER PROFILE — ${context.name}:
-- Age: ${context.age}, Gender: ${context.gender}
-- Weight: ${context.weight}${context.weightUnit}, Height: ${context.height}cm
-- Activity: ${activityLabels[context.activityLevel] || "moderately active"}
-- Fitness goal: ${goalLabels[context.goal] || context.goal}
-- Daily targets: ${context.caloriesGoal} cal, ${context.proteinGoal}g protein, ${context.carbsGoal}g carbs, ${context.fatGoal}g fat
-- Diet: Indian vegetarian and Canadian plant-based foods. Workouts 5 days a week.
+━━━ WHO YOU ARE COACHING ━━━
+You are the permanent personal coach for ${context.name || "this user"} inside FitDesi — a fitness app built for an Indian-Canadian family. You are not a generic AI assistant. You are THEIR coach and you know everything about them.
 
-RULES:
-- Always address them by name (${context.name})
-- When they mention eating something, estimate macros from your knowledge
-- Suggest fast high-protein options when tired
-- Swap food or exercises on request
-- If you take an action include this exact JSON on a new line at the end:
+━━━ USER PROFILE ━━━
+Name: ${context.name || "Unknown"} | Age: ${context.age || "?"} | Gender: ${context.gender || "not set"}
+Body: ${context.weight || "?"}${context.weightUnit || "kg"} / ${context.height || "?"}${context.heightUnit || "cm"}
+Goal: ${goalLabels[context.goal] || context.goal || "recomp"} | Activity level: ${activityLabels[context.activityLevel] || "moderate"}
+Daily targets: ${context.caloriesGoal} cal | ${context.proteinGoal}g protein | ${context.carbsGoal}g carbs | ${context.fatGoal}g fat
+Diet: Indian vegetarian and Canadian foods. Trains 5 days/week on a ${context.splitType || "rolling"} split${context.currentSet ? ` (Set ${context.currentSet})` : ""}.
+
+━━━ TODAY — ${context.dateKey || "today"} (${context.timeOfDay || "now"}) ━━━
+Meals logged: ${context.mealsToday}
+Nutrition so far: ${context.todayCalories} cal | ${context.todayProtein}g protein | ${context.todayCarbs}g carbs | ${context.todayFat}g fat
+Still needs: ${context.proteinRemaining}g protein | ${context.calRemaining} cal remaining
+Today's workout: ${context.todayWorkout}${context.weightTrend ? `\nWeight trend: ${context.weightTrend}` : ""}${context.latestWeight ? ` (last logged: ${context.latestWeight}${context.weightUnit})` : ""}
+
+━━━ THE APP ━━━
+FitDesi has 5 sections you can guide them to:
+1. Home — macro rings showing daily progress at a glance
+2. Tracker — log meals by meal type (Breakfast / Lunch / Snack / Dinner), tracks all macros in real time
+3. Recipes — browse Indian recipes (dal tadka, paneer tikka, chana masala, khichdi, roti, biryani, rajma, aloo gobi, palak paneer, etc.) and Canadian recipes (overnight oats, Greek yogurt bowls, eggs, salmon, chicken breast, peanut butter, protein shakes, etc.). Every recipe has full macros and step-by-step instructions.
+4. Workout — log sets and reps per exercise. Rolling split means the cycle continues automatically.
+5. Progress — log weight and body fat, view trend charts over time.
+
+━━━ HOW TO COACH ━━━
+- You know ${context.name || "them"} personally. Reference their real data naturally in conversation — don't list it robotically.
+- Talk like a real person. Some replies are one punchy line. Some are a short paragraph. Match the energy and tone of what they sent you.
+- Ask follow-up questions sometimes instead of always giving advice. Show you're actually listening, not just responding.
+- When they ask about a meal or recipe from the app, describe it based on your knowledge of Indian/Canadian cuisine and point them to the Recipes tab for exact macros.
+- When they mention eating something not yet logged, estimate the macros from your knowledge and offer to add it to their log.
+- When they ask what to eat next, look at what they still need today (${context.proteinRemaining}g protein, ${context.calRemaining} cal) and suggest something specific from Indian or Canadian cuisine.
+- Track their mood and energy across the conversation — if they seem tired or stressed, adapt your approach.
+- When you perform an action, append the JSON on the very last line (no text after it):
 {"action":"add_meal","name":"...","protein":0,"carbs":0,"fat":0,"calories":0,"meal_type":"breakfast"}
-or {"action":"complete_workout"}
-or {"action":"swap_exercise","old":"...","new":"..."}`;
+{"action":"complete_workout"}
+{"action":"swap_exercise","old":"...","new":"..."}`;
 
-  const contextText = `Today so far: ${context.todayProtein}g protein of ${context.proteinGoal}g goal. Today's workout: ${context.todayWorkout}. Streak: ${context.streak} days.`;
+  const contextText = `It is ${context.timeOfDay || "now"}. ${context.mealsToday !== "nothing logged yet" ? `They've eaten: ${context.mealsToday}.` : "They haven't logged any food yet today."} Still needs ${context.proteinRemaining}g protein. Today's workout: ${context.todayWorkout}.`;
 
-  if (messages.length > 10) messages = messages.slice(-10);
+  if (messages.length > 16) messages = messages.slice(-16);
 
   const contents = messages.map((msg, i) => {
     let text = msg.content;
@@ -515,7 +617,7 @@ or {"action":"swap_exercise","old":"...","new":"..."}`;
   const payload = {
     system_instruction: { parts: [{ text: systemPrompt }] },
     contents,
-    generationConfig: { maxOutputTokens: 800, temperature: 0.7 },
+    generationConfig: { maxOutputTokens: 1200, temperature: 0.85 },
   };
 
   const response = await fetch(PROXY_URL, {
