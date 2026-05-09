@@ -466,6 +466,18 @@ async function addMealToLog(uid, meal) {
   }
 }
 
+// Returns all workout log docs for the streak calculation on the home page.
+// Each doc.id is a date string (ISO format), doc.data() has { completed, completedAt }.
+async function getWorkoutLogsAll(uid) {
+  try {
+    const snap = await getDocs(collection(db, "users", uid, "workoutLogs"));
+    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  } catch (error) {
+    console.error("Error fetching workout logs:", error);
+    return [];
+  }
+}
+
 async function completeWorkout(uid, date) {
   try {
     await setDoc(
@@ -602,6 +614,7 @@ export {
   clearWeightHistory,
   clearBodyFatHistory,
   addMealToLog,
+  getWorkoutLogsAll,
   completeWorkout,
   swapExercise,
   saveCoachChoice,

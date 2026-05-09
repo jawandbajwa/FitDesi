@@ -688,9 +688,7 @@
         getWorkoutCycle,
         getUserProfile,
         getDailyLog,
-        getDocs,
-        collection,
-        db,
+        getWorkoutLogsAll,
       } from "./firebase.js";
 
       async function loadCoach() {
@@ -879,11 +877,11 @@
           // ── Fire all 4 Firebase reads in parallel ──────────────
           document.getElementById("loadingOverlay").classList.remove("hidden");
           const todayStr = new Date().toDateString();
-          const [cycleData, profile, todayLog, workoutsSnap] = await Promise.all([
+          const [cycleData, profile, todayLog, workoutLogs] = await Promise.all([
             getWorkoutCycle(user.uid),
             getUserProfile(user.uid),
             getDailyLog(user.uid, todayStr).catch(() => ({})),
-            getDocs(collection(db, "users", user.uid, "workoutLogs")).catch(() => null),
+            getWorkoutLogsAll(user.uid).catch(() => []),
           ]);
           document.getElementById("loadingOverlay").classList.add("hidden");
 
@@ -947,13 +945,13 @@
           }
 
           // ── Workout streak ──
-          if (workoutsSnap) {
+          if (workoutLogs && workoutLogs.length >= 0) {
             const today = new Date(); today.setHours(0, 0, 0, 0);
             const weekAgo = new Date(today); weekAgo.setDate(today.getDate() - 7);
             let weekCount = 0;
             const doneDays = [];
-            workoutsSnap.forEach((doc) => {
-              const d = new Date(doc.id);
+            workoutLogs.forEach((entry) => {
+              const d = new Date(entry.id);
               if (!isNaN(d) && d >= weekAgo) { weekCount++; doneDays.push(d); }
             });
             document.getElementById("workoutsDone").textContent = weekCount;
