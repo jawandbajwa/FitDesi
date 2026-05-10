@@ -1,7 +1,7 @@
 // FitDesi Service Worker — Network-first, auto-update on every deploy
 // Bump this version whenever you want to force a full cache wipe.
 // With network-first below, normal file changes don't need a version bump.
-const CACHE_NAME = "fitdesi-v66";
+const CACHE_NAME = "fitdesi-v67";
 
 const STATIC_ASSETS = [
   "./",
@@ -91,10 +91,12 @@ self.addEventListener("fetch", (event) => {
   const isCodeFile = /\.(js|html)(\?|$)/.test(url) || url.endsWith("/");
 
   if (isCodeFile) {
-    // Network-first: always try to get the freshest JS/HTML.
-    // Fall back to cache only when genuinely offline.
+    // Network-first: always bypass the browser HTTP cache so stale cached
+    // JS/HTML never blocks freshly deployed code (cache:'reload' skips the
+    // HTTP cache entirely but still updates it with the fresh response).
+    const freshRequest = new Request(event.request, { cache: 'reload' });
     event.respondWith(
-      fetch(event.request)
+      fetch(freshRequest)
         .then((networkResponse) => {
           if (networkResponse && networkResponse.ok) {
             caches.open(CACHE_NAME).then((cache) =>
