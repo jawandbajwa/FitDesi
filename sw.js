@@ -1,7 +1,7 @@
 // FitDesi Service Worker — Network-first, auto-update on every deploy
 // Bump this version whenever you want to force a full cache wipe.
 // With network-first below, normal file changes don't need a version bump.
-const CACHE_NAME = "fitdesi-v65";
+const CACHE_NAME = "fitdesi-v66";
 
 const STATIC_ASSETS = [
   "./",
@@ -79,32 +79,50 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-// ─── FETCH — Stale-While-Revalidate ──────────────────────────
-// Serve from cache immediately (fast first paint), then fetch the
-// network in the background and update the cache so the *next* load
-// gets the freshest file.  On first visit (cache miss) we wait for
-// the network.  If the network is unavailable we fall back to cache.
+// ─── FETCH — Network-first for JS/HTML, cache-first for assets ───
+// JS and HTML always go to the network first so new code is never
+// blocked by a stale cached version (the bug that broke recipe imports).
+// Images/fonts fall back to cache when offline.
 self.addEventListener("fetch", (event) => {
-  // Only intercept GET requests for our own origin
   if (event.request.method !== "GET") return;
   if (!event.request.url.startsWith(self.location.origin)) return;
 
-  event.respondWith(
-    caches.open(CACHE_NAME).then((cache) =>
-      cache.match(event.request).then((cached) => {
-        // Background revalidation — always run, regardless of cache hit
-        const networkFetch = fetch(event.request)
-          .then((networkResponse) => {
-            if (networkResponse && networkResponse.ok) {
-              cache.put(event.request, networkResponse.clone());
-            }
-            return networkResponse;
-          })
-          .catch(() => null);
+  const url = event.request.url;
+  const isCodeFile = /\.(js|html)(\?|$)/.test(url) || url.endsWith("/");
 
-        // Return cached response instantly if available; else wait for network
-        return cached || networkFetch;
-      }),
-    ),
-  );
+  if (isCodeFile) {
+    // Network-first: always try to get the freshest JS/HTML.
+    // Fall back to cache only when genuinely offline.
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.ok) {
+            caches.open(CACHE_NAME).then((cache) =>
+              cache.put(event.request, networkResponse.clone())
+            );
+          }
+          return networkResponse;
+        })
+        .catch(() =>
+          caches.open(CACHE_NAME).then((cache) => cache.match(event.request))
+        )
+    );
+  } else {
+    // Cache-first for images, fonts, etc. — these rarely change.
+    event.respondWith(
+      caches.open(CACHE_NAME).then((cache) =>
+        cache.match(event.request).then((cached) => {
+          const networkFetch = fetch(event.request)
+            .then((networkResponse) => {
+              if (networkResponse && networkResponse.ok) {
+                cache.put(event.request, networkResponse.clone());
+              }
+              return networkResponse;
+            })
+            .catch(() => null);
+          return cached || networkFetch;
+        })
+      )
+    );
+  }
 });
