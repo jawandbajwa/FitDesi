@@ -581,6 +581,44 @@ async function assignCoach(uid, enabled) {
   }
 }
 
+// ─── USER RECIPES ────────────────────────────────────────────
+async function saveUserRecipe(uid, recipe) {
+  try {
+    if (recipe.id) {
+      const ref = doc(db, "users", uid, "recipes", recipe.id);
+      await setDoc(ref, recipe);
+      return recipe.id;
+    } else {
+      const ref = doc(collection(db, "users", uid, "recipes"));
+      const id = ref.id;
+      await setDoc(ref, { ...recipe, id });
+      return id;
+    }
+  } catch (error) {
+    console.error("Error saving user recipe:", error);
+    throw error;
+  }
+}
+
+async function getUserRecipes(uid) {
+  try {
+    const snap = await getDocs(collection(db, "users", uid, "recipes"));
+    return snap.docs.map((d) => ({ ...d.data(), id: d.id, _isUserRecipe: true }));
+  } catch (error) {
+    console.error("Error getting user recipes:", error);
+    return [];
+  }
+}
+
+async function deleteUserRecipe(uid, recipeId) {
+  try {
+    await deleteDoc(doc(db, "users", uid, "recipes", recipeId));
+  } catch (error) {
+    console.error("Error deleting user recipe:", error);
+    throw error;
+  }
+}
+
 async function getAllUsers() {
   try {
     const usersSnap = await getDocs(collection(db, "users"));
@@ -640,6 +678,9 @@ export {
   getWorkoutLogsAll,
   completeWorkout,
   swapExercise,
+  saveUserRecipe,
+  getUserRecipes,
+  deleteUserRecipe,
   saveCoachChoice,
   assignCoach,
   getAllUsers,
