@@ -222,6 +222,7 @@ async function addRecipeToMeal(meal) {
 // ─── LOAD RECIPES ─────────────────────────────────────────────────────
 async function loadRecipes(cuisine) {
   if (cuisine === "mine") {
+    if (!currentUser) { renderRecipes(); return; }
     myRecipes = await getUserRecipes(currentUser.uid);
     renderRecipes();
     return;
@@ -239,12 +240,15 @@ async function ensureDbIngredients() {
 
 function filterIngredients(query) {
   const results = document.getElementById("urIngResults");
+  if (!results) return;
   if (!query.trim()) { results.classList.remove("open"); return; }
   const q       = query.toLowerCase();
   const matches = dbIngredients.filter((ing) => (ing.name || "").toLowerCase().includes(q)).slice(0, 8);
   if (matches.length === 0) { results.classList.remove("open"); return; }
+  // Use ingredient name as the data key — more reliable than id since older
+  // Firestore documents may not have id stored inside the document data.
   results.innerHTML = matches.map((ing) => `
-    <div class="ur-ing-result-item" data-id="${ing.id}">
+    <div class="ur-ing-result-item" data-name="${encodeURIComponent(ing.name)}">
       <span>${ing.name}</span>
       <span class="ur-ing-result-macros">P:${ing.protein}g C:${ing.carbs}g F:${ing.fat}g / 100g</span>
     </div>`).join("");
@@ -258,7 +262,7 @@ function selectIngredientFromSearch(ing) {
   document.getElementById("urAmountName").textContent = ing.name;
   document.getElementById("urAmountInput").value = "100";
   document.getElementById("urAmountRow").classList.remove("hidden");
-  document.getElementById("urAmountInput").focus();
+  document.getElementById("urAmountInput")?.focus();
 }
 
 function addPendingIngredient() {
@@ -570,7 +574,8 @@ document.addEventListener("click", async function (e) {
   // ── Ingredient search result click ───────────────────────────────────
   const ingResultItem = e.target.closest(".ur-ing-result-item");
   if (ingResultItem) {
-    const ing = dbIngredients.find((i) => i.id === ingResultItem.dataset.id);
+    const decodedName = decodeURIComponent(ingResultItem.dataset.name || "");
+    const ing = dbIngredients.find((i) => i.name === decodedName);
     if (ing) selectIngredientFromSearch(ing);
     return;
   }
@@ -597,12 +602,14 @@ document.addEventListener("click", async function (e) {
 });
 
 // ─── INGREDIENT SEARCH INPUT ──────────────────────────────────────────
-document.getElementById("urIngSearch").addEventListener("input", (e) => {
+// Use optional chaining so the module doesn't crash if the modal doesn't
+// exist yet (e.g. old HTML served from SW cache during update transition).
+document.getElementById("urIngSearch")?.addEventListener("input", (e) => {
   filterIngredients(e.target.value);
 });
 
-// Allow Enter key to add ingredient amount
-document.getElementById("urAmountInput").addEventListener("keydown", (e) => {
+// Allow Enter key to confirm ingredient amount
+document.getElementById("urAmountInput")?.addEventListener("keydown", (e) => {
   if (e.key === "Enter") { e.preventDefault(); addPendingIngredient(); }
 });
 
