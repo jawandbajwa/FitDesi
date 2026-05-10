@@ -133,9 +133,23 @@ async function saveUserProfile(userId, profile) {
 async function getUserProfile(userId) {
   try {
     const snap = await getDoc(doc(db, "users", userId, "data", "profile"));
-    const profile = snap.exists() ? snap.data() : null;
-    if (profile) cacheUserProfile(userId, profile).catch(() => {});
-    return profile;
+    if (snap.exists()) {
+      const profile = snap.data();
+      cacheUserProfile(userId, profile).catch(() => {});
+      return profile;
+    }
+    // No profile doc yet — auto-create one from Google auth data
+    // so the user appears in the admin panel immediately
+    const user = auth.currentUser;
+    const minimal = {
+      name:      user?.displayName || "",
+      email:     user?.email       || "",
+      photoURL:  user?.photoURL    || "",
+      createdAt: new Date().toISOString(),
+    };
+    await setDoc(doc(db, "users", userId, "data", "profile"), minimal, { merge: true });
+    cacheUserProfile(userId, minimal).catch(() => {});
+    return minimal;
   } catch (error) {
     console.error("Firestore profile failed, falling back to cache:", error);
     try {
