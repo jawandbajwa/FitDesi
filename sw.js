@@ -1,7 +1,7 @@
 // FitDesi Service Worker — Network-first, auto-update on every deploy
 // Bump this version whenever you want to force a full cache wipe.
 // With network-first below, normal file changes don't need a version bump.
-const CACHE_NAME = "fitdesi-v67";
+const CACHE_NAME = "fitdesi-v68";
 
 const STATIC_ASSETS = [
   "./",
@@ -41,12 +41,16 @@ const STATIC_ASSETS = [
 // ─── INSTALL ─────────────────────────────────────────────────
 // Skip waiting immediately so the new SW activates without needing
 // all tabs closed — critical for iOS PWA which doesn't fully terminate.
+// cache: 'reload' bypasses the browser HTTP cache so we always fetch
+// the latest file from the network (not a stale cached version).
 self.addEventListener("install", (event) => {
   self.skipWaiting(); // take over right away, don't wait for old SW to die
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) =>
       Promise.allSettled(
-        STATIC_ASSETS.map((url) => cache.add(url).catch(() => {}))
+        STATIC_ASSETS.map((url) =>
+          cache.add(new Request(url, { cache: "reload" })).catch(() => {})
+        )
       )
     )
   );
