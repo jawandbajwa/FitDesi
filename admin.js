@@ -11,6 +11,8 @@ import {
   getAllUsers,
   assignCoach,
   saveCoachChoice,
+  getUserRecipes,
+  deleteUserRecipe,
 } from "./firebase.js";
 import { COACHES } from "./coaches.js";
 
@@ -268,6 +270,75 @@ function renderUsers() {
       editBtn.style.color = open ? "rgba(255,255,255,0.5)" : "#7ed99a";
     });
 
+    // ── Recipes button ──
+    const recipesBtn = document.createElement("button");
+    recipesBtn.textContent = "📖";
+    recipesBtn.title = "View user recipes";
+    recipesBtn.style.cssText = `
+      padding: 8px 10px; border-radius: 20px; font-size: 13px;
+      cursor: pointer; border: 1.5px solid rgba(255,255,255,0.15);
+      flex-shrink: 0; margin-left: 6px;
+      background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.5);
+    `;
+
+    const recipesPanel = document.createElement("div");
+    recipesPanel.style.cssText = `
+      display: none; padding: 4px 16px 12px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-top: none; border-radius: 0 0 14px 14px;
+    `;
+
+    recipesBtn.addEventListener("click", async () => {
+      const isOpen = recipesPanel.style.display !== "none";
+      if (isOpen) {
+        recipesPanel.style.display = "none";
+        recipesBtn.style.borderColor = "rgba(255,255,255,0.15)";
+        recipesBtn.style.color = "rgba(255,255,255,0.5)";
+        return;
+      }
+      recipesBtn.style.borderColor = "#7ed99a";
+      recipesBtn.style.color = "#7ed99a";
+      recipesPanel.style.display = "block";
+      recipesPanel.innerHTML = `<div style="font-size:12px;color:rgba(255,255,255,0.3);padding:10px 0">Loading recipes…</div>`;
+      try {
+        const userRecipes = await getUserRecipes(user.uid);
+        if (userRecipes.length === 0) {
+          recipesPanel.innerHTML = `<div style="font-size:12px;color:rgba(255,255,255,0.2);padding:10px 0">No personal recipes yet</div>`;
+          return;
+        }
+        recipesPanel.innerHTML = userRecipes.map((r) => `
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid rgba(255,255,255,0.04)">
+            <span style="font-size:12px;color:rgba(255,255,255,0.65)">${r.name}
+              <span style="font-size:10px;color:rgba(255,255,255,0.25);margin-left:4px">${r.category}</span>
+            </span>
+            <button data-rid="${r.id}" style="background:none;border:none;color:rgba(255,80,80,0.4);cursor:pointer;font-size:13px;padding:4px 8px;flex-shrink:0">🗑️</button>
+          </div>`).join("");
+
+        recipesPanel.querySelectorAll("button[data-rid]").forEach((btn) => {
+          const rid  = btn.dataset.rid;
+          const rObj = userRecipes.find((r) => r.id === rid);
+          btn.addEventListener("click", async () => {
+            if (!confirm(`Delete "${rObj?.name || "this recipe"}"?`)) return;
+            btn.textContent = "…";
+            btn.disabled = true;
+            try {
+              await deleteUserRecipe(user.uid, rid);
+              btn.closest("div").remove();
+              if (!recipesPanel.querySelector("button[data-rid]")) {
+                recipesPanel.innerHTML = `<div style="font-size:12px;color:rgba(255,255,255,0.2);padding:10px 0">No personal recipes yet</div>`;
+              }
+            } catch (e) {
+              btn.textContent = "🗑️";
+              btn.disabled = false;
+            }
+          });
+        });
+      } catch (e) {
+        recipesPanel.innerHTML = `<div style="font-size:12px;color:rgba(255,80,80,0.4);padding:10px 0">Error loading recipes</div>`;
+      }
+    });
+
     // Wrap row + picker in a container
     const container = document.createElement("div");
     container.style.cssText = `margin-bottom: 10px;`;
@@ -284,8 +355,10 @@ function renderUsers() {
 
     row.appendChild(toggleBtn);
     row.appendChild(editBtn);
+    row.appendChild(recipesBtn);
     container.appendChild(row);
     container.appendChild(pickerWrap);
+    container.appendChild(recipesPanel);
     list.appendChild(container);
   });
 }

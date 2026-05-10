@@ -39,10 +39,9 @@
 
     <!-- CUISINE TOGGLE -->
     <div class="cuisine-switcher">
-      <button class="cuisine-btn active" data-cuisine="indian">
-        🇮🇳 Indian
-      </button>
+      <button class="cuisine-btn active" data-cuisine="indian">🇮🇳 Indian</button>
       <button class="cuisine-btn" data-cuisine="canadian">🇨🇦 Canadian</button>
+      <button class="cuisine-btn" data-cuisine="mine">📖 Mine</button>
     </div>
 
     <!-- CATEGORY FILTER -->
@@ -56,13 +55,11 @@
 
     <!-- SEARCH -->
     <div class="search-container">
-      <input
-        type="text"
-        id="recipeSearch"
-        placeholder="Search recipes..."
-        class="search-input"
-      />
-      <span class="search-icon">🔍</span>
+      <div class="search-input-wrap">
+        <input type="text" id="recipeSearch" placeholder="Search recipes..." class="search-input" />
+        <span class="search-icon">🔍</span>
+      </div>
+      <button class="add-my-recipe-btn hidden" id="addMyRecipeBtn">+ Add Recipe</button>
     </div>
 
     <!-- RECIPE LIST -->
@@ -94,13 +91,17 @@
           How to make it
         </div>
         <div class="detail-instructions" id="detailInstructions"></div>
+        <div class="detail-section-label" id="notesLabel" style="display: none">Notes</div>
+        <div class="detail-notes" id="detailNotes"></div>
         <div class="detail-section-label" id="videoLabel" style="display: none">
           How to cook
         </div>
         <div class="detail-video" id="detailVideo"></div>
-        <button class="add-to-meal-btn" id="addToMealBtn">
-          + Add to Today's Meals
-        </button>
+        <button class="add-to-meal-btn" id="addToMealBtn">+ Add to Today's Meals</button>
+        <div class="ur-detail-actions hidden" id="userRecipeDetailActions">
+          <button class="ur-action-btn ur-edit-btn" id="detailEditBtn">✏️ Edit</button>
+          <button class="ur-action-btn ur-delete-btn" id="detailDeleteBtn">🗑️ Delete</button>
+        </div>
       </div>
     </div>
 
@@ -138,6 +139,99 @@
           </button>
         </div>
         <button class="save-btn" id="confirmAddMeal">Confirm</button>
+      </div>
+    </div>
+
+    <!-- USER RECIPE MODAL -->
+    <div class="modal-overlay" id="userRecipeModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h2 id="urModalTitle">New Recipe</h2>
+          <button class="modal-close" id="urModalClose">✕</button>
+        </div>
+
+        <div class="ur-form-group">
+          <label class="ur-label">Recipe Name *</label>
+          <input type="text" id="urName" class="ur-input" placeholder="e.g. Protein Dal Tadka" autocomplete="off" />
+        </div>
+
+        <div class="ur-form-group">
+          <label class="ur-label">Category *</label>
+          <div class="ur-category-row" id="urCategoryRow">
+            <button class="ur-cat-pill" data-cat="breakfast">Breakfast</button>
+            <button class="ur-cat-pill" data-cat="lunch">Lunch</button>
+            <button class="ur-cat-pill" data-cat="dinner">Dinner</button>
+            <button class="ur-cat-pill" data-cat="snack">Snack</button>
+          </div>
+        </div>
+
+        <div class="ur-form-group">
+          <label class="ur-label">Serving Size</label>
+          <input type="text" id="urServing" class="ur-input" placeholder="e.g. 1 bowl, 2 rotis" />
+        </div>
+
+        <div class="ur-form-group">
+          <label class="ur-label">Add Ingredients <span class="ur-optional">optional · auto-calculates macros</span></label>
+          <input type="text" id="urIngSearch" class="ur-input" placeholder="Search ingredients..." autocomplete="off" />
+          <div class="ur-ing-results" id="urIngResults"></div>
+          <div class="ur-amount-row hidden" id="urAmountRow">
+            <span class="ur-amount-name" id="urAmountName"></span>
+            <input type="number" id="urAmountInput" placeholder="100" min="0" />
+            <span class="ur-amount-unit">g</span>
+            <button class="ur-amount-add" id="urAmountAdd">+ Add</button>
+            <button class="ur-amount-cancel" id="urAmountCancel">✕</button>
+          </div>
+          <div class="ur-added-list" id="urAddedList"></div>
+        </div>
+
+        <div class="ur-form-group">
+          <label class="ur-label">Macros *</label>
+          <div class="ur-macro-grid">
+            <div class="ur-macro-field">
+              <input type="number" id="urProtein" class="ur-input" placeholder="0" min="0" step="0.1" />
+              <div class="ur-macro-lbl">Protein (g)</div>
+            </div>
+            <div class="ur-macro-field">
+              <input type="number" id="urCarbs" class="ur-input" placeholder="0" min="0" step="0.1" />
+              <div class="ur-macro-lbl">Carbs (g)</div>
+            </div>
+            <div class="ur-macro-field">
+              <input type="number" id="urFat" class="ur-input" placeholder="0" min="0" step="0.1" />
+              <div class="ur-macro-lbl">Fat (g)</div>
+            </div>
+            <div class="ur-macro-field">
+              <input type="number" id="urCalories" class="ur-input" placeholder="0" min="0" />
+              <div class="ur-macro-lbl">Calories</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ur-form-group">
+          <label class="ur-label">Notes <span class="ur-optional">optional</span></label>
+          <textarea id="urNotes" class="ur-input ur-textarea" placeholder="Prep tips, variations..."></textarea>
+        </div>
+
+        <div class="ur-form-group">
+          <label class="ur-label">YouTube Video ID <span class="ur-optional">optional</span></label>
+          <input type="text" id="urVideoId" class="ur-input" placeholder="e.g. dQw4w9WgXcQ" />
+        </div>
+
+        <button class="save-btn" id="urSaveBtn">Save Recipe</button>
+      </div>
+    </div>
+
+    <!-- CONFIRM DELETE MODAL -->
+    <div class="modal-overlay" id="urDeleteModal">
+      <div class="modal" style="max-width: 360px">
+        <div class="modal-header">
+          <h2>Delete Recipe?</h2>
+          <button class="modal-close" id="urDeleteClose">✕</button>
+        </div>
+        <p class="ur-delete-subtitle" id="urDeleteName"></p>
+        <div class="ur-delete-actions">
+          <button class="ur-del-confirm-btn" id="urConfirmDelete">Delete</button>
+          <button class="save-btn" style="flex: 1" id="urCancelDelete">Cancel</button>
+        </div>
       </div>
     </div>
 
