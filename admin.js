@@ -26,6 +26,7 @@ let addedIngredients = [];
 let selectedRecipeCategory = "";
 let deleteTarget = null;
 let deleteType = "";
+let deleteCallback = null;
 let activeCuisine = "indian";
 
 // ─── INLINE VALIDATION HELPER ────────────────────────────────
@@ -61,6 +62,17 @@ function validateField(id, required = true) {
   if (val < min) { el.classList.add("input-error"); errEl.textContent = `Min value is ${min}`; return false; }
   if (val > max) { el.classList.add("input-error"); errEl.textContent = `Max value is ${max}`; return false; }
   el.classList.remove("input-error"); errEl.textContent = ""; return true;
+}
+
+// ─── TOAST ───────────────────────────────────────────────────
+function showToast(msg, type = "success") {
+  const existing = document.querySelector(".admin-toast");
+  if (existing) existing.remove();
+  const toast = document.createElement("div");
+  toast.className = `admin-toast ${type}`;
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2500);
 }
 
 // ─── EMOJI HELPERS ───────────────────────────────────────────
@@ -318,20 +330,17 @@ function renderUsers() {
         recipesPanel.querySelectorAll("button[data-rid]").forEach((btn) => {
           const rid  = btn.dataset.rid;
           const rObj = userRecipes.find((r) => r.id === rid);
-          btn.addEventListener("click", async () => {
-            if (!confirm(`Delete "${rObj?.name || "this recipe"}"?`)) return;
-            btn.textContent = "…";
-            btn.disabled = true;
-            try {
+          btn.addEventListener("click", () => {
+            deleteCallback = async () => {
               await deleteUserRecipe(user.uid, rid);
               btn.closest("div").remove();
               if (!recipesPanel.querySelector("button[data-rid]")) {
                 recipesPanel.innerHTML = `<div style="font-size:12px;color:rgba(255,255,255,0.2);padding:10px 0">No personal recipes yet</div>`;
               }
-            } catch (e) {
-              btn.textContent = "🗑️";
-              btn.disabled = false;
-            }
+            };
+            document.getElementById("deleteMessage").textContent =
+              `Delete "${rObj?.name || "this recipe"}"? This cannot be undone.`;
+            document.getElementById("deleteModal").classList.add("open");
           });
         });
       } catch (e) {
@@ -353,6 +362,8 @@ function renderUsers() {
     `;
     pickerWrap.appendChild(picker);
 
+    row.appendChild(avatar);
+    row.appendChild(info);
     row.appendChild(toggleBtn);
     row.appendChild(editBtn);
     row.appendChild(recipesBtn);
@@ -487,7 +498,7 @@ document
     allIngredients = await getIngredients();
     renderIngredients();
     updateStats();
-    alert("Ingredient saved!");
+    showToast("Ingredient saved ✓");
   });
 
 document.getElementById("ingredientSearch").addEventListener("input", (e) => {
@@ -558,6 +569,8 @@ function openRecipeModal(recipe = null) {
   document.getElementById("recServing").value = recipe
     ? recipe.servingSize || ""
     : "";
+  document.getElementById("recInstructions").value = recipe ? recipe.instructions || "" : "";
+  document.getElementById("recNotes").value = recipe ? recipe.notes || "" : "";
   document.getElementById("recVideoId").value = recipe
     ? recipe.videoId || ""
     : "";
@@ -722,6 +735,8 @@ document.getElementById("saveRecipe").addEventListener("click", async () => {
     name,
     category: selectedRecipeCategory,
     servingSize: document.getElementById("recServing").value.trim(),
+    instructions: document.getElementById("recInstructions").value.trim(),
+    notes: document.getElementById("recNotes").value.trim(),
     videoId: document.getElementById("recVideoId").value.trim(),
     cuisine: activeCuisine,
     ingredients: addedIngredients.map((ing) => ({
@@ -743,7 +758,7 @@ document.getElementById("saveRecipe").addEventListener("click", async () => {
   allRecipes = await getRecipes(activeCuisine);
   renderRecipes();
   updateStats();
-  alert("Recipe saved!");
+  showToast("Recipe saved ✓");
 });
 
 document.getElementById("recipeSearch").addEventListener("input", (e) => {
@@ -760,17 +775,21 @@ document.getElementById("cancelDelete").addEventListener("click", () => {
 });
 
 document.getElementById("confirmDelete").addEventListener("click", async () => {
-  if (!deleteTarget) return;
-  if (deleteType === "ingredient") {
+  if (!deleteTarget && !deleteCallback) return;
+  if (deleteCallback) {
+    try { await deleteCallback(); } catch (e) {}
+    deleteCallback = null;
+  } else if (deleteType === "ingredient") {
     await deleteIngredient(deleteTarget);
     allIngredients = await getIngredients();
     renderIngredients();
+    updateStats();
   } else if (deleteType === "recipe") {
     await deleteRecipe(deleteTarget, activeCuisine);
     allRecipes = await getRecipes(activeCuisine);
     renderRecipes();
+    updateStats();
   }
-  updateStats();
   document.getElementById("deleteModal").classList.remove("open");
   deleteTarget = null;
 });
