@@ -130,8 +130,8 @@ body {
   color: #7ed99a;
 }
 
-.tab-content {
-  display: block; /* override style.css which sets .tab-content { display:none } */
+.admin-tab-pane {
+  display: block;
   animation: fadeIn 0.2s ease;
 }
 
