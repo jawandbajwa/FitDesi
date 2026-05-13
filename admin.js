@@ -17,7 +17,7 @@ import {
   getAllUserRecipes,
   promoteUserRecipe,
   getUserProfile,
-} from "./firebase.js";
+} from "./firebase.js?v=2";
 import { COACHES } from "./coaches.js";
 
 let currentUser = null;
