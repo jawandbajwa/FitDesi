@@ -62,22 +62,63 @@ This updates `manifest.json`, `profile.html` (About section), and `sw.js` cache 
 
 ---
 
+## Admin Panel — Current State
+
+**Access:** `jawandbajwa@gmail.com` only. Route: `admin.html`
+**Tab pane class:** `.admin-tab-pane` (never `.tab-content` — see Gotcha #10)
+**firebase.js import:** `from "./firebase.js?v=2"` — version suffix busts ES module cache
+
+### Tabs
+
+**🥬 Ingredients**
+- Full CRUD: add/edit/delete ingredients with per-100g macros + fiber + category
+- Search bar filters the list in real time
+- Stat card: total ingredient count
+
+**🍛 Recipes** (two sections)
+1. *Shared recipes* — Indian / Canadian cuisine toggle, full CRUD, ingredient picker with macro auto-calc, instructions + notes fields, YouTube video ID, serve size
+2. *Personal Recipes — All Users* — loads via `getAllUserRecipes()` on first tab open (lazy). Each entry shows the user's name + recipe. Actions: **Promote** (inline 🇮🇳/🇨🇦 picker → `promoteUserRecipe()`) or **Delete** (uses shared delete modal via `deleteCallback` pattern)
+
+**👥 Users**
+- Loads via `collectionGroup(db, "data")` filtered to `ref.id === "profile"` — finds every user who has ever signed in, no stub docs needed
+- Cached in `localStorage` under `fitdesi_admin_users`, refreshed in background on every page load
+- Per-user row: avatar initials, name, email, coach badge, join date, admin badge (if `isAdmin`)
+- **Assign Coach** button → expands inline picker (5 coach options) + Grant/Revoke Admin toggle
+- **✏️ Edit** button → change coach inline
+- **📖 Recipes** button → view that user's personal recipes
+
+### Known past bugs (fixed)
+- **Members always 0** — `users/{uid}` top-level docs didn't exist; `getDocs(collection(db,"users"))` returned []. Fixed by switching to `collectionGroup`.
+- **Both tabs visible simultaneously** — stale cached `admin.js` used `.tab-content` selector (old name); `querySelectorAll(".tab-content")` found 0 elements so no pane was ever hidden. Fixed by renaming to `.admin-tab-pane` + adding `?v=2` import suffix.
+- **Wrong Firestore paths in old admin queries** — old code queried `users/{uid}` directly instead of `users/{uid}/data/profile`. Fixed when collectionGroup approach was introduced.
+
+---
+
 ## Firebase / Firestore Structure
 
 ```
 users/{uid}/
-  data/profile   → { name, email, photoURL, age, weight, height, goal,
-                      activityLevel, gender, isAdmin, weightUnit, heightUnit,
-                      coachEnabled, chosenCoach }
-  data/cycle     → { startDate, currentSet, cycleCount, acknowledgedCycles,
-                      activeSplit, customSplitDays, lastSetPickedDate }
-  progress/{YYYY-MM-DD}  → { weight, bodyFat }
-  workoutLogs/{date}/{exerciseName}  → [{ reps, weight }, ...]
+  data/profile        → { name, email, photoURL, age, weight, height, goal,
+                           activityLevel, gender, isAdmin, weightUnit, heightUnit,
+                           coachEnabled, chosenCoach, onboardingDone, createdAt }
+  data/cycle          → { startDate, currentSet, cycleCount, acknowledgedCycles,
+                           activeSplit, customSplitDays, lastSetPickedDate }
+  data/notifications  → { breakfast, lunch, dinner }  (HH:MM strings)
+  logs/{YYYY-MM-DD}   → { breakfast:[...], lunch:[...], snack:[...], dinner:[...] }
+  progress/{YYYY-MM-DD} → { weight, bodyFat }
+  workoutLogs/{date}/{exerciseName} → [{ reps, weight }, ...]
+  recipes/{id}        → { name, category, cuisine, serving, ingredients:[],
+                           protein, carbs, fat, calories, videoId,
+                           instructions, notes, createdAt, uid }
+                         ← User-submitted personal recipes. Read/written by the
+                           user; admin can view, delete, or promote to shared.
 
-ingredients/{id}   → { name, protein, carbs, fat, calories, fiber, category }
-recipes/{id}       → { name, category, cuisine, serving, ingredients:[],
-                        protein, carbs, fat, calories, videoId }
+shared/recipes_indian/items/{id}    → recipe doc (cuisine: "indian")
+shared/recipes_canadian/items/{id}  → recipe doc (cuisine: "canadian")
+shared/ingredients/items/{id}       → { name, protein, carbs, fat, calories, fiber, category }
 ```
+
+> **Note:** The old CLAUDE.md had wrong paths (`ingredients/{id}`, `recipes/{id}` at the root). The correct paths are `shared/ingredients/items/{id}` and `shared/recipes_{cuisine}/items/{id}`.
 
 Auth: Google Sign-In only. `isAdmin: true` on the user profile doc grants admin access.
 
