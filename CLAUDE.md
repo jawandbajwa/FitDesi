@@ -40,7 +40,7 @@ This updates `manifest.json`, `profile.html` (About section), and `sw.js` cache 
 | `index.html` | Home page — protein ring, macro rings, streak, today's workout card |
 | `tracker.html` / `tracker.js` / `tracker.css` | Nutrition tracker — Today tab, Meal Plan tab, Progress tab |
 | `recipes.html` / `recipes.js` / `recipes.css` | Recipe browser — Indian & Canadian, filter by meal type |
-| `exercise.html` / `exercise.js` / `exercise.css` | Workout page — rolling split cycle, exercise library, set logging |
+| `exercise.html` / `exercise.js` / `exercise.css` | Workout page — rolling split cycle, exercise library, set logging, Train This Today (tap any week-day chip to shift startDate) |
 | `profile.html` / `profile.css` | User profile — edit stats, theme toggle, sign out, app version |
 | `admin.html` / `admin.js` / `admin.css` | Admin panel — manage ingredients, recipes, users + coach assignment |
 | `firebase.js` | ALL Firebase calls — auth, Firestore reads/writes, cache helpers |
