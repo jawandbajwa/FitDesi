@@ -16,6 +16,7 @@ import {
   deleteUserRecipe,
   getAllUserRecipes,
   promoteUserRecipe,
+  getUserProfile,
 } from "./firebase.js";
 import { COACHES } from "./coaches.js";
 
@@ -951,6 +952,8 @@ onAuthStateChanged(auth, async (user) => {
 
   document.getElementById("accessDenied").classList.add("hidden");
   document.getElementById("adminContent").classList.remove("hidden");
+  // Ensure stub doc exists for the admin user so they appear in the users list
+  getUserProfile(user.uid).catch(() => {});
   allIngredients = await getIngredients();
   allRecipes = await getRecipes(activeCuisine);
   renderIngredients();
