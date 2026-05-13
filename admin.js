@@ -11,8 +11,11 @@ import {
   getAllUsers,
   assignCoach,
   saveCoachChoice,
+  setAdminStatus,
   getUserRecipes,
   deleteUserRecipe,
+  getAllUserRecipes,
+  promoteUserRecipe,
 } from "./firebase.js";
 import { COACHES } from "./coaches.js";
 
@@ -28,6 +31,8 @@ let deleteTarget = null;
 let deleteType = "";
 let deleteCallback = null;
 let activeCuisine = "indian";
+let allUserRecipes = [];
+let userRecipesLoaded = false;
 
 // ─── INLINE VALIDATION HELPER ────────────────────────────────
 function validateField(id, required = true) {
@@ -111,6 +116,7 @@ document.querySelectorAll(".tab-btn").forEach((btn) => {
     btn.classList.add("active");
     document.getElementById(`tab-${btn.dataset.tab}`).classList.remove("hidden");
     if (btn.dataset.tab === "users") loadUsers();
+    if (btn.dataset.tab === "recipes") loadAllUserRecipes();
   });
 });
 
@@ -207,9 +213,21 @@ function renderUsers() {
       color: ${enabled ? "#7ed99a" : "rgba(255,255,255,0.25)"};
     `;
 
+    const joinDate = document.createElement("div");
+    joinDate.textContent = user.createdAt
+      ? `Joined ${new Date(user.createdAt).toLocaleDateString("en-CA", { year: "numeric", month: "short", day: "numeric" })}`
+      : "";
+    joinDate.style.cssText = `font-size: 10px; color: rgba(255,255,255,0.18); margin-top: 2px;`;
+
+    const adminBadge = document.createElement("div");
+    adminBadge.textContent = "⚙️ Admin";
+    adminBadge.style.cssText = `font-size: 10px; color: #f0a050; margin-top: 2px; ${user.isAdmin ? "" : "display:none;"}`;
+
     info.appendChild(name);
     info.appendChild(email);
     info.appendChild(coachBadge);
+    if (user.createdAt) info.appendChild(joinDate);
+    info.appendChild(adminBadge);
 
     // Toggle button
     const toggleBtn = document.createElement("button");
@@ -274,6 +292,38 @@ function renderUsers() {
 
       picker.appendChild(opt);
     });
+
+    // ── Admin toggle ─────────────────────────────────────────
+    const adminRow = document.createElement("div");
+    adminRow.style.cssText = `
+      grid-column: 1 / -1; display: flex; align-items: center;
+      justify-content: space-between; padding-top: 10px; margin-top: 4px;
+      border-top: 0.5px solid rgba(255,255,255,0.06);
+    `;
+    const adminLabel = document.createElement("span");
+    adminLabel.textContent = "Admin Access";
+    adminLabel.style.cssText = `font-size: 12px; color: rgba(255,255,255,0.35);`;
+
+    const isUserAdmin = !!user.isAdmin;
+    const adminToggle = document.createElement("button");
+    adminToggle.textContent = isUserAdmin ? "Revoke Admin" : "Grant Admin";
+    adminToggle.style.cssText = `
+      padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 600;
+      cursor: pointer; border: 1.5px solid;
+      background: ${isUserAdmin ? "rgba(239,68,68,0.1)" : "rgba(240,160,80,0.1)"};
+      border-color: ${isUserAdmin ? "#f87171" : "#f0a050"};
+      color: ${isUserAdmin ? "#f87171" : "#f0a050"};
+    `;
+    adminToggle.addEventListener("click", async () => {
+      adminToggle.disabled = true;
+      adminToggle.textContent = "Saving…";
+      await setAdminStatus(user.uid, !isUserAdmin);
+      user.isAdmin = !isUserAdmin;
+      renderUsers();
+    });
+    adminRow.appendChild(adminLabel);
+    adminRow.appendChild(adminToggle);
+    picker.appendChild(adminRow);
 
     editBtn.addEventListener("click", () => {
       const open = picker.style.display === "grid";
@@ -371,6 +421,97 @@ function renderUsers() {
     container.appendChild(pickerWrap);
     container.appendChild(recipesPanel);
     list.appendChild(container);
+  });
+}
+
+// ─── USER RECIPE SECTION (Recipes tab) ───────────────────────
+async function loadAllUserRecipes() {
+  if (userRecipesLoaded) { renderUserRecipesSection(); return; }
+  const container = document.getElementById("userRecipeList");
+  container.innerHTML = `<div style="text-align:center;color:rgba(255,255,255,0.3);font-size:13px;padding:20px">Loading…</div>`;
+  allUserRecipes = await getAllUserRecipes();
+  userRecipesLoaded = true;
+  renderUserRecipesSection();
+}
+
+function renderUserRecipesSection() {
+  const container = document.getElementById("userRecipeList");
+  if (!allUserRecipes.length) {
+    container.innerHTML = `<div style="text-align:center;color:rgba(255,255,255,0.2);font-size:12px;padding:30px">No personal recipes from any user yet</div>`;
+    return;
+  }
+  container.innerHTML = "";
+  allUserRecipes.forEach((recipe) => {
+    const wrapper = document.createElement("div");
+    wrapper.style.cssText = `margin-bottom: 8px;`;
+
+    const item = document.createElement("div");
+    item.className = "admin-item";
+    item.style.marginBottom = "0";
+    item.style.borderRadius = "14px 14px 14px 14px";
+    item.innerHTML = `
+      <div class="admin-item-icon">${getCatEmoji(recipe.category)}</div>
+      <div class="admin-item-info">
+        <div class="admin-item-name">${recipe.name}</div>
+        <div class="admin-item-meta">${recipe.category} · P: ${recipe.protein}g · C: ${recipe.carbs}g · F: ${recipe.fat}g · ${recipe.calories} cal</div>
+        <div class="admin-item-meta" style="color:rgba(126,217,154,0.5);margin-top:3px">👤 ${recipe._ownerName}</div>
+      </div>
+      <div class="admin-item-actions">
+        <button class="admin-promote-btn">⬆ Promote</button>
+        <button class="admin-delete-btn" data-name="${recipe.name}">Delete</button>
+      </div>
+    `;
+
+    const promotePicker = document.createElement("div");
+    promotePicker.className = "promote-picker";
+
+    ["indian", "canadian"].forEach((cuisine) => {
+      const pb = document.createElement("button");
+      pb.textContent = cuisine === "indian" ? "🇮🇳 Indian" : "🇨🇦 Canadian";
+      pb.addEventListener("click", async () => {
+        pb.textContent = "Promoting…";
+        pb.disabled = true;
+        try {
+          await promoteUserRecipe(recipe._uid, recipe.id, cuisine);
+          promotePicker.style.display = "none";
+          item.style.borderRadius = "14px";
+          showToast(`Promoted to ${cuisine === "indian" ? "Indian" : "Canadian"} recipes ✓`);
+          if (cuisine === activeCuisine) {
+            allRecipes = await getRecipes(activeCuisine);
+            renderRecipes();
+            updateStats();
+          }
+        } catch (e) {
+          pb.textContent = cuisine === "indian" ? "🇮🇳 Indian" : "🇨🇦 Canadian";
+          pb.disabled = false;
+          showToast("Promote failed — try again", "error");
+        }
+      });
+      promotePicker.appendChild(pb);
+    });
+
+    item.querySelector(".admin-promote-btn").addEventListener("click", () => {
+      const open = promotePicker.style.display === "flex";
+      promotePicker.style.display = open ? "none" : "flex";
+      item.style.borderRadius = open ? "14px" : "14px 14px 0 0";
+    });
+
+    item.querySelector(".admin-delete-btn").addEventListener("click", () => {
+      const uid = recipe._uid;
+      const id = recipe.id;
+      deleteCallback = async () => {
+        await deleteUserRecipe(uid, id);
+        allUserRecipes = allUserRecipes.filter((r) => !(r.id === id && r._uid === uid));
+        renderUserRecipesSection();
+      };
+      document.getElementById("deleteMessage").textContent =
+        `Delete "${recipe.name}"? This cannot be undone.`;
+      document.getElementById("deleteModal").classList.add("open");
+    });
+
+    wrapper.appendChild(item);
+    wrapper.appendChild(promotePicker);
+    container.appendChild(wrapper);
   });
 }
 
@@ -814,6 +955,8 @@ onAuthStateChanged(auth, async (user) => {
   allRecipes = await getRecipes(activeCuisine);
   renderIngredients();
   renderRecipes();
+  // Show ingredient/recipe counts immediately, then add user count when it loads
+  updateStats();
   // Show cached user count immediately, refresh in background
   const cachedUsers = loadUsersCache();
   if (cachedUsers) { allUsers = cachedUsers; updateStats(); }

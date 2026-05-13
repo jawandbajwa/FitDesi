@@ -581,6 +581,16 @@ async function assignCoach(uid, enabled) {
   }
 }
 
+async function setAdminStatus(uid, adminStatus) {
+  try {
+    const profileRef = doc(db, "users", uid, "data", "profile");
+    await setDoc(profileRef, { isAdmin: adminStatus }, { merge: true });
+  } catch (error) {
+    console.error("Error setting admin status:", error);
+    throw error;
+  }
+}
+
 // ─── USER RECIPES ────────────────────────────────────────────
 async function saveUserRecipe(uid, recipe) {
   try {
@@ -615,6 +625,61 @@ async function deleteUserRecipe(uid, recipeId) {
     await deleteDoc(doc(db, "users", uid, "recipes", recipeId));
   } catch (error) {
     console.error("Error deleting user recipe:", error);
+    throw error;
+  }
+}
+
+// Fetch every user's personal recipes in one call (admin only)
+async function getAllUserRecipes() {
+  try {
+    const usersSnap = await getDocs(collection(db, "users"));
+    const allRecipes = [];
+    await Promise.all(
+      usersSnap.docs.map(async (userDoc) => {
+        const uid = userDoc.id;
+        const [profileSnap, recipesSnap] = await Promise.all([
+          getDoc(doc(db, "users", uid, "data", "profile")),
+          getDocs(collection(db, "users", uid, "recipes")),
+        ]);
+        const profile = profileSnap.exists() ? profileSnap.data() : {};
+        const ownerName = profile.name || profile.email || "Unknown";
+        recipesSnap.docs.forEach((d) => {
+          allRecipes.push({
+            ...d.data(),
+            id: d.id,
+            _uid: uid,
+            _ownerName: ownerName,
+            _isUserRecipe: true,
+          });
+        });
+      })
+    );
+    return allRecipes;
+  } catch (error) {
+    console.error("Error fetching all user recipes:", error);
+    return [];
+  }
+}
+
+// Copy a user's personal recipe into the shared recipes collection
+async function promoteUserRecipe(uid, recipeId, cuisine = "indian") {
+  try {
+    const recipeSnap = await getDoc(doc(db, "users", uid, "recipes", recipeId));
+    if (!recipeSnap.exists()) throw new Error("Recipe not found");
+    const recipe = { ...recipeSnap.data() };
+    delete recipe._isUserRecipe;
+    const col = cuisine === "canadian" ? "recipes_canadian" : "recipes_indian";
+    const ref = doc(collection(db, "shared", col, "items"));
+    await setDoc(ref, {
+      ...recipe,
+      id: ref.id,
+      cuisine,
+      _promotedFrom: uid,
+      _promotedAt: new Date().toISOString(),
+    });
+    return ref.id;
+  } catch (error) {
+    console.error("Error promoting user recipe:", error);
     throw error;
   }
 }
@@ -683,6 +748,9 @@ export {
   deleteUserRecipe,
   saveCoachChoice,
   assignCoach,
+  setAdminStatus,
   getAllUsers,
+  getAllUserRecipes,
+  promoteUserRecipe,
   markOnboardingDone,
 };
