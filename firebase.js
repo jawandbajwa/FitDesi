@@ -18,6 +18,8 @@ import {
   getDoc,
   updateDoc,
   collection,
+  collectionGroup,
+  query,
   getDocs,
   deleteDoc,
   deleteField,
@@ -694,17 +696,16 @@ async function promoteUserRecipe(uid, recipeId, cuisine = "indian") {
 
 async function getAllUsers() {
   try {
-    const usersSnap = await getDocs(collection(db, "users"));
+    // Use collectionGroup to query all "data" sub-collections across every user.
+    // Each user has exactly one doc in their "data" collection: the "profile" doc.
+    // This discovers ALL users who have ever signed in — no stub top-level docs needed.
+    const snap = await getDocs(query(collectionGroup(db, "data")));
     const users = [];
-    for (const userDoc of usersSnap.docs) {
-      const profileSnap = await getDoc(doc(db, "users", userDoc.id, "data", "profile"));
-      if (profileSnap.exists()) {
-        users.push({ uid: userDoc.id, ...profileSnap.data() });
-      } else {
-        // User exists in auth/Firestore but has no profile doc yet — still show them
-        users.push({ uid: userDoc.id, name: "Unknown User", email: "" });
-      }
-    }
+    snap.docs.forEach((d) => {
+      // d.ref.parent.parent is the users/{uid} doc — grab the uid from its id
+      const uid = d.ref.parent.parent?.id;
+      if (uid) users.push({ uid, ...d.data() });
+    });
     return users;
   } catch (error) {
     console.error("Error fetching users:", error);
