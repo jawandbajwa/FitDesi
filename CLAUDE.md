@@ -156,25 +156,30 @@ Copy-Item "D:\FitDesi\cloudflare-worker.js" -Destination "src\index.js" -Force
 wrangler deploy
 ```
 
-### firebase.js coach functions
-- `getAllUsers()` — fetches all user docs; includes users without a profile doc (shows as "Unknown User") so no one is silently missing from admin panel
+### firebase.js admin functions
+- `getAllUsers()` — uses `collectionGroup(db, "data")` filtered to `d.ref.id === "profile"` to discover ALL users who have ever signed in. No top-level stub docs needed. Requires `/{path=**}/data/{document}` read rule for admin in firestore.rules.
+- `setAdminStatus(uid, adminStatus)` — sets `isAdmin` on a user's profile
 - `assignCoach(uid, enabled)` — sets `coachEnabled` on a user's profile
 - `saveCoachChoice(uid, coachId)` — sets `chosenCoach` on a user's profile
 - `markOnboardingDone(uid)` — sets `onboardingDone: true` on a user's profile (merge)
+- `getUserRecipes(uid)` — reads users/{uid}/recipes
+- `deleteUserRecipe(uid, recipeId)` — deletes from users/{uid}/recipes
+- `getAllUserRecipes()` — reads personal recipes from every user
+- `promoteUserRecipe(uid, recipeId, cuisine)` — copies user recipe to shared/recipes_{cuisine}/items
 
 ---
 
 ## Versioning
 
 Version is stored in two places: `manifest.json` and `profile.html` (About section).
-Current version: **3.0.0**
+Current version: **3.1.8**
 
 Rules:
 - Small change → `node bump-version.js patch` (+1 patch, 0–9, rolls to minor at 10)
 - Notable update → `node bump-version.js minor` (+1 minor, 0–9, rolls to major at 10)
 - Big release → `node bump-version.js major` (+1 major)
 
-The script also bumps `sw.js` cache version automatically (current: `fitdesi-v62`).
+The script also bumps `sw.js` cache version automatically (current: `fitdesi-v73`).
 
 ---
 
@@ -279,6 +284,10 @@ First-time user intro shown once, ever. Implemented in `onboarding.js`, triggere
 7. **Coach is not admin-only anymore** — any user with `coachEnabled: true` on their profile sees the coach button. Admin still sees it via the `isAdmin()` check.
 8. **Cloudflare Worker is separate from GitHub** — changes to `cloudflare-worker.js` must be manually deployed via `wrangler deploy`. Pushing to GitHub does not update the live worker.
 9. **Onboarding source of truth is Firestore, not localStorage** — localStorage is only a fast-path cache. If you need to reset onboarding for a user (e.g. for testing), clear `onboardingDone` from their Firestore profile doc AND delete `fitdesi_onboarding_done` from localStorage.
+10. **Admin tab panes use `.admin-tab-pane`, not `.tab-content`** — `style.css` has a global `.tab-content { display: none }` rule. Using the same class in admin would permanently hide all admin tabs.
+11. **`getAllUsers()` uses `collectionGroup` — requires a Firestore rule** — `match /{path=**}/data/{document} { allow read: if isAdmin(); }` must be present in `firestore.rules` AND deployed via `firebase deploy --only firestore:rules`. Without it the query silently returns `permission-denied` (no error thrown — just returns []).
+12. **Admin `firebase.js` import has a version suffix** — `from "./firebase.js?v=2"` in admin.js. When firebase.js changes significantly, increment the `?v=N` to bust the ES module cache in long-lived browser sessions.
+13. **Firestore rules are NOT deployed by git push** — always run `firebase deploy --only firestore:rules` after editing `firestore.rules`.
 
 ---
 
