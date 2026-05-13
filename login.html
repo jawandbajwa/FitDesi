@@ -8,8 +8,15 @@
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" />
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+    />
     <link rel="icon" href="icon-192.png" />
     <title>FitDesi — Sign In</title>
     <link rel="manifest" href="manifest.json" />
@@ -238,7 +245,7 @@
       }
       .open-app-card p {
         font-size: 13px;
-        color: rgba(255,255,255,0.6);
+        color: rgba(255, 255, 255, 0.6);
         margin: 0 0 16px;
         line-height: 1.5;
       }
@@ -269,8 +276,10 @@
       const errorEl = document.getElementById("loginError");
 
       function isStandalone() {
-        return window.navigator.standalone === true ||
-               window.matchMedia("(display-mode: standalone)").matches;
+        return (
+          window.navigator.standalone === true ||
+          window.matchMedia("(display-mode: standalone)").matches
+        );
       }
 
       function setLoading(on) {
@@ -286,16 +295,16 @@
       }
 
       function showOpenAppUI() {
-        // Auth succeeded in Chrome browser (Android redirect landed here, not in PWA).
-        // Auth state is in IndexedDB — shared with the PWA — so opening the app
-        // from the home screen will log the user in automatically.
         btn.style.display = "none";
+        let existingCard = document.querySelector(".open-app-card");
+        if (existingCard) return;
+
         const card = document.createElement("div");
         card.className = "open-app-card";
         card.innerHTML = `
-          <p>✅ You're signed in!<br>Tap below to open the FitDesi app.</p>
-          <a class="open-app-btn" href="./index.html">Open FitDesi →</a>
-        `;
+    <p>✅ You're signed in!<br>Tap below to open the FitDesi app.</p>
+    <a class="open-app-btn" href="./index.html">Open FitDesi →</a>
+  `;
         card.style.display = "block";
         btn.parentNode.insertBefore(card, btn);
       }
@@ -303,10 +312,9 @@
       // ── Handle redirect result on page load ─────────────────
       (async () => {
         try {
-          setLoading(true);
+          // Check if we just returned from a redirect
           const result = await getRedirectResult(auth);
           if (result && result.user) {
-            // Redirect captured — go to app (or show open-app UI if in browser)
             if (isStandalone()) {
               window.location.href = "index.html";
             } else {
@@ -315,21 +323,20 @@
             return;
           }
         } catch (e) {
+          console.error("Redirect Error:", e);
           if (e.code && e.code !== "auth/no-auth-event") {
             showError("Sign in failed (" + e.code + "). Try again.");
-            return;
           }
         }
         setLoading(false);
       })();
 
-      // ── Already signed in → go straight to app ─────────────
+      // ── Watch Auth State ─────────────────────────────────────
       onAuthStateChanged(auth, (user) => {
         if (user) {
           if (isStandalone()) {
             window.location.href = "index.html";
           } else {
-            // In browser after redirect — show open-app UI
             showOpenAppUI();
           }
         }
@@ -339,28 +346,29 @@
       btn.addEventListener("click", async () => {
         setLoading(true);
         errorEl.style.display = "none";
-        try {
-          const user = await signInWithGoogle();
-          // Mobile: triggers redirect (returns null) — result handled above.
-          // Desktop: returns user immediately.
-          if (user) window.location.href = "index.html";
-        } catch (error) {
-          // Popup blocked on desktop → fall back to redirect
-          if (
-            error.code === "auth/popup-blocked" ||
-            error.code === "auth/cancelled-popup-request"
-          ) {
-            try {
+
+        // Force redirect on Android to avoid popup blocking/stalling
+        const isAndroid = /Android/i.test(navigator.userAgent);
+
+        if (isAndroid) {
+          try {
+            await signInWithGoogleRedirect();
+          } catch (e) {
+            showError("Android Redirect failed: " + e.message);
+          }
+        } else {
+          try {
+            const user = await signInWithGoogle();
+            if (user) window.location.href = "index.html";
+          } catch (error) {
+            if (
+              error.code === "auth/popup-blocked" ||
+              error.code === "auth/cancelled-popup-request"
+            ) {
               await signInWithGoogleRedirect();
-            } catch (e2) {
-              showError("Sign in failed (" + (e2.code || "unknown") + "). Try again.");
+            } else {
+              showError("Sign in failed (" + (error.code || "unknown") + ").");
             }
-          } else {
-            showError(
-              error.code
-                ? "Sign in failed (" + error.code + "). Try again."
-                : "Sign in failed. Check your connection and try again.",
-            );
           }
         }
       });
