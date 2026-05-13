@@ -131,6 +131,7 @@ body {
 }
 
 .tab-content {
+  display: block; /* override style.css which sets .tab-content { display:none } */
   animation: fadeIn 0.2s ease;
 }
 

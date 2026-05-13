@@ -124,6 +124,10 @@ function isAdmin(user) {
 async function saveUserProfile(userId, profile) {
   try {
     await setDoc(doc(db, "users", userId, "data", "profile"), profile);
+    // Write a stub to the top-level users/{uid} document so getDocs(collection(db,"users"))
+    // can discover all users. Firestore subcollections don't create parent documents
+    // automatically — without this stub, getAllUsers() always returns [].
+    await setDoc(doc(db, "users", userId), { uid: userId, _exists: true }, { merge: true });
   } catch (error) {
     console.error("Error saving user profile:", error);
     throw error;
@@ -136,6 +140,8 @@ async function getUserProfile(userId) {
     if (snap.exists()) {
       const profile = snap.data();
       cacheUserProfile(userId, profile).catch(() => {});
+      // Ensure top-level stub exists (fire-and-forget — never block the profile return)
+      setDoc(doc(db, "users", userId), { uid: userId, _exists: true }, { merge: true }).catch(() => {});
       return profile;
     }
     // No profile doc yet — auto-create one from Google auth data
@@ -148,6 +154,8 @@ async function getUserProfile(userId) {
       createdAt: new Date().toISOString(),
     };
     await setDoc(doc(db, "users", userId, "data", "profile"), minimal, { merge: true });
+    // Write stub so this user is discoverable by getAllUsers()
+    await setDoc(doc(db, "users", userId), { uid: userId, _exists: true }, { merge: true });
     cacheUserProfile(userId, minimal).catch(() => {});
     return minimal;
   } catch (error) {
