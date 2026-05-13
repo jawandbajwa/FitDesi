@@ -952,8 +952,9 @@ onAuthStateChanged(auth, async (user) => {
 
   document.getElementById("accessDenied").classList.add("hidden");
   document.getElementById("adminContent").classList.remove("hidden");
-  // Ensure stub doc exists for the admin user so they appear in the users list
-  getUserProfile(user.uid).catch(() => {});
+  // Ensure stub doc exists for the admin user so they appear in the users list.
+  // Await it so the stub is written before getAllUsers() reads the collection.
+  await getUserProfile(user.uid).catch(() => {});
   allIngredients = await getIngredients();
   allRecipes = await getRecipes(activeCuisine);
   renderIngredients();
