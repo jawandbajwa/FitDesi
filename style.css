@@ -1256,7 +1256,10 @@ body {
   border-radius: 10px;
   background: rgba(255,255,255,0.02);
   border: 1px solid transparent;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
 }
+.week-day:not(.today):active { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.12); }
 
 .week-day.today { border-color: var(--green); background: rgba(126,217,154,0.08); }
 .week-day-name { font-size: 9px; color: var(--text-faint); text-transform: uppercase; }
