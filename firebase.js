@@ -702,6 +702,8 @@ async function getAllUsers() {
     const snap = await getDocs(query(collectionGroup(db, "data")));
     const users = [];
     snap.docs.forEach((d) => {
+      // Only include "profile" docs — skip "cycle" and any other sub-docs
+      if (d.ref.id !== "profile") return;
       // d.ref.parent.parent is the users/{uid} doc — grab the uid from its id
       const uid = d.ref.parent.parent?.id;
       if (uid) users.push({ uid, ...d.data() });
