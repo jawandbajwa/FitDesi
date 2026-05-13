@@ -172,14 +172,14 @@ wrangler deploy
 ## Versioning
 
 Version is stored in two places: `manifest.json` and `profile.html` (About section).
-Current version: **3.1.8**
+Current version: **3.2.0**
 
 Rules:
 - Small change → `node bump-version.js patch` (+1 patch, 0–9, rolls to minor at 10)
 - Notable update → `node bump-version.js minor` (+1 minor, 0–9, rolls to major at 10)
 - Big release → `node bump-version.js major` (+1 major)
 
-The script also bumps `sw.js` cache version automatically (current: `fitdesi-v73`).
+The script also bumps `sw.js` cache version automatically (current: `fitdesi-v74`).
 
 ---
 
@@ -225,6 +225,17 @@ The script also bumps `sw.js` cache version automatically (current: `fitdesi-v73
   - Show Set A/B popup when `elapsedCycleCount() > cycleData.acknowledgedCycles`
   - On picking Set A/B: save `acknowledgedCycles = elapsedCycleCount()` to Firestore
 - `localStorage("fitdesi_cycle_ack")` = today's date string — blocks popup re-showing on same-day refresh
+
+### Train This Today
+Tapping any non-today chip in the week strip shows a confirmation popup. On confirm, `startDate` is recalculated so the tapped cycle day index becomes today — without touching `cycleCount` or `acknowledgedCycles`.
+
+**Formula (safe — no cycle popup re-trigger):**
+```
+ack          = cycleData.acknowledgedCycles ?? 0
+newDiffDays  = ack × splitDays.length + cycleIdx
+newStartDate = todayMidnight − newDiffDays × 86400000
+```
+Only `startDate` is written back; page reloads after save.
 
 ---
 
