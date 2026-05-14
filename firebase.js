@@ -69,13 +69,17 @@ function isStandalonePWA() {
   );
 }
 
+function isMobileBrowser() {
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
 async function signInWithGoogle() {
   try {
-    // In standalone PWA mode on BOTH iOS and Android, use signInWithRedirect.
-    // - iOS: signInWithPopup is blocked by the OS in standalone WKWebView
-    // - Android: redirect is more reliable and avoids popup-blocker edge cases
-    // In normal browser mode, signInWithPopup gives a better UX (stays on page).
-    if (isStandalonePWA()) {
+    // Use signInWithRedirect for all mobile devices AND standalone PWA mode.
+    // signInWithPopup is unreliable on Android Chrome (popup gets blocked or
+    // auth state is lost when returning to the tab). Redirect is the safe path.
+    // On desktop browsers, popup gives better UX (no full-page navigation).
+    if (isStandalonePWA() || isMobileBrowser()) {
       await signInWithRedirect(auth, provider);
       return null; // page will navigate; result handled via getRedirectResult()
     }
