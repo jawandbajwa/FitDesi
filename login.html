@@ -2,14 +2,37 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+    />
+    <link rel="icon" href="icon-192.png" />
     <title>FitDesi — Sign In</title>
     <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#7ed99a" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
     <link rel="apple-touch-icon" href="icon-192.png" />
-    <script>try{if(localStorage.getItem("fitdesi_theme")==="light")document.documentElement.setAttribute("data-theme","light")}catch(e){}</script>
+    <script>
+      try {
+        if (localStorage.getItem("fitdesi_theme") === "light")
+          document.documentElement.setAttribute("data-theme", "light");
+      } catch (e) {}
+    </script>
     <link rel="stylesheet" href="style.css" />
     <style>
       .login-page {
@@ -210,18 +233,54 @@
       </div>
     </div>
 
+    <style>
+      .open-app-card {
+        display: none;
+        background: rgba(126, 217, 154, 0.08);
+        border: 0.5px solid rgba(126, 217, 154, 0.3);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 16px;
+        text-align: center;
+      }
+      .open-app-card p {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.6);
+        margin: 0 0 16px;
+        line-height: 1.5;
+      }
+      .open-app-btn {
+        display: inline-block;
+        background: #7ed99a;
+        color: #0d1f10;
+        font-size: 14px;
+        font-weight: 600;
+        padding: 12px 24px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-family: Inter, sans-serif;
+      }
+    </style>
     <script type="module">
       import {
         signInWithGoogle,
+        signInWithGoogleRedirect,
         onAuthStateChanged,
         auth,
         getRedirectResult,
       } from "./firebase.js";
 
-      const btn     = document.getElementById("googleSignIn");
+      const btn = document.getElementById("googleSignIn");
       const btnText = document.getElementById("btnText");
       const spinner = document.getElementById("spinner");
       const errorEl = document.getElementById("loginError");
+
+      function isStandalone() {
+        return (
+          window.navigator.standalone === true ||
+          window.matchMedia("(display-mode: standalone)").matches
+        );
+      }
 
       function setLoading(on) {
         btn.disabled = on;
@@ -229,44 +288,88 @@
         spinner.style.display = on ? "block" : "none";
       }
 
-      // ── Handle iOS redirect result ──────────────────────────
-      // After signInWithRedirect() on iOS standalone, Google bounces
-      // back here — getRedirectResult() captures the credential.
+      function showError(msg) {
+        setLoading(false);
+        errorEl.style.display = "block";
+        errorEl.textContent = msg;
+      }
+
+      function showOpenAppUI() {
+        btn.style.display = "none";
+        let existingCard = document.querySelector(".open-app-card");
+        if (existingCard) return;
+
+        const card = document.createElement("div");
+        card.className = "open-app-card";
+        card.innerHTML = `
+    <p>✅ You're signed in!<br>Tap below to open the FitDesi app.</p>
+    <a class="open-app-btn" href="./index.html">Open FitDesi →</a>
+  `;
+        card.style.display = "block";
+        btn.parentNode.insertBefore(card, btn);
+      }
+
+      // ── Handle redirect result on page load ─────────────────
       (async () => {
         try {
-          setLoading(true);
+          // Check if we just returned from a redirect
           const result = await getRedirectResult(auth);
           if (result && result.user) {
-            window.location.href = "index.html";
+            if (isStandalone()) {
+              window.location.href = "index.html";
+            } else {
+              showOpenAppUI();
+            }
             return;
           }
         } catch (e) {
-          // No redirect in flight — normal first load
+          console.error("Redirect Error:", e);
+          if (e.code && e.code !== "auth/no-auth-event") {
+            showError("Sign in failed (" + e.code + "). Try again.");
+          }
         }
         setLoading(false);
       })();
 
-      // ── Already signed in → go straight to app ─────────────
+      // ── Watch Auth State ─────────────────────────────────────
       onAuthStateChanged(auth, (user) => {
-        if (user) window.location.href = "index.html";
+        if (user) {
+          if (isStandalone()) {
+            window.location.href = "index.html";
+          } else {
+            showOpenAppUI();
+          }
+        }
       });
 
       // ── Sign-in button ──────────────────────────────────────
       btn.addEventListener("click", async () => {
         setLoading(true);
         errorEl.style.display = "none";
-        try {
-          const user = await signInWithGoogle();
-          // On iOS standalone, signInWithGoogle triggers a redirect and
-          // returns null — result is handled above by getRedirectResult.
-          if (user) window.location.href = "index.html";
-        } catch (error) {
-          setLoading(false);
-          errorEl.style.display = "block";
-          errorEl.textContent =
-            error.code === "auth/popup-blocked"
-              ? "Popup blocked. Please allow popups or try a different browser."
-              : "Sign in failed. Please try again.";
+
+        // Force redirect on Android to avoid popup blocking/stalling
+        const isAndroid = /Android/i.test(navigator.userAgent);
+
+        if (isAndroid) {
+          try {
+            await signInWithGoogleRedirect();
+          } catch (e) {
+            showError("Android Redirect failed: " + e.message);
+          }
+        } else {
+          try {
+            const user = await signInWithGoogle();
+            if (user) window.location.href = "index.html";
+          } catch (error) {
+            if (
+              error.code === "auth/popup-blocked" ||
+              error.code === "auth/cancelled-popup-request"
+            ) {
+              await signInWithGoogleRedirect();
+            } else {
+              showError("Sign in failed (" + (error.code || "unknown") + ").");
+            }
+          }
         }
       });
     </script>

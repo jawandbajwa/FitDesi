@@ -2,15 +2,32 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" />
+    <link rel="icon" href="icon-192.png" />
     <title>FitDesi — Recipes</title>
     <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#7ed99a" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
     <link rel="apple-touch-icon" href="icon-192.png" />
-    <script>try{if(localStorage.getItem("fitdesi_theme")==="light")document.documentElement.setAttribute("data-theme","light")}catch(e){}</script>
+    <script>
+      try {
+        if (localStorage.getItem("fitdesi_theme") === "light")
+          document.documentElement.setAttribute("data-theme", "light");
+      } catch (e) {}
+    </script>
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="coach.css" />
     <link rel="stylesheet" href="recipes.css" />
   </head>
   <body>
@@ -24,6 +41,7 @@
     <div class="cuisine-switcher">
       <button class="cuisine-btn active" data-cuisine="indian">🇮🇳 Indian</button>
       <button class="cuisine-btn" data-cuisine="canadian">🇨🇦 Canadian</button>
+      <button class="cuisine-btn" data-cuisine="mine">📖 Mine</button>
     </div>
 
     <!-- CATEGORY FILTER -->
@@ -37,13 +55,11 @@
 
     <!-- SEARCH -->
     <div class="search-container">
-      <input
-        type="text"
-        id="recipeSearch"
-        placeholder="Search recipes..."
-        class="search-input"
-      />
-      <span class="search-icon">🔍</span>
+      <div class="search-input-wrap">
+        <input type="text" id="recipeSearch" placeholder="Search recipes..." class="search-input" />
+        <span class="search-icon">🔍</span>
+      </div>
+      <button class="add-my-recipe-btn hidden" id="addMyRecipeBtn">+ Add Recipe</button>
     </div>
 
     <!-- RECIPE LIST -->
@@ -67,11 +83,25 @@
         <div class="macro-grid" id="detailMacros"></div>
         <div class="detail-section-label">Ingredients</div>
         <div class="detail-ingredients" id="detailIngredients"></div>
-        <div class="detail-section-label" id="instructionsLabel" style="display:none">How to make it</div>
+        <div
+          class="detail-section-label"
+          id="instructionsLabel"
+          style="display: none"
+        >
+          How to make it
+        </div>
         <div class="detail-instructions" id="detailInstructions"></div>
-        <div class="detail-section-label" id="videoLabel" style="display:none">How to cook</div>
+        <div class="detail-section-label" id="notesLabel" style="display: none">Notes</div>
+        <div class="detail-notes" id="detailNotes"></div>
+        <div class="detail-section-label" id="videoLabel" style="display: none">
+          How to cook
+        </div>
         <div class="detail-video" id="detailVideo"></div>
         <button class="add-to-meal-btn" id="addToMealBtn">+ Add to Today's Meals</button>
+        <div class="ur-detail-actions hidden" id="userRecipeDetailActions">
+          <button class="ur-action-btn ur-edit-btn" id="detailEditBtn">✏️ Edit</button>
+          <button class="ur-action-btn ur-delete-btn" id="detailDeleteBtn">🗑️ Delete</button>
+        </div>
       </div>
     </div>
 
@@ -82,7 +112,14 @@
           <h2>Add to which meal?</h2>
           <button class="modal-close" id="mealSelectorClose">✕</button>
         </div>
-        <p style="font-size:12px; color:rgba(255,255,255,0.3); margin-bottom:16px" id="mealSelectorRecipeName"></p>
+        <p
+          style="
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.3);
+            margin-bottom: 16px;
+          "
+          id="mealSelectorRecipeName"
+        ></p>
         <div class="meal-selector-grid">
           <button class="meal-sel-btn" data-meal="breakfast">
             <span class="meal-sel-icon">🌅</span>
@@ -105,62 +142,241 @@
       </div>
     </div>
 
+    <!-- USER RECIPE MODAL -->
+    <div class="modal-overlay" id="userRecipeModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h2 id="urModalTitle">New Recipe</h2>
+          <button class="modal-close" id="urModalClose">✕</button>
+        </div>
+
+        <div class="ur-form-group">
+          <label class="ur-label">Recipe Name *</label>
+          <input type="text" id="urName" class="ur-input" placeholder="e.g. Protein Dal Tadka" autocomplete="off" />
+        </div>
+
+        <div class="ur-form-group">
+          <label class="ur-label">Category *</label>
+          <div class="ur-category-row" id="urCategoryRow">
+            <button class="ur-cat-pill" data-cat="breakfast">Breakfast</button>
+            <button class="ur-cat-pill" data-cat="lunch">Lunch</button>
+            <button class="ur-cat-pill" data-cat="dinner">Dinner</button>
+            <button class="ur-cat-pill" data-cat="snack">Snack</button>
+          </div>
+        </div>
+
+        <div class="ur-form-group">
+          <label class="ur-label">Serving Size</label>
+          <input type="text" id="urServing" class="ur-input" placeholder="e.g. 1 bowl, 2 rotis" />
+        </div>
+
+        <div class="ur-form-group">
+          <label class="ur-label">Add Ingredients <span class="ur-optional">optional · auto-calculates macros</span></label>
+          <input type="text" id="urIngSearch" class="ur-input" placeholder="Search ingredients..." autocomplete="off" />
+          <div class="ur-ing-results" id="urIngResults"></div>
+          <div class="ur-amount-row hidden" id="urAmountRow">
+            <span class="ur-amount-name" id="urAmountName"></span>
+            <input type="number" id="urAmountInput" placeholder="100" min="0" />
+            <span class="ur-amount-unit">g</span>
+            <button class="ur-amount-add" id="urAmountAdd">+ Add</button>
+            <button class="ur-amount-cancel" id="urAmountCancel">✕</button>
+          </div>
+          <div class="ur-added-list" id="urAddedList"></div>
+        </div>
+
+        <div class="ur-form-group">
+          <label class="ur-label">Macros *</label>
+          <div class="ur-macro-grid">
+            <div class="ur-macro-field">
+              <input type="number" id="urProtein" class="ur-input" placeholder="0" min="0" step="0.1" />
+              <div class="ur-macro-lbl">Protein (g)</div>
+            </div>
+            <div class="ur-macro-field">
+              <input type="number" id="urCarbs" class="ur-input" placeholder="0" min="0" step="0.1" />
+              <div class="ur-macro-lbl">Carbs (g)</div>
+            </div>
+            <div class="ur-macro-field">
+              <input type="number" id="urFat" class="ur-input" placeholder="0" min="0" step="0.1" />
+              <div class="ur-macro-lbl">Fat (g)</div>
+            </div>
+            <div class="ur-macro-field">
+              <input type="number" id="urCalories" class="ur-input" placeholder="0" min="0" />
+              <div class="ur-macro-lbl">Calories</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ur-form-group">
+          <label class="ur-label">Notes <span class="ur-optional">optional</span></label>
+          <textarea id="urNotes" class="ur-input ur-textarea" placeholder="Prep tips, variations..."></textarea>
+        </div>
+
+        <div class="ur-form-group">
+          <label class="ur-label">YouTube Video ID <span class="ur-optional">optional</span></label>
+          <input type="text" id="urVideoId" class="ur-input" placeholder="e.g. dQw4w9WgXcQ" />
+        </div>
+
+        <button class="save-btn" id="urSaveBtn">Save Recipe</button>
+      </div>
+    </div>
+
+    <!-- CONFIRM DELETE MODAL -->
+    <div class="modal-overlay" id="urDeleteModal">
+      <div class="modal" style="max-width: 360px">
+        <div class="modal-header">
+          <h2>Delete Recipe?</h2>
+          <button class="modal-close" id="urDeleteClose">✕</button>
+        </div>
+        <p class="ur-delete-subtitle" id="urDeleteName"></p>
+        <div class="ur-delete-actions">
+          <button class="ur-del-confirm-btn" id="urConfirmDelete">Delete</button>
+          <button class="save-btn" style="flex: 1" id="urCancelDelete">Cancel</button>
+        </div>
+      </div>
+    </div>
+
     <!-- BOTTOM NAV -->
     <nav class="bottom-nav">
       <a href="recipes.html" class="nav-item active" data-page="recipes">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
-          <path d="M8 12h8M12 8v8"/>
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path
+            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"
+          />
+          <path d="M8 12h8M12 8v8" />
         </svg>
         <span>Recipes</span>
       </a>
       <a href="tracker.html" class="nav-item" data-page="nutrition">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M3 3h18v4H3zM3 10h18v4H3zM3 17h18v4H3z"/>
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M3 3h18v4H3zM3 10h18v4H3zM3 17h18v4H3z" />
         </svg>
         <span>Nutrition</span>
       </a>
       <a href="index.html" class="nav-item home-tab" data-page="home">
         <div class="home-tab-ring">
           <svg width="58" height="58" viewBox="0 0 58 58">
-            <circle cx="29" cy="29" r="22" fill="none" stroke="#1a2e1e" stroke-width="4"/>
-            <circle cx="29" cy="29" r="22" fill="none" stroke="#7ed99a" stroke-width="4"
-              stroke-dasharray="138.2" stroke-dashoffset="138.2"
-              stroke-linecap="round" transform="rotate(-90 29 29)"
-              id="navProteinRing" class="nav-protein-ring"/>
+            <circle
+              cx="29"
+              cy="29"
+              r="22"
+              fill="none"
+              stroke="#1a2e1e"
+              stroke-width="4"
+            />
+            <circle
+              cx="29"
+              cy="29"
+              r="22"
+              fill="none"
+              stroke="#7ed99a"
+              stroke-width="4"
+              stroke-dasharray="138.2"
+              stroke-dashoffset="138.2"
+              stroke-linecap="round"
+              transform="rotate(-90 29 29)"
+              id="navProteinRing"
+              class="nav-protein-ring"
+            />
           </svg>
-          <svg class="home-tab-icon" style="position:relative;z-index:1" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7ed99a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-            <polyline points="9 22 9 12 15 12 15 22"/>
+          <svg
+            class="home-tab-icon"
+            style="position: relative; z-index: 1"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#7ed99a"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            <polyline points="9 22 9 12 15 12 15 22" />
           </svg>
         </div>
         <span>Home</span>
       </a>
       <a href="exercise.html" class="nav-item" data-page="workout">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M6.5 6.5h11M6.5 17.5h11M4 12h16M4 12l-2-2M4 12l-2 2M20 12l2-2M20 12l2 2"/>
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path
+            d="M6.5 6.5h11M6.5 17.5h11M4 12h16M4 12l-2-2M4 12l-2 2M20 12l2-2M20 12l2 2"
+          />
         </svg>
         <span>Workout</span>
       </a>
       <a href="profile.html" class="nav-item" data-page="profile">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-          <circle cx="12" cy="7" r="4"/>
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
         </svg>
         <span>Profile</span>
       </a>
     </nav>
 
     <script type="module" src="recipes.js"></script>
+
+    <!-- Coach -->
+    <script type="module">
+      async function loadCoach() {
+        try {
+          const coachModule = await import("./coach.js");
+          coachModule.initCoach();
+        } catch (error) {
+          console.warn("FitDesi coach module not loaded:", error);
+        }
+      }
+
+      loadCoach();
+    </script>
     <script>
       /* Nav protein ring */
-      (function() {
+      (function () {
         const goal = parseInt(localStorage.getItem("proteinGoal") || "0");
         if (!goal) return;
         const data = JSON.parse(localStorage.getItem("proteinData") || "{}");
         const protein = data[new Date().toDateString()] || 0;
         const ring = document.getElementById("navProteinRing");
-        if (ring) ring.setAttribute("stroke-dashoffset", (138.2 * (1 - Math.min(protein / goal, 1))).toFixed(1));
+        if (ring)
+          ring.setAttribute(
+            "stroke-dashoffset",
+            (138.2 * (1 - Math.min(protein / goal, 1))).toFixed(1),
+          );
       })();
     </script>
   </body>

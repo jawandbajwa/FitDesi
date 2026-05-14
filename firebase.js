@@ -18,6 +18,8 @@ import {
   getDoc,
   updateDoc,
   collection,
+  collectionGroup,
+  query,
   getDocs,
   deleteDoc,
   deleteField,
@@ -69,26 +71,43 @@ function isStandalonePWA() {
   );
 }
 
-function isMobileBrowser() {
-  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+function isIOS() {
+  return /iphone|ipad|ipod/i.test(navigator.userAgent);
+}
+
+function isAndroidStandalone() {
+  // Android PWA or any Android browser (redirect is needed; popup blocked)
+  return /android/i.test(navigator.userAgent) ||
+    window.matchMedia("(display-mode: standalone)").matches;
 }
 
 async function signInWithGoogle() {
   try {
-    // Use signInWithRedirect for all mobile devices AND standalone PWA mode.
-    // signInWithPopup is unreliable on Android Chrome (popup gets blocked or
-    // auth state is lost when returning to the tab). Redirect is the safe path.
-    // On desktop browsers, popup gives better UX (no full-page navigation).
-    if (isStandalonePWA() || isMobileBrowser()) {
-      await signInWithRedirect(auth, provider);
-      return null; // page will navigate; result handled via getRedirectResult()
+    if (isIOS()) {
+      // iOS: signInWithRedirect opens Google in Safari and the redirect back
+      // lands in Safari — NOT in the PWA — so the PWA never captures the result.
+      // Popup works correctly in both Safari browser and iOS standalone (Add to Home).
+      const result = await signInWithPopup(auth, provider);
+      return result.user;
     }
+    if (isAndroidStandalone() || window.navigator.standalone === true) {
+      // Android PWA / standalone: popup is blocked, must use redirect.
+      // getRedirectResult() on login.html captures the credential.
+      await signInWithRedirect(auth, provider);
+      return null;
+    }
+    // Desktop browser: popup.
     const result = await signInWithPopup(auth, provider);
     return result.user;
   } catch (error) {
     console.error("Sign in error:", error);
     throw error;
   }
+}
+
+// Explicit redirect sign-in — used as a manual fallback in login.html
+async function signInWithGoogleRedirect() {
+  await signInWithRedirect(auth, provider);
 }
 
 async function signOutUser() {
@@ -107,6 +126,10 @@ function isAdmin(user) {
 async function saveUserProfile(userId, profile) {
   try {
     await setDoc(doc(db, "users", userId, "data", "profile"), profile);
+    // Write a stub to the top-level users/{uid} document so getDocs(collection(db,"users"))
+    // can discover all users. Firestore subcollections don't create parent documents
+    // automatically — without this stub, getAllUsers() always returns [].
+    await setDoc(doc(db, "users", userId), { uid: userId, _exists: true }, { merge: true });
   } catch (error) {
     console.error("Error saving user profile:", error);
     throw error;
@@ -115,21 +138,34 @@ async function saveUserProfile(userId, profile) {
 
 async function getUserProfile(userId) {
   try {
-    if (navigator.onLine) {
-      const snap = await getDoc(doc(db, "users", userId, "data", "profile"));
-      const profile = snap.exists() ? snap.data() : null;
-      if (profile) await cacheUserProfile(userId, profile);
+    const snap = await getDoc(doc(db, "users", userId, "data", "profile"));
+    if (snap.exists()) {
+      const profile = snap.data();
+      cacheUserProfile(userId, profile).catch(() => {});
+      // Ensure top-level stub exists (fire-and-forget — never block the profile return)
+      setDoc(doc(db, "users", userId), { uid: userId, _exists: true }, { merge: true }).catch(() => {});
       return profile;
-    } else {
-      return await getCachedUserProfile(userId);
     }
+    // No profile doc yet — auto-create one from Google auth data
+    // so the user appears in the admin panel immediately
+    const user = auth.currentUser;
+    const minimal = {
+      name:      user?.displayName || "",
+      email:     user?.email       || "",
+      photoURL:  user?.photoURL    || "",
+      createdAt: new Date().toISOString(),
+    };
+    await setDoc(doc(db, "users", userId, "data", "profile"), minimal, { merge: true });
+    // Write stub so this user is discoverable by getAllUsers()
+    await setDoc(doc(db, "users", userId), { uid: userId, _exists: true }, { merge: true });
+    cacheUserProfile(userId, minimal).catch(() => {});
+    return minimal;
   } catch (error) {
-    console.error("Error getting user profile:", error);
+    console.error("Firestore profile failed, falling back to cache:", error);
     try {
       return await getCachedUserProfile(userId);
-    } catch (cacheError) {
-      console.error("Cache error:", cacheError);
-      throw error;
+    } catch {
+      return null;
     }
   }
 }
@@ -145,26 +181,18 @@ async function saveDailyLog(userId, dateKey, log) {
 }
 
 async function getDailyLog(userId, dateKey) {
+  const empty = { breakfast: [], lunch: [], snack: [], dinner: [] };
   try {
-    if (navigator.onLine) {
-      const snap = await getDoc(doc(db, "users", userId, "logs", dateKey));
-      const log = snap.exists()
-        ? snap.data()
-        : { breakfast: [], lunch: [], snack: [], dinner: [] };
-      await cacheDailyLog(userId, dateKey, log);
-      return log;
-    } else {
-      const cached = await getCachedDailyLog(userId, dateKey);
-      return cached || { breakfast: [], lunch: [], snack: [], dinner: [] };
-    }
+    const snap = await getDoc(doc(db, "users", userId, "logs", dateKey));
+    const log = snap.exists() ? snap.data() : empty;
+    cacheDailyLog(userId, dateKey, log).catch(() => {});
+    return log;
   } catch (error) {
-    console.error("Error getting daily log:", error);
+    console.error("Firestore daily log failed, falling back to cache:", error);
     try {
-      const cached = await getCachedDailyLog(userId, dateKey);
-      return cached || { breakfast: [], lunch: [], snack: [], dinner: [] };
-    } catch (cacheError) {
-      console.error("Cache error:", cacheError);
-      throw error;
+      return (await getCachedDailyLog(userId, dateKey)) || empty;
+    } catch {
+      return empty;
     }
   }
 }
@@ -212,29 +240,30 @@ async function saveRecipe(recipe, cuisine = "indian") {
 
 async function getRecipes(cuisine = "indian") {
   try {
-    // Try Firebase first if online
-    if (navigator.onLine) {
-      const col =
-        cuisine === "canadian" ? "recipes_canadian" : "recipes_indian";
-      const snap = await getDocs(collection(db, "shared", col, "items"));
-      // Tag each recipe with its cuisine so the cache stays separated
-      const recipes = snap.docs.map((d) => ({ id: d.id, ...d.data(), _cuisine: cuisine }));
-      // Cache for offline (keyed by cuisine)
-      await cacheRecipes(recipes, cuisine);
-      return recipes;
-    } else {
-      // Offline: use cached data filtered to the requested cuisine
-      return await getCachedRecipes(cuisine);
-    }
+    // Always try Firestore first — navigator.onLine is unreliable on mobile
+    // networks and cellular connections, so we let the fetch itself fail
+    // and fall back to cache only when it genuinely can't reach Firebase.
+    const col = cuisine === "canadian" ? "recipes_canadian" : "recipes_indian";
+    const snap = await getDocs(collection(db, "shared", col, "items"));
+    const recipes = snap.docs.map((d) => ({
+      id: d.id,
+      ...d.data(),
+      _cuisine: cuisine,
+    }));
+    // Fire-and-forget cache update — never let a cache write failure
+    // mask a successful Firestore read (was a bug: if cacheRecipes threw,
+    // the entire catch block ran and returned [] instead of the fresh data).
+    cacheRecipes(recipes, cuisine).catch(() => {});
+    return recipes;
   } catch (error) {
-    console.error("Error getting recipes:", error);
-    // Fallback to cache
+    console.error("Firestore recipes failed, falling back to cache:", error);
     try {
-      return await getCachedRecipes(cuisine);
+      const cached = await getCachedRecipes(cuisine);
+      if (cached && cached.length > 0) return cached;
     } catch (cacheError) {
-      console.error("Cache error:", cacheError);
-      throw error;
+      console.error("Cache also failed:", cacheError);
     }
+    return [];
   }
 }
 
@@ -268,23 +297,18 @@ async function saveIngredient(ingredient) {
 
 async function getIngredients() {
   try {
-    if (navigator.onLine) {
-      const snap = await getDocs(
-        collection(db, "shared", "ingredients", "items"),
-      );
-      const ingredients = snap.docs.map((d) => d.data());
-      await cacheIngredients(ingredients);
-      return ingredients;
-    } else {
-      return await getCachedIngredients();
-    }
+    const snap = await getDocs(
+      collection(db, "shared", "ingredients", "items"),
+    );
+    const ingredients = snap.docs.map((d) => d.data());
+    cacheIngredients(ingredients).catch(() => {});
+    return ingredients;
   } catch (error) {
-    console.error("Error getting ingredients:", error);
+    console.error("Firestore ingredients failed, falling back to cache:", error);
     try {
       return await getCachedIngredients();
-    } catch (cacheError) {
-      console.error("Cache error:", cacheError);
-      throw error;
+    } catch {
+      return [];
     }
   }
 }
@@ -334,21 +358,16 @@ async function saveWorkoutCycle(userId, cycle) {
 
 async function getWorkoutCycle(userId) {
   try {
-    if (navigator.onLine) {
-      const snap = await getDoc(doc(db, "users", userId, "data", "cycle"));
-      const cycle = snap.exists() ? snap.data() : null;
-      if (cycle) await cacheWorkoutCycle(userId, cycle);
-      return cycle;
-    } else {
-      return await getCachedWorkoutCycle(userId);
-    }
+    const snap = await getDoc(doc(db, "users", userId, "data", "cycle"));
+    const cycle = snap.exists() ? snap.data() : null;
+    if (cycle) cacheWorkoutCycle(userId, cycle).catch(() => {});
+    return cycle;
   } catch (error) {
-    console.error("Error getting workout cycle:", error);
+    console.error("Firestore workout cycle failed, falling back to cache:", error);
     try {
       return await getCachedWorkoutCycle(userId);
-    } catch (cacheError) {
-      console.error("Cache error:", cacheError);
-      throw error;
+    } catch {
+      return null;
     }
   }
 }
@@ -406,14 +425,16 @@ async function getProgressHistory(userId) {
 async function clearWeightHistory(userId) {
   try {
     const snap = await getDocs(collection(db, "users", userId, "progress"));
-    await Promise.all(snap.docs.map((d) => {
-      const data = d.data();
-      const ref = doc(db, "users", userId, "progress", d.id);
-      // If the doc has bodyFat too, just strip the weight field; otherwise delete the doc
-      return (data.bodyFat != null)
-        ? updateDoc(ref, { weight: deleteField() })
-        : deleteDoc(ref);
-    }));
+    await Promise.all(
+      snap.docs.map((d) => {
+        const data = d.data();
+        const ref = doc(db, "users", userId, "progress", d.id);
+        // If the doc has bodyFat too, just strip the weight field; otherwise delete the doc
+        return data.bodyFat != null
+          ? updateDoc(ref, { weight: deleteField() })
+          : deleteDoc(ref);
+      }),
+    );
   } catch (error) {
     console.error("Error clearing weight history:", error);
     throw error;
@@ -423,17 +444,274 @@ async function clearWeightHistory(userId) {
 async function clearBodyFatHistory(userId) {
   try {
     const snap = await getDocs(collection(db, "users", userId, "progress"));
-    await Promise.all(snap.docs.map((d) => {
-      const data = d.data();
-      const ref = doc(db, "users", userId, "progress", d.id);
-      // If the doc has weight too, just strip the bodyFat field; otherwise delete the doc
-      return (data.weight != null)
-        ? updateDoc(ref, { bodyFat: deleteField() })
-        : deleteDoc(ref);
-    }));
+    await Promise.all(
+      snap.docs.map((d) => {
+        const data = d.data();
+        const ref = doc(db, "users", userId, "progress", d.id);
+        // If the doc has weight too, just strip the bodyFat field; otherwise delete the doc
+        return data.weight != null
+          ? updateDoc(ref, { bodyFat: deleteField() })
+          : deleteDoc(ref);
+      }),
+    );
   } catch (error) {
     console.error("Error clearing body fat history:", error);
     throw error;
+  }
+}
+
+// ─── COACH FUNCTIONS ──────────────────────────────────────────
+async function addMealToLog(uid, meal) {
+  try {
+    const today = new Date().toISOString().split("T")[0];
+    const logRef = doc(db, "users", uid, "logs", today);
+
+    // Get existing log
+    const existingLog = await getDoc(logRef);
+    const currentLog = existingLog.exists()
+      ? existingLog.data()
+      : {
+          breakfast: [],
+          lunch: [],
+          snack: [],
+          dinner: [],
+        };
+
+    // Add meal to appropriate array
+    const mealType = meal.meal_type || "snack";
+    if (!currentLog[mealType]) currentLog[mealType] = [];
+    currentLog[mealType].push({
+      name: meal.name,
+      protein: meal.protein,
+      carbs: meal.carbs,
+      fat: meal.fat,
+      calories: meal.calories,
+      timestamp: new Date().toISOString(),
+    });
+
+    await setDoc(logRef, currentLog);
+  } catch (error) {
+    console.error("Error adding meal to log:", error);
+    throw error;
+  }
+}
+
+// Returns all workout log docs for the streak calculation on the home page.
+// Each doc.id is a date string (ISO format), doc.data() has { completed, completedAt }.
+async function getWorkoutLogsAll(uid) {
+  try {
+    const snap = await getDocs(collection(db, "users", uid, "workoutLogs"));
+    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  } catch (error) {
+    console.error("Error fetching workout logs:", error);
+    return [];
+  }
+}
+
+async function completeWorkout(uid, date) {
+  try {
+    await setDoc(
+      doc(db, "users", uid, "workoutLogs", date),
+      {
+        completed: true,
+        completedAt: new Date().toISOString(),
+      },
+      { merge: true },
+    );
+  } catch (error) {
+    console.error("Error completing workout:", error);
+    throw error;
+  }
+}
+
+async function swapExercise(uid, date, oldName, newName) {
+  try {
+    const workoutRef = doc(
+      db,
+      "users",
+      uid,
+      "workouts",
+      date,
+      "exercises",
+      oldName,
+    );
+    const newRef = doc(
+      db,
+      "users",
+      uid,
+      "workouts",
+      date,
+      "exercises",
+      newName,
+    );
+
+    // Get old exercise data
+    const oldDoc = await getDoc(workoutRef);
+    if (oldDoc.exists()) {
+      const data = oldDoc.data();
+      // Create new exercise with same data
+      await setDoc(newRef, data);
+      // Delete old exercise
+      await deleteDoc(workoutRef);
+    }
+  } catch (error) {
+    console.error("Error swapping exercise:", error);
+    throw error;
+  }
+}
+
+// ─── ONBOARDING ──────────────────────────────────────────────
+async function markOnboardingDone(uid) {
+  try {
+    const profileRef = doc(db, "users", uid, "data", "profile");
+    await setDoc(profileRef, { onboardingDone: true }, { merge: true });
+  } catch (error) {
+    console.error("Error marking onboarding done:", error);
+  }
+}
+
+// ─── COACH FUNCTIONS ─────────────────────────────────────────
+async function saveCoachChoice(uid, coachId) {
+  try {
+    const profileRef = doc(db, "users", uid, "data", "profile");
+    await setDoc(profileRef, { chosenCoach: coachId }, { merge: true });
+  } catch (error) {
+    console.error("Error saving coach choice:", error);
+    throw error;
+  }
+}
+
+async function assignCoach(uid, enabled) {
+  try {
+    const profileRef = doc(db, "users", uid, "data", "profile");
+    await setDoc(profileRef, { coachEnabled: enabled }, { merge: true });
+  } catch (error) {
+    console.error("Error assigning coach:", error);
+    throw error;
+  }
+}
+
+async function setAdminStatus(uid, adminStatus) {
+  try {
+    const profileRef = doc(db, "users", uid, "data", "profile");
+    await setDoc(profileRef, { isAdmin: adminStatus }, { merge: true });
+  } catch (error) {
+    console.error("Error setting admin status:", error);
+    throw error;
+  }
+}
+
+// ─── USER RECIPES ────────────────────────────────────────────
+async function saveUserRecipe(uid, recipe) {
+  try {
+    if (recipe.id) {
+      const ref = doc(db, "users", uid, "recipes", recipe.id);
+      await setDoc(ref, recipe);
+      return recipe.id;
+    } else {
+      const ref = doc(collection(db, "users", uid, "recipes"));
+      const id = ref.id;
+      await setDoc(ref, { ...recipe, id });
+      return id;
+    }
+  } catch (error) {
+    console.error("Error saving user recipe:", error);
+    throw error;
+  }
+}
+
+async function getUserRecipes(uid) {
+  try {
+    const snap = await getDocs(collection(db, "users", uid, "recipes"));
+    return snap.docs.map((d) => ({ ...d.data(), id: d.id, _isUserRecipe: true }));
+  } catch (error) {
+    console.error("Error getting user recipes:", error);
+    return [];
+  }
+}
+
+async function deleteUserRecipe(uid, recipeId) {
+  try {
+    await deleteDoc(doc(db, "users", uid, "recipes", recipeId));
+  } catch (error) {
+    console.error("Error deleting user recipe:", error);
+    throw error;
+  }
+}
+
+// Fetch every user's personal recipes in one call (admin only)
+async function getAllUserRecipes() {
+  try {
+    const usersSnap = await getDocs(collection(db, "users"));
+    const allRecipes = [];
+    await Promise.all(
+      usersSnap.docs.map(async (userDoc) => {
+        const uid = userDoc.id;
+        const [profileSnap, recipesSnap] = await Promise.all([
+          getDoc(doc(db, "users", uid, "data", "profile")),
+          getDocs(collection(db, "users", uid, "recipes")),
+        ]);
+        const profile = profileSnap.exists() ? profileSnap.data() : {};
+        const ownerName = profile.name || profile.email || "Unknown";
+        recipesSnap.docs.forEach((d) => {
+          allRecipes.push({
+            ...d.data(),
+            id: d.id,
+            _uid: uid,
+            _ownerName: ownerName,
+            _isUserRecipe: true,
+          });
+        });
+      })
+    );
+    return allRecipes;
+  } catch (error) {
+    console.error("Error fetching all user recipes:", error);
+    return [];
+  }
+}
+
+// Copy a user's personal recipe into the shared recipes collection
+async function promoteUserRecipe(uid, recipeId, cuisine = "indian") {
+  try {
+    const recipeSnap = await getDoc(doc(db, "users", uid, "recipes", recipeId));
+    if (!recipeSnap.exists()) throw new Error("Recipe not found");
+    const recipe = { ...recipeSnap.data() };
+    delete recipe._isUserRecipe;
+    const col = cuisine === "canadian" ? "recipes_canadian" : "recipes_indian";
+    const ref = doc(collection(db, "shared", col, "items"));
+    await setDoc(ref, {
+      ...recipe,
+      id: ref.id,
+      cuisine,
+      _promotedFrom: uid,
+      _promotedAt: new Date().toISOString(),
+    });
+    return ref.id;
+  } catch (error) {
+    console.error("Error promoting user recipe:", error);
+    throw error;
+  }
+}
+
+async function getAllUsers() {
+  try {
+    // Use collectionGroup to query all "data" sub-collections across every user.
+    // Each user has exactly one doc in their "data" collection: the "profile" doc.
+    // This discovers ALL users who have ever signed in — no stub top-level docs needed.
+    const snap = await getDocs(query(collectionGroup(db, "data")));
+    const users = [];
+    snap.docs.forEach((d) => {
+      // Only include "profile" docs — skip "cycle" and any other sub-docs
+      if (d.ref.id !== "profile") return;
+      // d.ref.parent.parent is the users/{uid} doc — grab the uid from its id
+      const uid = d.ref.parent.parent?.id;
+      if (uid) users.push({ uid, ...d.data() });
+    });
+    return users;
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    return [];
   }
 }
 
@@ -445,6 +723,7 @@ export {
   ADMIN_EMAIL,
   onAuthStateChanged,
   signInWithGoogle,
+  signInWithGoogleRedirect,
   signOutUser,
   isAdmin,
   isStandalonePWA,
@@ -471,4 +750,18 @@ export {
   getProgressHistory,
   clearWeightHistory,
   clearBodyFatHistory,
+  addMealToLog,
+  getWorkoutLogsAll,
+  completeWorkout,
+  swapExercise,
+  saveUserRecipe,
+  getUserRecipes,
+  deleteUserRecipe,
+  saveCoachChoice,
+  assignCoach,
+  setAdminStatus,
+  getAllUsers,
+  getAllUserRecipes,
+  promoteUserRecipe,
+  markOnboardingDone,
 };

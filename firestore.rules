@@ -1,16 +1,34 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Users can read and write their own data
+
+    function isAdmin() {
+      return request.auth != null &&
+        request.auth.token.email == 'jawandbajwa@gmail.com';
+    }
+
+    // Top-level user container docs — admin can list/read all, users read own
+    match /users/{userId} {
+      allow read:  if request.auth != null && (request.auth.uid == userId || isAdmin());
+      allow write: if request.auth != null && (request.auth.uid == userId || isAdmin());
+    }
+
+    // User subcollections (data/profile, logs, workouts, progress, etc.)
+    // Admin can read/write any user's subcollections (assign coach, view stats)
     match /users/{userId}/{document=**} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, write: if request.auth != null && (request.auth.uid == userId || isAdmin());
+    }
+
+    // collectionGroup query on "data" — lets admin panel list ALL users' profiles
+    // in one query via collectionGroup(db, "data") without needing top-level stubs.
+    match /{path=**}/data/{document} {
+      allow read: if isAdmin();
     }
 
     // Shared recipes and ingredients — anyone authenticated can read, only admin can write
     match /shared/{document=**} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null &&
-        request.auth.token.email == 'jawandbajwa@gmail.com';
+      allow read:  if request.auth != null;
+      allow write: if isAdmin();
     }
   }
 }

@@ -1,14 +1,16 @@
-// FitDesi Service Worker — Network-first, auto-update on every deploy
-// Bump this version whenever you want to force a full cache wipe.
-// With network-first below, normal file changes don't need a version bump.
-const CACHE_NAME = "fitdesi-v4";
+// FitDesi Service Worker — Updated for Android Auth Fix
+const CACHE_NAME = "fitdesi-v79"; // Bumped version
 
 const STATIC_ASSETS = [
   "./",
   "./index.html",
   "./style.css",
-  "./app.js",
+  "./coach.css",
   "./firebase.js",
+  "./coach.js",
+  "./coaches.js",
+  "./onboarding.js",
+  "./coach-config.example.js",
   "./db.js",
   "./manifest.json",
   "./tracker.html",
@@ -23,6 +25,7 @@ const STATIC_ASSETS = [
   "./profile.html",
   "./profile.css",
   "./admin.html",
+  "./admin.css",
   "./admin.js",
   "./login.html",
   "./ingredients.js",
@@ -30,23 +33,24 @@ const STATIC_ASSETS = [
   "./recipes_canada.js",
   "./icon-192.png",
   "./icon-512.png",
+  "./favicon.ico",
 ];
 
-// ─── INSTALL ─────────────────────────────────────────────────
-// Pre-cache all assets, then skip the "waiting" phase so the
-// new SW activates immediately instead of waiting for old tabs to close.
 self.addEventListener("install", (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches
       .open(CACHE_NAME)
-      .then((cache) => cache.addAll(STATIC_ASSETS))
-      .then(() => self.skipWaiting())   // ← activate NOW, don't wait
+      .then((cache) =>
+        Promise.allSettled(
+          STATIC_ASSETS.map((url) =>
+            cache.add(new Request(url, { cache: "reload" })).catch(() => {}),
+          ),
+        ),
+      ),
   );
 });
 
-// ─── ACTIVATE ────────────────────────────────────────────────
-// Delete every cache that isn't the current version, then
-// immediately take control of all open tabs (clients.claim).
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches
@@ -55,36 +59,61 @@ self.addEventListener("activate", (event) => {
         Promise.all(
           keys
             .filter((key) => key !== CACHE_NAME)
-            .map((key) => caches.delete(key))
-        )
+            .map((key) => caches.delete(key)),
+        ),
       )
-      .then(() => self.clients.claim())  // ← control open tabs immediately
+      .then(() => self.clients.claim()),
   );
 });
 
-// ─── FETCH — Network First, Cache Fallback ───────────────────
-// Always try the network. On success, refresh the cache entry so
-// next offline visit gets the latest file. On failure, serve cache.
-// This guarantees deployed changes are visible on the next page load
-// without the user needing to delete and recreate the bookmark.
 self.addEventListener("fetch", (event) => {
-  // Only intercept GET requests for our own origin
   if (event.request.method !== "GET") return;
-  if (!event.request.url.startsWith(self.location.origin)) return;
 
-  event.respondWith(
-    fetch(event.request)
-      .then((networkResponse) => {
-        // Fresh from network — update the cache entry
-        if (networkResponse && networkResponse.ok) {
-          const clone = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
-        }
-        return networkResponse;
-      })
-      .catch(() =>
-        // Network unavailable — serve from cache (offline support)
-        caches.match(event.request)
-      )
-  );
+  const url = event.request.url;
+
+  // ─── AUTH BYPASS (THE ANDROID FIX) ──────────────────────────
+  // Do NOT intercept Firebase Auth internal URLs or Google Login
+  if (url.includes("/__/auth") || url.includes("accounts.google.com")) {
+    return; // Let the browser handle this directly
+  }
+
+  if (!url.startsWith(self.location.origin)) return;
+
+  const isCodeFile = /\.(js|html)(\?|$)/.test(url) || url.endsWith("/");
+
+  if (isCodeFile) {
+    const freshRequest = new Request(event.request, { cache: "reload" });
+    event.respondWith(
+      fetch(freshRequest)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.ok) {
+            caches
+              .open(CACHE_NAME)
+              .then((cache) =>
+                cache.put(event.request, networkResponse.clone()),
+              );
+          }
+          return networkResponse;
+        })
+        .catch(() =>
+          caches.open(CACHE_NAME).then((cache) => cache.match(event.request)),
+        ),
+    );
+  } else {
+    event.respondWith(
+      caches.open(CACHE_NAME).then((cache) =>
+        cache.match(event.request).then((cached) => {
+          return (
+            cached ||
+            fetch(event.request).then((networkResponse) => {
+              if (networkResponse && networkResponse.ok) {
+                cache.put(event.request, networkResponse.clone());
+              }
+              return networkResponse;
+            })
+          );
+        }),
+      ),
+    );
+  }
 });

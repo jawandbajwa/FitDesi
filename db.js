@@ -145,8 +145,6 @@ async function getCachedWorkoutCycle(userId) {
 
 // Sync functions - attempt to sync cached data to Firebase when online
 async function syncToFirebase() {
-  if (!navigator.onLine) return;
-
   try {
     // Import Firebase functions dynamically
     const {
@@ -178,8 +176,6 @@ async function syncToFirebase() {
       }
     }
 
-    // Note: User data sync would need user auth context
-    console.log("Offline data synced to Firebase");
   } catch (e) {
     console.error("Sync failed:", e);
   }

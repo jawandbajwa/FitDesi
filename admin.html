@@ -2,14 +2,30 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" />
+    <link rel="icon" href="icon-192.png" />
     <title>FitDesi — Admin</title>
     <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#7ed99a" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
     <link rel="apple-touch-icon" href="icon-192.png" />
-    <script>try{if(localStorage.getItem("fitdesi_theme")==="light")document.documentElement.setAttribute("data-theme","light")}catch(e){}</script>
+    <script>
+      try {
+        if (localStorage.getItem("fitdesi_theme") === "light")
+          document.documentElement.setAttribute("data-theme", "light");
+      } catch (e) {}
+    </script>
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="admin.css" />
   </head>
@@ -55,7 +71,7 @@
       </div>
 
       <!-- INGREDIENTS TAB -->
-      <div class="tab-content" id="tab-ingredients">
+      <div class="admin-tab-pane" id="tab-ingredients">
         <div class="admin-section-header">
           <div class="admin-section-title">Ingredient Database</div>
           <button class="admin-add-btn" id="addIngredientBtn">
@@ -74,7 +90,7 @@
       </div>
 
       <!-- RECIPES TAB -->
-      <div class="tab-content hidden" id="tab-recipes">
+      <div class="admin-tab-pane hidden" id="tab-recipes">
         <div class="admin-section-header">
           <div class="admin-section-title">Recipe Database</div>
           <button class="admin-add-btn" id="addRecipeBtn">+ Add Recipe</button>
@@ -96,10 +112,19 @@
           />
         </div>
         <div class="admin-list" id="recipeList"></div>
+
+        <div class="admin-section-header" style="margin-top: 28px">
+          <div class="admin-section-title">Personal Recipes — All Users</div>
+        </div>
+        <div class="admin-list" id="userRecipeList">
+          <div style="text-align:center;color:rgba(255,255,255,0.2);font-size:12px;padding:20px">
+            Switch to this tab to load personal recipes
+          </div>
+        </div>
       </div>
 
       <!-- USERS TAB -->
-      <div class="tab-content hidden" id="tab-users">
+      <div class="admin-tab-pane hidden" id="tab-users">
         <div class="admin-section-header">
           <div class="admin-section-title">Family Members</div>
         </div>
@@ -135,19 +160,43 @@
         <div class="macro-form-grid">
           <div class="form-group">
             <label>Protein (g)</label>
-            <input type="number" id="ingProtein" placeholder="0" min="0" max="100" />
+            <input
+              type="number"
+              id="ingProtein"
+              placeholder="0"
+              min="0"
+              max="100"
+            />
           </div>
           <div class="form-group">
             <label>Carbs (g)</label>
-            <input type="number" id="ingCarbs" placeholder="0" min="0" max="100" />
+            <input
+              type="number"
+              id="ingCarbs"
+              placeholder="0"
+              min="0"
+              max="100"
+            />
           </div>
           <div class="form-group">
             <label>Fat (g)</label>
-            <input type="number" id="ingFat" placeholder="0" min="0" max="100" />
+            <input
+              type="number"
+              id="ingFat"
+              placeholder="0"
+              min="0"
+              max="100"
+            />
           </div>
           <div class="form-group">
             <label>Calories</label>
-            <input type="number" id="ingCalories" placeholder="0" min="0" max="900" />
+            <input
+              type="number"
+              id="ingCalories"
+              placeholder="0"
+              min="0"
+              max="900"
+            />
           </div>
         </div>
         <div class="form-group">
@@ -184,7 +233,21 @@
           <h2 id="recipeModalTitle">Add Recipe</h2>
           <button class="modal-close" id="recipeModalClose">✕</button>
         </div>
-        <div id="recipeCuisineBadge" style="display:inline-block;margin-bottom:16px;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;background:rgba(126,217,154,0.12);border:0.5px solid rgba(126,217,154,0.35);color:#7ed99a;letter-spacing:0.5px"></div>
+        <div
+          id="recipeCuisineBadge"
+          style="
+            display: inline-block;
+            margin-bottom: 16px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            background: rgba(126, 217, 154, 0.12);
+            border: 0.5px solid rgba(126, 217, 154, 0.35);
+            color: #7ed99a;
+            letter-spacing: 0.5px;
+          "
+        ></div>
         <div class="form-group">
           <label>Recipe Name</label>
           <input type="text" id="recName" placeholder="e.g. Dal Tadka" />
@@ -214,6 +277,14 @@
             ></label
           >
           <input type="text" id="recServing" placeholder="e.g. 1 bowl" />
+        </div>
+        <div class="form-group">
+          <label>Instructions <span style="color:rgba(255,255,255,0.2);font-size:10px">optional</span></label>
+          <textarea id="recInstructions" placeholder="Step 1: Soak dal for 30 mins…&#10;Step 2: Heat oil in a pan…" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Notes <span style="color:rgba(255,255,255,0.2);font-size:10px">optional · tips, substitutions</span></label>
+          <textarea id="recNotes" placeholder="e.g. Add extra cumin for more flavour" rows="2"></textarea>
         </div>
         <div class="form-group">
           <label>Ingredients</label>

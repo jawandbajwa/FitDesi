@@ -1059,7 +1059,7 @@ function renderWeekView() {
                       .join("<br>") || "Rest";
 
                 return `
-                    <div class="week-day ${isToday ? "today" : ""}">
+                    <div class="week-day ${isToday ? "today" : ""}" data-cycle-idx="${cycleIdx}" data-day-name="${dayData?.name || "Rest"}">
                         <div class="week-day-name">${day}</div>
                         <div class="week-day-muscle">${dayData?.icon || ""} ${muscles}</div>
                     </div>
@@ -1500,6 +1500,59 @@ document.querySelectorAll(".muscle-btn").forEach((btn) => {
 document.getElementById("searchInput").addEventListener("input", (e) => {
   searchQuery = e.target.value;
   renderLibrary();
+});
+
+// ─── TRAIN THIS TODAY ────────────────────────────────────
+let trainTodayPendingIdx = null;
+
+// Delegated click on week-day chips — skip the "today" chip (already active)
+document.getElementById("workoutContainer").addEventListener("click", (e) => {
+  const chip = e.target.closest(".week-day");
+  if (!chip || chip.classList.contains("today")) return;
+  if (!cycleData || !cycleData.startDate) return;
+
+  trainTodayPendingIdx = parseInt(chip.dataset.cycleIdx, 10);
+  const dayName = chip.dataset.dayName || "this workout";
+  document.getElementById("trainTodayMsg").textContent =
+    `Start your cycle from "${dayName}" today?`;
+  document.getElementById("trainTodayModal").classList.add("open");
+});
+
+document.getElementById("trainTodayCancel").addEventListener("click", () => {
+  document.getElementById("trainTodayModal").classList.remove("open");
+  trainTodayPendingIdx = null;
+});
+
+document.getElementById("trainTodayModal").addEventListener("click", (e) => {
+  if (e.target === e.currentTarget) {
+    e.currentTarget.classList.remove("open");
+    trainTodayPendingIdx = null;
+  }
+});
+
+document.getElementById("trainTodayConfirm").addEventListener("click", async () => {
+  if (trainTodayPendingIdx === null || !cycleData) return;
+
+  const splitDays = getSplitDays();
+  const cycleIdx = trainTodayPendingIdx;
+
+  // Recalculate startDate so that cycleIdx becomes today's index,
+  // while keeping the elapsed cycle count intact (no popup re-trigger).
+  // newDiffDays = acknowledgedCycles * splitLen + cycleIdx
+  // → today is exactly cycleIdx days into the current "acknowledged" cycle.
+  const ack = cycleData.acknowledgedCycles ?? 0;
+  const newDiffDays = ack * splitDays.length + cycleIdx;
+
+  const todayMidnight = new Date();
+  todayMidnight.setHours(0, 0, 0, 0);
+  const newStartDate = new Date(todayMidnight.getTime() - newDiffDays * 86400000);
+
+  // Only update startDate — never touch cycleCount or acknowledgedCycles
+  cycleData.startDate = newStartDate.toISOString();
+  await saveWorkoutCycle(currentUser.uid, cycleData);
+
+  document.getElementById("trainTodayModal").classList.remove("open");
+  location.reload();
 });
 
 // ─── HOME WORKOUT SYNC ───────────────────────────────────

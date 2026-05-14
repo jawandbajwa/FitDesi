@@ -67,8 +67,15 @@
 
 /* SEARCH */
 .search-container {
-  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin: 10px 16px;
+}
+
+.search-input-wrap {
+  flex: 1;
+  position: relative;
 }
 
 .search-input {
@@ -96,6 +103,23 @@
   font-size: 14px;
   opacity: 0.4;
 }
+
+/* ADD MY RECIPE BUTTON */
+.add-my-recipe-btn {
+  flex-shrink: 0;
+  background: rgba(126, 217, 154, 0.1);
+  border: 0.5px solid rgba(126, 217, 154, 0.35);
+  border-radius: 10px;
+  color: #7ed99a;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-family: "Inter", sans-serif;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+.add-my-recipe-btn:hover { background: rgba(126, 217, 154, 0.2); }
 
 /* RECIPE LIST */
 .recipe-list {
@@ -402,5 +426,257 @@
 }
 
 .save-btn:hover { background: rgba(126, 217, 154, 0.2); }
+
+/* DETAIL NOTES */
+.detail-notes {
+  background: rgba(255, 255, 255, 0.03);
+  border: 0.5px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+/* USER RECIPE DETAIL ACTIONS */
+.ur-detail-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.ur-action-btn {
+  flex: 1;
+  padding: 13px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: "Inter", sans-serif;
+  transition: all 0.2s;
+}
+
+.ur-edit-btn {
+  background: rgba(126, 217, 154, 0.08);
+  border: 0.5px solid rgba(126, 217, 154, 0.3);
+  color: #7ed99a;
+}
+
+.ur-delete-btn {
+  background: rgba(255, 80, 80, 0.08);
+  border: 0.5px solid rgba(255, 80, 80, 0.3);
+  color: #ff6060;
+}
+
+/* USER RECIPE BADGE on list item */
+.ur-badge {
+  font-size: 9px;
+  color: rgba(126, 217, 154, 0.55);
+  background: rgba(126, 217, 154, 0.07);
+  border: 0.5px solid rgba(126, 217, 154, 0.18);
+  border-radius: 6px;
+  padding: 3px 8px;
+  white-space: nowrap;
+}
+
+/* ── USER RECIPE FORM ── */
+.ur-form-group { margin-bottom: 18px; }
+
+.ur-label {
+  display: block;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.ur-optional {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.18);
+  font-size: 10px;
+}
+
+.ur-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 11px 14px;
+  color: #f0f0f0;
+  font-size: 13px;
+  font-family: "Inter", sans-serif;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+.ur-input:focus { border-color: rgba(126, 217, 154, 0.4); }
+.ur-input::placeholder { color: rgba(255, 255, 255, 0.15); }
+
+.ur-textarea { resize: vertical; min-height: 68px; }
+
+.ur-category-row { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.ur-cat-pill {
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 12px;
+  cursor: pointer;
+  font-family: "Inter", sans-serif;
+  transition: all 0.2s;
+}
+.ur-cat-pill.active {
+  background: rgba(126, 217, 154, 0.12);
+  border-color: #7ed99a;
+  color: #7ed99a;
+}
+
+.ur-macro-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.ur-macro-field { display: flex; flex-direction: column; gap: 5px; }
+.ur-macro-lbl {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.2);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.ur-macro-field .ur-input { text-align: center; padding: 10px 4px; }
+
+/* Ingredient builder */
+.ur-ing-results {
+  background: rgba(255, 255, 255, 0.03);
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  max-height: 150px;
+  overflow-y: auto;
+  margin-top: 6px;
+  display: none;
+}
+.ur-ing-results.open { display: block; }
+
+.ur-ing-result-item {
+  padding: 10px 14px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.04);
+  transition: background 0.15s;
+}
+.ur-ing-result-item:last-child { border-bottom: none; }
+.ur-ing-result-item:hover { background: rgba(126, 217, 154, 0.06); }
+.ur-ing-result-macros { font-size: 10px; color: rgba(255, 255, 255, 0.2); }
+
+.ur-amount-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(126, 217, 154, 0.05);
+  border: 0.5px solid rgba(126, 217, 154, 0.18);
+  border-radius: 10px;
+  margin-top: 6px;
+}
+.ur-amount-name {
+  flex: 1;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ur-amount-row input {
+  width: 60px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 0.5px solid rgba(255, 255, 255, 0.12);
+  border-radius: 7px;
+  padding: 6px 8px;
+  color: #f0f0f0;
+  font-size: 12px;
+  font-family: "Inter", sans-serif;
+  outline: none;
+  text-align: right;
+}
+.ur-amount-unit { font-size: 11px; color: rgba(255, 255, 255, 0.2); }
+.ur-amount-add {
+  background: rgba(126, 217, 154, 0.12);
+  border: 0.5px solid rgba(126, 217, 154, 0.3);
+  border-radius: 8px;
+  color: #7ed99a;
+  font-size: 11px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-family: "Inter", sans-serif;
+}
+.ur-amount-cancel {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.2);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 4px;
+  line-height: 1;
+}
+
+.ur-added-list { margin-top: 8px; }
+.ur-added-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(126, 217, 154, 0.04);
+  border: 0.5px solid rgba(126, 217, 154, 0.12);
+  border-radius: 10px;
+  margin-bottom: 5px;
+  font-size: 12px;
+  gap: 8px;
+}
+.ur-added-name { flex: 1; color: rgba(255, 255, 255, 0.65); }
+.ur-added-macros { color: rgba(255, 255, 255, 0.2); font-size: 10px; }
+.ur-added-remove {
+  background: none;
+  border: none;
+  color: rgba(255, 80, 80, 0.4);
+  font-size: 15px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+/* Delete modal */
+.ur-delete-subtitle {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.35);
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+.ur-delete-actions { display: flex; gap: 10px; }
+.ur-del-confirm-btn {
+  flex: 1;
+  padding: 13px;
+  background: rgba(255, 80, 80, 0.1);
+  border: 0.5px solid rgba(255, 80, 80, 0.4);
+  border-radius: 12px;
+  color: #ff6060;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: "Inter", sans-serif;
+  transition: background 0.2s;
+}
+.ur-del-confirm-btn:hover { background: rgba(255, 80, 80, 0.18); }
 
 .hidden { display: none !important; }

@@ -2,20 +2,37 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" />
+    <link rel="icon" href="icon-192.png" />
     <title>FitDesi</title>
     <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#7ed99a" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
     <link rel="apple-touch-icon" href="icon-192.png" />
-    <script>try{if(localStorage.getItem("fitdesi_theme")==="light")document.documentElement.setAttribute("data-theme","light")}catch(e){}</script>
+    <script>
+      try {
+        if (localStorage.getItem("fitdesi_theme") === "light")
+          document.documentElement.setAttribute("data-theme", "light");
+      } catch (e) {}
+    </script>
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="coach.css" />
     <style>
       /* ─── HOME PAGE SPECIFIC ────────────────────────────── */
       .greeting-line {
         font-size: 13px;
-        color: rgba(126,217,154,0.6);
+        color: rgba(126, 217, 154, 0.6);
         padding: 18px 20px 2px;
         letter-spacing: 0.3px;
       }
@@ -40,7 +57,8 @@
 
       .protein-ring-wrap svg {
         position: absolute;
-        top: 0; left: 0;
+        top: 0;
+        left: 0;
       }
 
       .ring-center {
@@ -58,7 +76,7 @@
 
       .ring-lbl {
         font-size: 10px;
-        color: rgba(126,217,154,0.6);
+        color: rgba(126, 217, 154, 0.6);
         text-transform: uppercase;
         letter-spacing: 1px;
         margin-top: 2px;
@@ -66,7 +84,7 @@
 
       .ring-goal {
         font-size: 11px;
-        color: rgba(255,255,255,0.3);
+        color: rgba(255, 255, 255, 0.3);
         margin-top: 3px;
       }
 
@@ -97,7 +115,8 @@
 
       .mini-ring-svg-wrap svg {
         position: absolute;
-        top: 0; left: 0;
+        top: 0;
+        left: 0;
       }
 
       .mini-ring-info {
@@ -106,7 +125,7 @@
 
       .mini-ring-name {
         font-size: 10px;
-        color: rgba(255,255,255,0.35);
+        color: rgba(255, 255, 255, 0.35);
         text-transform: uppercase;
         letter-spacing: 0.5px;
       }
@@ -120,7 +139,7 @@
 
       .mini-ring-goal {
         font-size: 10px;
-        color: rgba(255,255,255,0.25);
+        color: rgba(255, 255, 255, 0.25);
       }
 
       /* Streak card */
@@ -135,9 +154,13 @@
         padding: 14px 16px;
       }
 
-      .streak-flame { font-size: 28px; }
+      .streak-flame {
+        font-size: 28px;
+      }
 
-      .streak-info { flex: 1; }
+      .streak-info {
+        flex: 1;
+      }
 
       .streak-num {
         font-size: 24px;
@@ -148,7 +171,7 @@
 
       .streak-label {
         font-size: 11px;
-        color: rgba(255,255,255,0.35);
+        color: rgba(255, 255, 255, 0.35);
         margin-top: 2px;
       }
 
@@ -157,12 +180,19 @@
         gap: 5px;
       }
 
+      .streak-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+      }
+
       .streak-dot {
         width: 8px;
         height: 8px;
         border-radius: 50%;
-        background: rgba(245,166,35,0.2);
-        border: 1px solid rgba(245,166,35,0.3);
+        background: rgba(245, 166, 35, 0.2);
+        border: 1px solid rgba(245, 166, 35, 0.3);
         transition: background 0.2s;
       }
 
@@ -171,11 +201,23 @@
         border-color: #f5a623;
       }
 
+      .streak-day-lbl {
+        font-size: 8px;
+        color: rgba(255, 255, 255, 0.25);
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        line-height: 1;
+      }
+
+      .streak-item:last-child .streak-day-lbl {
+        color: rgba(245, 166, 35, 0.6);
+      }
+
       /* Workout card */
       .today-workout-card {
         margin: 0 16px 12px;
         background: #111a13;
-        border: 1px solid rgba(126,217,154,0.2);
+        border: 1px solid rgba(126, 217, 154, 0.2);
         border-radius: 14px;
         padding: 14px 16px;
         display: flex;
@@ -185,7 +227,7 @@
 
       .workout-label {
         font-size: 10px;
-        color: rgba(126,217,154,0.5);
+        color: rgba(126, 217, 154, 0.5);
         text-transform: uppercase;
         letter-spacing: 1.5px;
         margin-bottom: 4px;
@@ -200,10 +242,12 @@
       .workout-name.empty {
         font-size: 13px;
         font-weight: 400;
-        color: rgba(255,255,255,0.3);
+        color: rgba(255, 255, 255, 0.3);
       }
 
-      .workout-card-info { flex: 1; }
+      .workout-card-info {
+        flex: 1;
+      }
 
       .workout-start-btn {
         background: #7ed99a;
@@ -219,7 +263,9 @@
         transition: opacity 0.15s;
       }
 
-      .workout-start-btn:hover { opacity: 0.85; }
+      .workout-start-btn:hover {
+        opacity: 0.85;
+      }
 
       /* Quick actions */
       .quick-actions {
@@ -233,7 +279,7 @@
         background: #111a13;
         border: 1px solid #1a2e1e;
         border-radius: 12px;
-        color: rgba(255,255,255,0.7);
+        color: rgba(255, 255, 255, 0.7);
         font-size: 12px;
         font-weight: 500;
         padding: 14px 8px;
@@ -248,18 +294,20 @@
       }
 
       .quick-btn:hover {
-        border-color: rgba(126,217,154,0.3);
+        border-color: rgba(126, 217, 154, 0.3);
         color: #7ed99a;
       }
 
-      .quick-btn-icon { font-size: 20px; }
+      .quick-btn-icon {
+        font-size: 20px;
+      }
 
       /* Coach message */
       .coach-msg-home {
         margin: 0 16px 16px;
-        background: rgba(126,217,154,0.05);
-        border: 1px solid rgba(126,217,154,0.12);
-        border-left: 3px solid rgba(126,217,154,0.35);
+        background: rgba(126, 217, 154, 0.05);
+        border: 1px solid rgba(126, 217, 154, 0.12);
+        border-left: 3px solid rgba(126, 217, 154, 0.35);
         border-radius: 10px;
         padding: 12px 14px;
         display: flex;
@@ -267,11 +315,14 @@
         gap: 10px;
       }
 
-      .coach-msg-icon { font-size: 18px; flex-shrink: 0; }
+      .coach-msg-icon {
+        font-size: 18px;
+        flex-shrink: 0;
+      }
 
       .coach-msg-text {
         font-size: 12px;
-        color: rgba(255,255,255,0.45);
+        color: rgba(255, 255, 255, 0.45);
         line-height: 1.6;
       }
     </style>
@@ -294,11 +345,28 @@
       <!-- Large protein ring -->
       <div class="protein-ring-wrap">
         <svg width="130" height="130" viewBox="0 0 130 130">
-          <circle cx="65" cy="65" r="54" fill="none" stroke="#1a2e1e" stroke-width="10"/>
-          <circle cx="65" cy="65" r="54" fill="none" stroke="#7ed99a" stroke-width="10"
-            stroke-dasharray="339.3" stroke-dashoffset="339.3"
-            stroke-linecap="round" transform="rotate(-90 65 65)"
-            id="proteinRingArc" style="transition: stroke-dashoffset 0.6s ease;"/>
+          <circle
+            cx="65"
+            cy="65"
+            r="54"
+            fill="none"
+            stroke="#1a2e1e"
+            stroke-width="10"
+          />
+          <circle
+            cx="65"
+            cy="65"
+            r="54"
+            fill="none"
+            stroke="#7ed99a"
+            stroke-width="10"
+            stroke-dasharray="339.3"
+            stroke-dashoffset="339.3"
+            stroke-linecap="round"
+            transform="rotate(-90 65 65)"
+            id="proteinRingArc"
+            style="transition: stroke-dashoffset 0.6s ease"
+          />
         </svg>
         <div class="ring-center">
           <div class="ring-val" id="proteinToday">0g</div>
@@ -312,11 +380,28 @@
         <div class="mini-ring-card">
           <div class="mini-ring-svg-wrap">
             <svg width="36" height="36" viewBox="0 0 36 36">
-              <circle cx="18" cy="18" r="14" fill="none" stroke="#1a2e1e" stroke-width="4"/>
-              <circle cx="18" cy="18" r="14" fill="none" stroke="#5bc8f5" stroke-width="4"
-                stroke-dasharray="87.96" stroke-dashoffset="87.96"
-                stroke-linecap="round" transform="rotate(-90 18 18)"
-                id="carbsRingArc" style="transition: stroke-dashoffset 0.6s ease;"/>
+              <circle
+                cx="18"
+                cy="18"
+                r="14"
+                fill="none"
+                stroke="#1a2e1e"
+                stroke-width="4"
+              />
+              <circle
+                cx="18"
+                cy="18"
+                r="14"
+                fill="none"
+                stroke="#5bc8f5"
+                stroke-width="4"
+                stroke-dasharray="87.96"
+                stroke-dashoffset="87.96"
+                stroke-linecap="round"
+                transform="rotate(-90 18 18)"
+                id="carbsRingArc"
+                style="transition: stroke-dashoffset 0.6s ease"
+              />
             </svg>
           </div>
           <div class="mini-ring-info">
@@ -329,11 +414,28 @@
         <div class="mini-ring-card">
           <div class="mini-ring-svg-wrap">
             <svg width="36" height="36" viewBox="0 0 36 36">
-              <circle cx="18" cy="18" r="14" fill="none" stroke="#1a2e1e" stroke-width="4"/>
-              <circle cx="18" cy="18" r="14" fill="none" stroke="#f5a623" stroke-width="4"
-                stroke-dasharray="87.96" stroke-dashoffset="87.96"
-                stroke-linecap="round" transform="rotate(-90 18 18)"
-                id="fatRingArc" style="transition: stroke-dashoffset 0.6s ease;"/>
+              <circle
+                cx="18"
+                cy="18"
+                r="14"
+                fill="none"
+                stroke="#1a2e1e"
+                stroke-width="4"
+              />
+              <circle
+                cx="18"
+                cy="18"
+                r="14"
+                fill="none"
+                stroke="#f5a623"
+                stroke-width="4"
+                stroke-dasharray="87.96"
+                stroke-dashoffset="87.96"
+                stroke-linecap="round"
+                transform="rotate(-90 18 18)"
+                id="fatRingArc"
+                style="transition: stroke-dashoffset 0.6s ease"
+              />
             </svg>
           </div>
           <div class="mini-ring-info">
@@ -346,11 +448,28 @@
         <div class="mini-ring-card">
           <div class="mini-ring-svg-wrap">
             <svg width="36" height="36" viewBox="0 0 36 36">
-              <circle cx="18" cy="18" r="14" fill="none" stroke="#1a2e1e" stroke-width="4"/>
-              <circle cx="18" cy="18" r="14" fill="none" stroke="#e05c5c" stroke-width="4"
-                stroke-dasharray="87.96" stroke-dashoffset="87.96"
-                stroke-linecap="round" transform="rotate(-90 18 18)"
-                id="calRingArc" style="transition: stroke-dashoffset 0.6s ease;"/>
+              <circle
+                cx="18"
+                cy="18"
+                r="14"
+                fill="none"
+                stroke="#1a2e1e"
+                stroke-width="4"
+              />
+              <circle
+                cx="18"
+                cy="18"
+                r="14"
+                fill="none"
+                stroke="#e05c5c"
+                stroke-width="4"
+                stroke-dasharray="87.96"
+                stroke-dashoffset="87.96"
+                stroke-linecap="round"
+                transform="rotate(-90 18 18)"
+                id="calRingArc"
+                style="transition: stroke-dashoffset 0.6s ease"
+              />
             </svg>
           </div>
           <div class="mini-ring-info">
@@ -370,13 +489,13 @@
         <div class="streak-label">Workouts this week</div>
       </div>
       <div class="streak-dots" id="streakDots">
-        <div class="streak-dot"></div>
-        <div class="streak-dot"></div>
-        <div class="streak-dot"></div>
-        <div class="streak-dot"></div>
-        <div class="streak-dot"></div>
-        <div class="streak-dot"></div>
-        <div class="streak-dot"></div>
+        <div class="streak-item"><div class="streak-dot"></div><div class="streak-day-lbl"></div></div>
+        <div class="streak-item"><div class="streak-dot"></div><div class="streak-day-lbl"></div></div>
+        <div class="streak-item"><div class="streak-dot"></div><div class="streak-day-lbl"></div></div>
+        <div class="streak-item"><div class="streak-dot"></div><div class="streak-day-lbl"></div></div>
+        <div class="streak-item"><div class="streak-dot"></div><div class="streak-day-lbl"></div></div>
+        <div class="streak-item"><div class="streak-dot"></div><div class="streak-day-lbl"></div></div>
+        <div class="streak-item"><div class="streak-dot"></div><div class="streak-day-lbl"></div></div>
       </div>
     </div>
 
@@ -384,9 +503,16 @@
     <div class="today-workout-card" id="todayWorkout">
       <div class="workout-card-info">
         <div class="workout-label">Today's Workout</div>
-        <div class="workout-name empty">Set up your cycle in the Workout page</div>
+        <div class="workout-name empty">
+          Set up your cycle in the Workout page
+        </div>
       </div>
-      <button class="workout-start-btn" onclick="location.href='exercise.html'">Start →</button>
+      <button
+        class="workout-start-btn"
+        onclick="location.href = 'exercise.html'"
+      >
+        Start →
+      </button>
     </div>
 
     <!-- Quick actions -->
@@ -399,7 +525,7 @@
         <span class="quick-btn-icon">💪</span>
         Workout
       </a>
-      <a href="tracker.html" class="quick-btn" id="planDayBtn">
+      <a href="tracker.html?tab=plan" class="quick-btn" id="planDayBtn">
         <span class="quick-btn-icon">🗓️</span>
         Plan Day
       </a>
@@ -414,43 +540,113 @@
     <!-- Bottom nav -->
     <nav class="bottom-nav">
       <a href="recipes.html" class="nav-tab" data-page="recipes">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/>
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" />
+          <path d="M7 2v20" />
+          <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7" />
         </svg>
         <span class="nav-label">Recipes</span>
       </a>
       <a href="tracker.html" class="nav-tab" data-page="nutrition">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/>
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M18 20V10" />
+          <path d="M12 20V4" />
+          <path d="M6 20v-6" />
         </svg>
         <span class="nav-label">Nutrition</span>
       </a>
       <a href="index.html" class="nav-tab nav-home-tab active" data-page="home">
         <div class="home-tab-ring">
           <svg width="58" height="58" viewBox="0 0 58 58">
-            <circle cx="29" cy="29" r="22" fill="none" stroke="#1a2e1e" stroke-width="4"/>
-            <circle cx="29" cy="29" r="22" fill="none" stroke="#7ed99a" stroke-width="4"
-              stroke-dasharray="138.2" stroke-dashoffset="138.2"
-              stroke-linecap="round" transform="rotate(-90 29 29)"
-              id="navProteinRing" class="nav-protein-ring"/>
+            <circle
+              cx="29"
+              cy="29"
+              r="22"
+              fill="none"
+              stroke="#1a2e1e"
+              stroke-width="4"
+            />
+            <circle
+              cx="29"
+              cy="29"
+              r="22"
+              fill="none"
+              stroke="#7ed99a"
+              stroke-width="4"
+              stroke-dasharray="138.2"
+              stroke-dashoffset="138.2"
+              stroke-linecap="round"
+              transform="rotate(-90 29 29)"
+              id="navProteinRing"
+              class="nav-protein-ring"
+            />
           </svg>
-          <svg class="home-tab-icon" style="position:relative;z-index:1" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7ed99a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-            <polyline points="9 22 9 12 15 12 15 22"/>
+          <svg
+            class="home-tab-icon"
+            style="position: relative; z-index: 1"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#7ed99a"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            <polyline points="9 22 9 12 15 12 15 22" />
           </svg>
         </div>
         <span class="nav-label">Home</span>
       </a>
       <a href="exercise.html" class="nav-tab" data-page="workout">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M6.5 6.5h11M6.5 17.5h11M4 12h16M4 12l-2-2M4 12l-2 2M20 12l2-2M20 12l2 2"/>
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path
+            d="M6.5 6.5h11M6.5 17.5h11M4 12h16M4 12l-2-2M4 12l-2 2M20 12l2-2M20 12l2 2"
+          />
         </svg>
         <span class="nav-label">Workout</span>
       </a>
       <a href="profile.html" class="nav-tab" data-page="profile">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-          <circle cx="12" cy="7" r="4"/>
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
         </svg>
         <span class="nav-label">Profile</span>
       </a>
@@ -461,34 +657,68 @@
       <div class="spinner"></div>
       <span>Loading...</span>
     </div>
-    <div id="errorMessage" class="error-message" style="display:none"></div>
-
-    <script src="app.js"></script>
+    <div id="errorMessage" class="error-message" style="display: none"></div>
 
     <!-- Service Worker — auto-reloads the page when a new version activates -->
     <script>
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
-          navigator.serviceWorker.register("./sw.js").then((reg) => {
-            // When a new SW takes control, reload so the user gets the update
-            // immediately without having to close and reopen the app.
-            navigator.serviceWorker.addEventListener("controllerchange", () => {
-              window.location.reload();
-            });
-          }).catch(() => {});
+          navigator.serviceWorker
+            .register("./sw.js")
+            .then((reg) => {
+              // When a new SW takes control, reload so the user gets the update
+              // immediately without having to close and reopen the app.
+              navigator.serviceWorker.addEventListener(
+                "controllerchange",
+                () => {
+                  window.location.reload();
+                },
+              );
+            })
+            .catch(() => {});
         });
       }
     </script>
 
     <script type="module">
-      import { onAuthStateChanged, auth, isAdmin, getWorkoutCycle, getUserProfile, getDailyLog } from "./firebase.js";
+      import {
+        onAuthStateChanged,
+        auth,
+        isAdmin,
+        getWorkoutCycle,
+        getUserProfile,
+        getDailyLog,
+        getWorkoutLogsAll,
+      } from "./firebase.js";
+
+      async function loadCoach() {
+        try {
+          const coachModule = await import("./coach.js");
+          coachModule.initCoach();
+        } catch (error) {
+          console.warn("FitDesi coach module not loaded:", error);
+        }
+      }
+
+      async function loadOnboarding() {
+        try {
+          const m = await import("./onboarding.js");
+          m.initOnboarding();
+        } catch (error) {
+          console.warn("FitDesi onboarding module not loaded:", error);
+        }
+      }
+
+      loadCoach();
+      loadOnboarding();
 
       const PROTEIN_CIRC = 339.3;
       const MINI_CIRC = 87.96;
 
       function setRing(id, circ, pct) {
         const el = document.getElementById(id);
-        if (el) el.setAttribute("stroke-dashoffset", circ * (1 - Math.min(pct, 1)));
+        if (el)
+          el.setAttribute("stroke-dashoffset", circ * (1 - Math.min(pct, 1)));
       }
 
       function getTimeOfDay() {
@@ -508,13 +738,42 @@
 
       const STANDARD_SPLITS = {
         mysplit: MY_SPLIT,
-        ppl: [{ name: "Push Day", icon: "💪" }, { name: "Pull Day", icon: "🏋️" }, { name: "Leg Day", icon: "🦵" }],
-        upperlower: [{ name: "Upper Body", icon: "💪" }, { name: "Lower Body", icon: "🦵" }],
+        ppl: [
+          { name: "Push Day", icon: "💪" },
+          { name: "Pull Day", icon: "🏋️" },
+          { name: "Leg Day", icon: "🦵" },
+        ],
+        upperlower: [
+          { name: "Upper Body", icon: "💪" },
+          { name: "Lower Body", icon: "🦵" },
+        ],
         fullbody: [{ name: "Full Body", icon: "🔥" }],
-        brosplit: [{ name: "Chest Day", icon: "💪" }, { name: "Back Day", icon: "🏋️" }, { name: "Shoulder Day", icon: "🏔️" }, { name: "Arm Day", icon: "💪" }, { name: "Leg Day", icon: "🦵" }],
-        arnold: [{ name: "Chest + Back", icon: "🏋️" }, { name: "Shoulders + Arms", icon: "💪" }, { name: "Legs", icon: "🦵" }],
-        ppl6: [{ name: "Push Day A", icon: "💪" }, { name: "Pull Day A", icon: "🏋️" }, { name: "Leg Day A", icon: "🦵" }, { name: "Push Day B", icon: "💪" }, { name: "Pull Day B", icon: "🏋️" }, { name: "Leg Day B", icon: "🦵" }],
-        ul4: [{ name: "Upper A", icon: "💪" }, { name: "Lower A", icon: "🦵" }, { name: "Upper B", icon: "💪" }, { name: "Lower B", icon: "🦵" }],
+        brosplit: [
+          { name: "Chest Day", icon: "💪" },
+          { name: "Back Day", icon: "🏋️" },
+          { name: "Shoulder Day", icon: "🏔️" },
+          { name: "Arm Day", icon: "💪" },
+          { name: "Leg Day", icon: "🦵" },
+        ],
+        arnold: [
+          { name: "Chest + Back", icon: "🏋️" },
+          { name: "Shoulders + Arms", icon: "💪" },
+          { name: "Legs", icon: "🦵" },
+        ],
+        ppl6: [
+          { name: "Push Day A", icon: "💪" },
+          { name: "Pull Day A", icon: "🏋️" },
+          { name: "Leg Day A", icon: "🦵" },
+          { name: "Push Day B", icon: "💪" },
+          { name: "Pull Day B", icon: "🏋️" },
+          { name: "Leg Day B", icon: "🦵" },
+        ],
+        ul4: [
+          { name: "Upper A", icon: "💪" },
+          { name: "Lower A", icon: "🦵" },
+          { name: "Upper B", icon: "💪" },
+          { name: "Lower B", icon: "🦵" },
+        ],
       };
 
       function getTodayWorkout(cycleData) {
@@ -525,7 +784,8 @@
           splitDays = cycleData.customSplitDays.map((day, idx) => ({
             name: `Day ${idx + 1} — ${day.muscles.join(", ") || "Rest"}`,
             icon: day.muscles.includes("Cardio") ? "🏃" : "💪",
-            isCardio: day.muscles.includes("Cardio") || day.muscles.includes("Rest"),
+            isCardio:
+              day.muscles.includes("Cardio") || day.muscles.includes("Rest"),
           }));
         } else {
           splitDays = STANDARD_SPLITS[splitKey] || MY_SPLIT;
@@ -540,28 +800,57 @@
 
       function calculateMacros(profile) {
         const { weight, height, age, gender, activity, goal } = profile;
-        let bmr = gender === "male"
-          ? 10 * weight + 6.25 * height - 5 * age + 5
-          : 10 * weight + 6.25 * height - 5 * age - 161;
-        const multipliers = { sedentary: 1.2, light: 1.375, moderate: 1.55, active: 1.725 };
+        let bmr =
+          gender === "male"
+            ? 10 * weight + 6.25 * height - 5 * age + 5
+            : 10 * weight + 6.25 * height - 5 * age - 161;
+        const multipliers = {
+          sedentary: 1.2,
+          light: 1.375,
+          moderate: 1.55,
+          active: 1.725,
+        };
         let tdee = bmr * (multipliers[activity] || 1.55);
-        let calTarget = goal === "recomp" ? tdee * 0.95 : goal === "muscle" ? tdee * 1.1 : tdee * 0.85;
-        let protein = goal === "recomp" ? Math.round(weight * 2.2) : goal === "muscle" ? Math.round(weight * 2.0) : Math.round(weight * 2.4);
+        let calTarget =
+          goal === "recomp"
+            ? tdee * 0.95
+            : goal === "muscle"
+              ? tdee * 1.1
+              : tdee * 0.85;
+        let protein =
+          goal === "recomp"
+            ? Math.round(weight * 2.2)
+            : goal === "muscle"
+              ? Math.round(weight * 2.0)
+              : Math.round(weight * 2.4);
         let fat = Math.round((calTarget * 0.25) / 9);
         let carbs = Math.round((calTarget - protein * 4 - fat * 9) / 4);
         return { protein, carbs, fat, calories: Math.round(calTarget) };
       }
 
-      // Set date
-      document.getElementById("currentDate").textContent = new Date().toLocaleDateString("en-US", { weekday: "short", day: "numeric", month: "short" });
+      // Set date + placeholder greeting immediately (before auth resolves)
+      document.getElementById("currentDate").textContent =
+        new Date().toLocaleDateString("en-US", {
+          weekday: "short",
+          day: "numeric",
+          month: "short",
+        });
+      document.getElementById("greeting").textContent =
+        `Good ${getTimeOfDay()}`;
 
       onAuthStateChanged(auth, async (user) => {
-        if (!user) { window.location.href = "login.html"; return; }
+        if (!user) {
+          window.location.href = "login.html";
+          return;
+        }
 
         try {
           // Greeting
-          const firstName = user.displayName ? user.displayName.split(" ")[0] : "there";
-          document.getElementById("greeting").textContent = `Good ${getTimeOfDay()}, ${firstName}`;
+          const firstName = user.displayName
+            ? user.displayName.split(" ")[0]
+            : "there";
+          document.getElementById("greeting").textContent =
+            `Good ${getTimeOfDay()}, ${firstName}`;
 
           // Admin badge
           if (isAdmin(user)) {
@@ -574,18 +863,29 @@
 
           // Sign out button (small, in header)
           const signOutBtn = document.createElement("button");
-          signOutBtn.textContent = "Out";
-          signOutBtn.style.cssText = `font-size:11px;color:rgba(255,255,255,0.25);background:none;border:0.5px solid rgba(255,255,255,0.08);padding:4px 10px;border-radius:20px;cursor:pointer;font-family:Inter,sans-serif;`;
+          signOutBtn.textContent = "Sign Out";
+          signOutBtn.style.cssText = `font-size:11px;color:rgba(255,255,255,0.3);background:none;border:0.5px solid rgba(255,255,255,0.1);padding:4px 10px;border-radius:20px;cursor:pointer;font-family:Inter,sans-serif;`;
           signOutBtn.addEventListener("click", async () => {
-            try { const { signOutUser } = await import("./firebase.js"); await signOutUser(); window.location.href = "login.html"; } catch (e) {}
+            try {
+              const { signOutUser } = await import("./firebase.js");
+              await signOutUser();
+              window.location.href = "login.html";
+            } catch (e) {}
           });
           document.querySelector(".nav-right").appendChild(signOutBtn);
 
-          // Today's workout
+          // ── Fire all 4 Firebase reads in parallel ──────────────
           document.getElementById("loadingOverlay").classList.remove("hidden");
-          const cycleData = await getWorkoutCycle(user.uid);
+          const todayStr = new Date().toDateString();
+          const [cycleData, profile, todayLog, workoutLogs] = await Promise.all([
+            getWorkoutCycle(user.uid),
+            getUserProfile(user.uid),
+            getDailyLog(user.uid, todayStr).catch(() => ({})),
+            getWorkoutLogsAll(user.uid).catch(() => []),
+          ]);
           document.getElementById("loadingOverlay").classList.add("hidden");
 
+          // ── Today's workout ──
           const todayWorkout = getTodayWorkout(cycleData);
           const wEl = document.getElementById("todayWorkout");
           if (wEl && todayWorkout) {
@@ -597,8 +897,7 @@
               <button class="workout-start-btn" onclick="location.href='exercise.html'">Start →</button>`;
           }
 
-          // Profile & macros
-          const profile = await getUserProfile(user.uid);
+          // ── Macros & rings ──
           if (profile) {
             const macros = calculateMacros(profile);
             document.getElementById("proteinGoal").textContent = macros.protein + "g";
@@ -606,15 +905,13 @@
             document.getElementById("fatGoalLabel").textContent = "of " + macros.fat + "g";
             document.getElementById("calGoalLabel").textContent = "of " + macros.calories;
 
-            // Fetch today's log from Firebase (fall back to localStorage cache)
             let protein = 0, carbs = 0, fat = 0, calories = 0;
-            try {
-              const todayLog = await getDailyLog(user.uid, new Date().toDateString());
-              ["breakfast","lunch","snack","dinner"].forEach(meal => {
-                (todayLog[meal] || []).forEach(item => {
-                  protein  += item.protein  || 0;
-                  carbs    += item.carbs    || 0;
-                  fat      += item.fat      || 0;
+            if (todayLog && Object.keys(todayLog).length) {
+              ["breakfast", "lunch", "snack", "dinner"].forEach((meal) => {
+                (todayLog[meal] || []).forEach((item) => {
+                  protein += item.protein || 0;
+                  carbs   += item.carbs   || 0;
+                  fat     += item.fat     || 0;
                   calories += item.calories || 0;
                 });
               });
@@ -623,58 +920,53 @@
               fat      = Math.round(fat);
               calories = Math.round(calories);
               // Keep localStorage cache in sync
-              const todayStr = new Date().toDateString();
               const cached = JSON.parse(localStorage.getItem("fitdesiLogs") || "{}");
               cached[todayStr] = { protein, carbs, fat, calories };
               localStorage.setItem("fitdesiLogs", JSON.stringify(cached));
-            } catch (_) {
+            } else {
               // Fallback to localStorage cache
-              const cached = JSON.parse(localStorage.getItem("fitdesiLogs") || "{}");
-              const day    = cached[new Date().toDateString()] || {};
+              const day = JSON.parse(localStorage.getItem("fitdesiLogs") || "{}")[todayStr] || {};
               protein  = day.protein  || 0;
               carbs    = day.carbs    || 0;
               fat      = day.fat      || 0;
               calories = day.calories || 0;
             }
 
-            document.getElementById("proteinToday").textContent = protein + "g";
-            document.getElementById("carbsToday").textContent = carbs + "g";
-            document.getElementById("fatToday").textContent = fat + "g";
+            document.getElementById("proteinToday").textContent  = protein + "g";
+            document.getElementById("carbsToday").textContent    = carbs + "g";
+            document.getElementById("fatToday").textContent      = fat + "g";
             document.getElementById("caloriesToday").textContent = calories;
 
-            // Update rings
             setRing("proteinRingArc", PROTEIN_CIRC, protein / macros.protein);
-            setRing("carbsRingArc", MINI_CIRC, macros.carbs > 0 ? carbs / macros.carbs : 0);
-            setRing("fatRingArc", MINI_CIRC, macros.fat > 0 ? fat / macros.fat : 0);
-            setRing("calRingArc", MINI_CIRC, macros.calories > 0 ? calories / macros.calories : 0);
+            setRing("carbsRingArc",   MINI_CIRC, macros.carbs    > 0 ? carbs    / macros.carbs    : 0);
+            setRing("fatRingArc",     MINI_CIRC, macros.fat      > 0 ? fat      / macros.fat      : 0);
+            setRing("calRingArc",     MINI_CIRC, macros.calories > 0 ? calories / macros.calories : 0);
             setRing("navProteinRing", 138.2, protein / macros.protein);
-          } else {
+          }
 
-          // Workouts this week from Firebase
-          try {
-            const { getDocs, collection, db } = await import("./firebase.js");
-            const workoutsSnap = await getDocs(collection(db, "users", user.uid, "workouts"));
-            const today = new Date(); today.setHours(0,0,0,0);
+          // ── Workout streak ──
+          if (workoutLogs && workoutLogs.length >= 0) {
+            const today = new Date(); today.setHours(0, 0, 0, 0);
             const weekAgo = new Date(today); weekAgo.setDate(today.getDate() - 7);
             let weekCount = 0;
             const doneDays = [];
-            workoutsSnap.forEach((doc) => {
-              const d = new Date(doc.id);
+            workoutLogs.forEach((entry) => {
+              const d = new Date(entry.id);
               if (!isNaN(d) && d >= weekAgo) { weekCount++; doneDays.push(d); }
             });
             document.getElementById("workoutsDone").textContent = weekCount;
-            // Fill streak dots
-            const dots = document.querySelectorAll(".streak-dot");
-            const dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+            const DAY_INITIALS = ["Su","Mo","Tu","We","Th","Fr","Sa"];
+            const items = document.querySelectorAll(".streak-item");
             for (let i = 6; i >= 0; i--) {
               const day = new Date(today); day.setDate(today.getDate() - i);
-              const dayStr = day.toDateString();
-              const done = doneDays.some(d => d.toDateString() === dayStr);
-              if (done) dots[6 - i].classList.add("filled");
+              const idx = 6 - i;
+              const done = doneDays.some((d) => d.toDateString() === day.toDateString());
+              if (done) items[idx].querySelector(".streak-dot").classList.add("filled");
+              items[idx].querySelector(".streak-day-lbl").textContent = DAY_INITIALS[day.getDay()];
             }
-          } catch (e) {}
+          }
 
-          // Daily tip
+          // ── Daily tip ──
           const tips = [
             "Combine dal with rice for a complete amino acid profile.",
             "Paneer gives ~18g protein per 100g — stack it.",
@@ -685,7 +977,6 @@
             "Drink 3+ litres on workout days for best recovery.",
           ];
           document.getElementById("dailyTip").textContent = tips[new Date().getDay() % tips.length];
-
         } catch (error) {
           console.error("Error loading:", error);
           document.getElementById("loadingOverlay").classList.add("hidden");

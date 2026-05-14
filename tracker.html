@@ -2,19 +2,35 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>FitDesi — Nutrition</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" />
+    <link rel="icon" href="icon-192.png" />
+    <title>FitDesi — Nutrition Tracker</title>
     <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#7ed99a" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
     <link rel="apple-touch-icon" href="icon-192.png" />
-    <script>try{if(localStorage.getItem("fitdesi_theme")==="light")document.documentElement.setAttribute("data-theme","light")}catch(e){}</script>
+    <script>
+      try {
+        if (localStorage.getItem("fitdesi_theme") === "light")
+          document.documentElement.setAttribute("data-theme", "light");
+      } catch (e) {}
+    </script>
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="coach.css" />
     <link rel="stylesheet" href="tracker.css" />
   </head>
   <body>
-
     <!-- Top header -->
     <header class="app-header">
       <div class="app-header-title">Nutrition</div>
@@ -26,20 +42,37 @@
       <div class="onboarding-card">
         <div class="onboarding-step" id="step1">
           <h2>Let's set up your <em>profile</em></h2>
-          <p>Answer a few questions so your coach can personalize everything for you</p>
+          <p>
+            Answer a few questions so your coach can personalize everything for
+            you
+          </p>
           <div class="form-group">
             <label>Your Name</label>
-            <input type="text" id="userName" placeholder="What should I call you?" />
+            <input
+              type="text"
+              id="userName"
+              placeholder="What should I call you?"
+            />
           </div>
           <div class="form-group">
             <label>Age</label>
-            <input type="number" id="userAge" placeholder="Years" min="10" max="100" />
+            <input
+              type="number"
+              id="userAge"
+              placeholder="Years"
+              min="10"
+              max="100"
+            />
           </div>
           <div class="form-group">
             <label>Gender</label>
             <div class="option-row">
-              <button class="option-btn" data-field="gender" data-val="male">Male</button>
-              <button class="option-btn" data-field="gender" data-val="female">Female</button>
+              <button class="option-btn" data-field="gender" data-val="male">
+                Male
+              </button>
+              <button class="option-btn" data-field="gender" data-val="female">
+                Female
+              </button>
             </div>
           </div>
           <div class="form-group">
@@ -49,11 +82,23 @@
               <button class="toggle-btn" id="weightLbs">lbs</button>
             </div>
             <div class="input-row" id="weightKgInput">
-              <input type="number" id="userWeight" placeholder="e.g. 70" min="20" max="400" />
+              <input
+                type="number"
+                id="userWeight"
+                placeholder="e.g. 70"
+                min="20"
+                max="400"
+              />
               <span class="unit">kg</span>
             </div>
             <div class="input-row hidden" id="weightLbsInput">
-              <input type="number" id="userWeightLbs" placeholder="e.g. 154" min="44" max="880" />
+              <input
+                type="number"
+                id="userWeightLbs"
+                placeholder="e.g. 154"
+                min="44"
+                max="880"
+              />
               <span class="unit">lbs</span>
             </div>
           </div>
@@ -64,34 +109,80 @@
               <button class="toggle-btn" id="heightFt">ft / in</button>
             </div>
             <div class="input-row" id="heightCmInput">
-              <input type="number" id="userHeight" placeholder="e.g. 175" min="100" max="250" />
+              <input
+                type="number"
+                id="userHeight"
+                placeholder="e.g. 175"
+                min="100"
+                max="250"
+              />
               <span class="unit">cm</span>
             </div>
             <div class="input-row hidden" id="heightFtInput">
-              <input type="number" id="userHeightFt" placeholder="5" min="3" max="8" />
+              <input
+                type="number"
+                id="userHeightFt"
+                placeholder="5"
+                min="3"
+                max="8"
+              />
               <span class="unit">ft</span>
-              <input type="number" id="userHeightIn" placeholder="9" min="0" max="11" />
+              <input
+                type="number"
+                id="userHeightIn"
+                placeholder="9"
+                min="0"
+                max="11"
+              />
               <span class="unit">in</span>
             </div>
           </div>
           <div class="form-group">
             <label>Neck circumference</label>
             <div class="input-row">
-              <input type="number" id="userNeck" placeholder="e.g. 37" min="20" max="80" />
+              <input
+                type="number"
+                id="userNeck"
+                placeholder="e.g. 37"
+                min="20"
+                max="80"
+              />
               <span class="unit">cm</span>
             </div>
           </div>
           <div class="form-group">
-            <label>Waist circumference <span style="color:rgba(255,255,255,0.2);font-size:10px">(at navel)</span></label>
+            <label
+              >Waist circumference
+              <span style="color: rgba(255, 255, 255, 0.2); font-size: 10px"
+                >(at navel)</span
+              ></label
+            >
             <div class="input-row">
-              <input type="number" id="userWaist" placeholder="e.g. 82" min="40" max="250" />
+              <input
+                type="number"
+                id="userWaist"
+                placeholder="e.g. 82"
+                min="40"
+                max="250"
+              />
               <span class="unit">cm</span>
             </div>
           </div>
           <div class="form-group" id="hipGroup">
-            <label>Hip circumference <span style="color:rgba(255,255,255,0.2);font-size:10px">(females only)</span></label>
+            <label
+              >Hip circumference
+              <span style="color: rgba(255, 255, 255, 0.2); font-size: 10px"
+                >(females only)</span
+              ></label
+            >
             <div class="input-row">
-              <input type="number" id="userHip" placeholder="e.g. 95" min="50" max="250" />
+              <input
+                type="number"
+                id="userHip"
+                placeholder="e.g. 95"
+                min="50"
+                max="250"
+              />
               <span class="unit">cm</span>
             </div>
           </div>
@@ -106,14 +197,18 @@
               <span class="goal-icon">⚡</span>
               <div>
                 <span class="goal-title">Body Recomposition</span>
-                <span class="goal-desc">Lose fat &amp; build muscle simultaneously</span>
+                <span class="goal-desc"
+                  >Lose fat &amp; build muscle simultaneously</span
+                >
               </div>
             </button>
             <button class="goal-btn" data-val="muscle">
               <span class="goal-icon">💪</span>
               <div>
                 <span class="goal-title">Muscle Gain</span>
-                <span class="goal-desc">Build maximum muscle, slight surplus</span>
+                <span class="goal-desc"
+                  >Build maximum muscle, slight surplus</span
+                >
               </div>
             </button>
             <button class="goal-btn" data-val="fatloss">
@@ -124,19 +219,60 @@
               </div>
             </button>
           </div>
-          <div class="form-group" style="margin-top:20px">
-            <label>Activity Level <button class="info-btn" id="activityInfo">?</button></label>
+          <div class="form-group" style="margin-top: 20px">
+            <label
+              >Activity Level
+              <button class="info-btn" id="activityInfo">?</button></label
+            >
             <div class="info-box hidden" id="activityInfoBox">
-              <div class="info-item"><span class="info-title">Sedentary</span><span class="info-desc">Desk job, little movement outside gym.</span></div>
-              <div class="info-item"><span class="info-title">Lightly Active</span><span class="info-desc">Gym 2-3x per week, some walking.</span></div>
-              <div class="info-item"><span class="info-title">Moderate</span><span class="info-desc">Gym 4-5x per week with daily cardio.</span></div>
-              <div class="info-item"><span class="info-title">Very Active</span><span class="info-desc">Hard training 6-7x per week or physical job.</span></div>
+              <div class="info-item">
+                <span class="info-title">Sedentary</span
+                ><span class="info-desc"
+                  >Desk job, little movement outside gym.</span
+                >
+              </div>
+              <div class="info-item">
+                <span class="info-title">Lightly Active</span
+                ><span class="info-desc">Gym 2-3x per week, some walking.</span>
+              </div>
+              <div class="info-item">
+                <span class="info-title">Moderate</span
+                ><span class="info-desc"
+                  >Gym 4-5x per week with daily cardio.</span
+                >
+              </div>
+              <div class="info-item">
+                <span class="info-title">Very Active</span
+                ><span class="info-desc"
+                  >Hard training 6-7x per week or physical job.</span
+                >
+              </div>
             </div>
             <div class="activity-options">
-              <button class="option-btn" data-field="activity" data-val="sedentary">Sedentary</button>
-              <button class="option-btn" data-field="activity" data-val="light">Lightly Active</button>
-              <button class="option-btn" data-field="activity" data-val="moderate">Moderate</button>
-              <button class="option-btn" data-field="activity" data-val="active">Very Active</button>
+              <button
+                class="option-btn"
+                data-field="activity"
+                data-val="sedentary"
+              >
+                Sedentary
+              </button>
+              <button class="option-btn" data-field="activity" data-val="light">
+                Lightly Active
+              </button>
+              <button
+                class="option-btn"
+                data-field="activity"
+                data-val="moderate"
+              >
+                Moderate
+              </button>
+              <button
+                class="option-btn"
+                data-field="activity"
+                data-val="active"
+              >
+                Very Active
+              </button>
             </div>
           </div>
           <div class="btn-row">
@@ -160,7 +296,6 @@
 
     <!-- ─── MAIN TRACKER ──────────────────────────────────── -->
     <div class="tracker-main hidden" id="trackerMain">
-
       <!-- Segmented control: Today / Meal Plan / Progress -->
       <div class="seg-control">
         <button class="seg-btn active" data-tab="today">Today</button>
@@ -171,9 +306,11 @@
       <!-- ── TODAY TAB ─────────────────────────────────────── -->
       <div class="seg-tab" id="tab-today">
         <!-- Coach bar -->
-        <div class="coach-bar" id="coachBar" style="margin-top:14px">
+        <div class="coach-bar" id="coachBar" style="margin-top: 14px">
           <div class="coach-avatar">🤖</div>
-          <div class="coach-text" id="coachDailyMessage">Loading your coach...</div>
+          <div class="coach-text" id="coachDailyMessage">
+            Loading your coach...
+          </div>
         </div>
 
         <!-- Macro rings (scrollable row) -->
@@ -224,51 +361,75 @@
         </div>
 
         <!-- Notification settings at bottom of today tab -->
-        <div class="section-label" style="margin-top:24px">Meal Reminders</div>
+        <div class="section-label" style="margin-top: 24px">Meal Reminders</div>
         <div class="settings-card">
           <div class="settings-row">
             <span>Breakfast</span>
-            <input type="time" id="notifBreakfast" value="08:00" class="time-input" />
+            <input
+              type="time"
+              id="notifBreakfast"
+              value="08:00"
+              class="time-input"
+            />
           </div>
           <div class="settings-row">
             <span>Lunch</span>
-            <input type="time" id="notifLunch" value="13:00" class="time-input" />
+            <input
+              type="time"
+              id="notifLunch"
+              value="13:00"
+              class="time-input"
+            />
           </div>
           <div class="settings-row">
             <span>Dinner</span>
-            <input type="time" id="notifDinner" value="20:00" class="time-input" />
+            <input
+              type="time"
+              id="notifDinner"
+              value="20:00"
+              class="time-input"
+            />
           </div>
-          <button class="save-notif-btn" id="saveNotifications">Save Reminders</button>
+          <button class="save-notif-btn" id="saveNotifications">
+            Save Reminders
+          </button>
           <button class="reset-btn" id="resetProfile">Reset Profile</button>
         </div>
-        <div style="height:24px"></div>
+        <div style="height: 24px"></div>
       </div>
 
       <!-- ── MEAL PLAN TAB ──────────────────────────────────── -->
       <div class="seg-tab hidden" id="tab-plan">
-        <div style="padding:16px 0 0">
+        <div style="padding: 16px 0 0">
           <div class="plan-btn-wrapper">
-            <button class="plan-my-day-btn" id="planMyDayBtn">🗓️ Plan My Day</button>
+            <button class="plan-my-day-btn" id="planMyDayBtn">
+              🗓️ Plan My Day
+            </button>
           </div>
           <div class="section-label">Shopping List</div>
         </div>
         <!-- Shopping list lives here -->
-        <div class="shopping-list-section" id="shoppingListSection" style="display:none; padding:0 16px 0">
+        <div
+          class="shopping-list-section"
+          id="shoppingListSection"
+          style="display: none; padding: 0 16px 0"
+        >
           <div class="shopping-list" id="shoppingList">
             <div class="shopping-header">
               <span class="shopping-title">Ingredients Needed</span>
-              <button class="shopping-clear" id="clearShoppingList">Clear All</button>
+              <button class="shopping-clear" id="clearShoppingList">
+                Clear All
+              </button>
             </div>
             <div id="shoppingItems"></div>
           </div>
         </div>
-        <div style="height:calc(var(--nav-h) + 16px)"></div>
+        <div style="height: calc(var(--nav-h) + 16px)"></div>
       </div>
 
       <!-- ── PROGRESS TAB ───────────────────────────────────── -->
       <div class="seg-tab hidden" id="tab-progress">
         <div class="progress-section">
-
           <!-- Body composition stats -->
           <div class="section-label">Your Stats</div>
           <div class="progress-stats-grid" id="progressStats">
@@ -276,47 +437,71 @@
           </div>
 
           <!-- Log entry form -->
-          <div class="section-label" style="margin-top:20px">Log Today</div>
+          <div class="section-label" style="margin-top: 20px">Log Today</div>
           <div class="progress-form">
             <div class="form-group">
               <label>Weight (kg)</label>
-              <input type="number" id="progressWeight" placeholder="e.g. 70.5" step="0.1" min="20" max="400" />
+              <input
+                type="number"
+                id="progressWeight"
+                placeholder="e.g. 70.5"
+                step="0.1"
+                min="20"
+                max="400"
+              />
             </div>
             <div class="form-group">
               <label>Body Fat %</label>
-              <input type="number" id="progressBodyFat" placeholder="e.g. 15.2" step="0.1" min="2" max="60" />
+              <input
+                type="number"
+                id="progressBodyFat"
+                placeholder="e.g. 15.2"
+                step="0.1"
+                min="2"
+                max="60"
+              />
             </div>
-            <button class="save-btn" id="saveProgress" style="grid-column:1/-1;margin-top:0">Save Entry</button>
+            <button
+              class="save-btn"
+              id="saveProgress"
+              style="grid-column: 1/-1; margin-top: 0"
+            >
+              Save Entry
+            </button>
           </div>
 
           <!-- Charts -->
-          <div class="section-label" style="margin-top:20px">History</div>
+          <div class="section-label" style="margin-top: 20px">History</div>
           <div class="chart-card">
             <div class="chart-card-header">
               <span class="chart-card-title">Weight Over Time</span>
               <div class="chart-card-actions">
                 <span class="chart-card-unit">kg</span>
-                <button class="chart-reset-btn" id="resetWeightChart">Reset</button>
+                <button class="chart-reset-btn" id="resetWeightChart">
+                  Reset
+                </button>
               </div>
             </div>
             <div class="chart-wrap"><canvas id="weightChart"></canvas></div>
           </div>
-          <div class="chart-card" style="margin-top:12px">
+          <div class="chart-card" style="margin-top: 12px">
             <div class="chart-card-header">
               <span class="chart-card-title">Body Fat Over Time</span>
               <div class="chart-card-actions">
                 <span class="chart-card-unit">%</span>
-                <button class="chart-reset-btn" id="resetBodyFatChart">Reset</button>
+                <button class="chart-reset-btn" id="resetBodyFatChart">
+                  Reset
+                </button>
               </div>
             </div>
             <div class="chart-wrap"><canvas id="bodyFatChart"></canvas></div>
           </div>
 
-          <div style="height:24px"></div>
+          <div style="height: 24px"></div>
         </div>
       </div>
-
-    </div><!-- /tracker-main -->
+    </div>
+    <!-- /tracker-main -->
 
     <!-- ─── MODALS (all IDs unchanged) ───────────────────── -->
 
@@ -327,7 +512,13 @@
           <h2>Add Food</h2>
           <button class="modal-close" id="foodModalClose">✕</button>
         </div>
-        <input type="text" id="foodSearch" placeholder="Search your recipes..." class="search-input" style="margin-bottom:12px" />
+        <input
+          type="text"
+          id="foodSearch"
+          placeholder="Search your recipes..."
+          class="search-input"
+          style="margin-bottom: 12px"
+        />
         <div class="food-list" id="foodList"></div>
         <div class="modal-divider">— or add manually —</div>
         <div class="form-group">
@@ -337,19 +528,43 @@
         <div class="manual-macros">
           <div class="form-group">
             <label>Protein (g)</label>
-            <input type="number" id="manualProtein" placeholder="0" min="0" max="300" />
+            <input
+              type="number"
+              id="manualProtein"
+              placeholder="0"
+              min="0"
+              max="300"
+            />
           </div>
           <div class="form-group">
             <label>Carbs (g)</label>
-            <input type="number" id="manualCarbs" placeholder="0" min="0" max="500" />
+            <input
+              type="number"
+              id="manualCarbs"
+              placeholder="0"
+              min="0"
+              max="500"
+            />
           </div>
           <div class="form-group">
             <label>Fat (g)</label>
-            <input type="number" id="manualFat" placeholder="0" min="0" max="300" />
+            <input
+              type="number"
+              id="manualFat"
+              placeholder="0"
+              min="0"
+              max="300"
+            />
           </div>
           <div class="form-group">
             <label>Calories</label>
-            <input type="number" id="manualCalories" placeholder="0" min="0" max="3000" />
+            <input
+              type="number"
+              id="manualCalories"
+              placeholder="0"
+              min="0"
+              max="3000"
+            />
           </div>
         </div>
         <button class="save-btn" id="addManualFood">Add Food</button>
@@ -364,21 +579,35 @@
           <button class="modal-close" id="plannerClose">✕</button>
         </div>
         <div class="planner-mode-toggle">
-          <button class="planner-mode-btn active" data-mode="full">Plan Full Day</button>
-          <button class="planner-mode-btn" data-mode="remaining">Fill Remaining</button>
+          <button class="planner-mode-btn active" data-mode="full">
+            Plan Full Day
+          </button>
+          <button class="planner-mode-btn" data-mode="remaining">
+            Fill Remaining
+          </button>
         </div>
         <div class="planner-cuisine-toggle">
-          <button class="planner-cuisine-btn active" data-cuisine="indian">🇮🇳 Indian</button>
-          <button class="planner-cuisine-btn" data-cuisine="canadian">🇨🇦 Canadian</button>
+          <button class="planner-cuisine-btn active" data-cuisine="indian">
+            🇮🇳 Indian
+          </button>
+          <button class="planner-cuisine-btn" data-cuisine="canadian">
+            🇨🇦 Canadian
+          </button>
         </div>
         <div class="planner-targets" id="plannerTargets"></div>
-        <button class="planner-generate-btn" id="generatePlanBtn">✨ Generate Plan</button>
+        <button class="planner-generate-btn" id="generatePlanBtn">
+          ✨ Generate Plan
+        </button>
         <div class="planner-results hidden" id="plannerResults">
           <div class="planner-meals" id="plannerMeals"></div>
           <div class="planner-totals" id="plannerTotals"></div>
           <div class="planner-actions">
-            <button class="save-btn" id="confirmPlanBtn">✓ Add to Today's Log</button>
-            <button class="secondary-btn" id="generateShoppingListBtn">🛒 Shopping List</button>
+            <button class="save-btn" id="confirmPlanBtn">
+              ✓ Add to Today's Log
+            </button>
+            <button class="secondary-btn" id="generateShoppingListBtn">
+              🛒 Shopping List
+            </button>
           </div>
         </div>
       </div>
@@ -391,7 +620,14 @@
           <h2>Swap Meal</h2>
           <button class="modal-close" id="swapModalClose">✕</button>
         </div>
-        <p style="font-size:12px;color:rgba(255,255,255,0.3);margin-bottom:12px" id="swapModalLabel"></p>
+        <p
+          style="
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.3);
+            margin-bottom: 12px;
+          "
+          id="swapModalLabel"
+        ></p>
         <div class="swap-list" id="swapList"></div>
       </div>
     </div>
@@ -399,72 +635,186 @@
     <!-- Bottom nav -->
     <nav class="bottom-nav">
       <a href="recipes.html" class="nav-tab" data-page="recipes">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/>
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" />
+          <path d="M7 2v20" />
+          <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7" />
         </svg>
         <span class="nav-label">Recipes</span>
       </a>
       <a href="tracker.html" class="nav-tab active" data-page="nutrition">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/>
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M18 20V10" />
+          <path d="M12 20V4" />
+          <path d="M6 20v-6" />
         </svg>
         <span class="nav-label">Nutrition</span>
       </a>
       <a href="index.html" class="nav-tab nav-home-tab" data-page="home">
         <div class="home-tab-ring">
           <svg width="58" height="58" viewBox="0 0 58 58">
-            <circle cx="29" cy="29" r="22" fill="none" stroke="#1a2e1e" stroke-width="4"/>
-            <circle cx="29" cy="29" r="22" fill="none" stroke="#7ed99a" stroke-width="4"
-              stroke-dasharray="138.2" stroke-dashoffset="138.2"
-              stroke-linecap="round" transform="rotate(-90 29 29)"
-              class="nav-protein-ring"/>
+            <circle
+              cx="29"
+              cy="29"
+              r="22"
+              fill="none"
+              stroke="#1a2e1e"
+              stroke-width="4"
+            />
+            <circle
+              cx="29"
+              cy="29"
+              r="22"
+              fill="none"
+              stroke="#7ed99a"
+              stroke-width="4"
+              stroke-dasharray="138.2"
+              stroke-dashoffset="138.2"
+              stroke-linecap="round"
+              transform="rotate(-90 29 29)"
+              class="nav-protein-ring"
+            />
           </svg>
-          <svg class="home-tab-icon" style="position:relative;z-index:1" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7ed99a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-            <polyline points="9 22 9 12 15 12 15 22"/>
+          <svg
+            class="home-tab-icon"
+            style="position: relative; z-index: 1"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#7ed99a"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            <polyline points="9 22 9 12 15 12 15 22" />
           </svg>
         </div>
         <span class="nav-label">Home</span>
       </a>
       <a href="exercise.html" class="nav-tab" data-page="workout">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M6.5 6.5h11M6.5 17.5h11M4 12h16M4 12l-2-2M4 12l-2 2M20 12l2-2M20 12l2 2"/>
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path
+            d="M6.5 6.5h11M6.5 17.5h11M4 12h16M4 12l-2-2M4 12l-2 2M20 12l2-2M20 12l2 2"
+          />
         </svg>
         <span class="nav-label">Workout</span>
       </a>
       <a href="profile.html" class="nav-tab" data-page="profile">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-          <circle cx="12" cy="7" r="4"/>
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
         </svg>
         <span class="nav-label">Profile</span>
       </a>
     </nav>
 
-    <!-- Segmented tab switcher -->
+    <!-- Segmented tab switcher + lazy Chart.js -->
     <script>
-      document.querySelectorAll('.seg-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
-          document.querySelectorAll('.seg-tab').forEach(t => t.classList.add('hidden'));
-          btn.classList.add('active');
-          const tab = document.getElementById('tab-' + btn.dataset.tab);
-          if (tab) tab.classList.remove('hidden');
+      let _chartJsLoaded = false;
+      function ensureChartJs(cb) {
+        if (typeof Chart !== "undefined") { cb(); return; }
+        if (_chartJsLoaded) { /* already injecting */ return; }
+        _chartJsLoaded = true;
+        const s = document.createElement("script");
+        s.src = "https://cdn.jsdelivr.net/npm/chart.js";
+        s.onload = cb;
+        document.head.appendChild(s);
+      }
+
+      document.querySelectorAll(".seg-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document
+            .querySelectorAll(".seg-btn")
+            .forEach((b) => b.classList.remove("active"));
+          document
+            .querySelectorAll(".seg-tab")
+            .forEach((t) => t.classList.add("hidden"));
+          btn.classList.add("active");
+          const tab = document.getElementById("tab-" + btn.dataset.tab);
+          if (tab) tab.classList.remove("hidden");
+          // Load Chart.js only when Progress tab is first opened
+          if (btn.dataset.tab === "progress") {
+            ensureChartJs(() => {
+              if (window._loadProgressHistory) window._loadProgressHistory();
+            });
+          }
         });
       });
+
+      // Deep-link: ?tab=plan opens Meal Plan tab directly
+      const urlTab = new URLSearchParams(window.location.search).get("tab");
+      if (urlTab) {
+        const targetBtn = document.querySelector(`.seg-btn[data-tab="${urlTab}"]`);
+        if (targetBtn) targetBtn.click();
+      }
     </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="module" src="tracker.js"></script>
+
+    <!-- Coach -->
+    <script type="module">
+      async function loadCoach() {
+        try {
+          const coachModule = await import("./coach.js");
+          coachModule.initCoach();
+        } catch (error) {
+          console.warn("FitDesi coach module not loaded:", error);
+        }
+      }
+
+      loadCoach();
+    </script>
     <script>
       /* Nav protein ring — reads from localStorage set by tracker.js */
-      (function() {
+      (function () {
         const goal = parseInt(localStorage.getItem("proteinGoal") || "0");
         if (!goal) return;
         const data = JSON.parse(localStorage.getItem("proteinData") || "{}");
         const protein = data[new Date().toDateString()] || 0;
         const ring = document.getElementById("navProteinRing");
-        if (ring) ring.setAttribute("stroke-dashoffset", (138.2 * (1 - Math.min(protein / goal, 1))).toFixed(1));
+        if (ring)
+          ring.setAttribute(
+            "stroke-dashoffset",
+            (138.2 * (1 - Math.min(protein / goal, 1))).toFixed(1),
+          );
       })();
     </script>
   </body>
