@@ -71,35 +71,37 @@ function isStandalonePWA() {
   );
 }
 
-function isIOS() {
-  return /iphone|ipad|ipod/i.test(navigator.userAgent);
-}
-
-function isAndroidStandalone() {
-  // Android PWA or any Android browser (redirect is needed; popup blocked)
-  return /android/i.test(navigator.userAgent) ||
+function isAndroidPWA() {
+  // True only when installed as a PWA on Android (standalone mode).
+  // Regular Android Chrome browser is NOT standalone.
+  return /android/i.test(navigator.userAgent) &&
     window.matchMedia("(display-mode: standalone)").matches;
 }
 
 async function signInWithGoogle() {
   try {
-    if (isIOS()) {
-      // iOS: signInWithRedirect opens Google in Safari and the redirect back
-      // lands in Safari — NOT in the PWA — so the PWA never captures the result.
-      // Popup works correctly in both Safari browser and iOS standalone (Add to Home).
-      const result = await signInWithPopup(auth, provider);
-      return result.user;
-    }
-    if (isAndroidStandalone() || window.navigator.standalone === true) {
-      // Android PWA / standalone: popup is blocked, must use redirect.
-      // getRedirectResult() on login.html captures the credential.
+    // Android standalone PWA: signInWithPopup may be blocked inside the
+    // WebView shell, so use redirect. Result captured by getRedirectResult()
+    // in login.html.
+    if (isAndroidPWA()) {
       await signInWithRedirect(auth, provider);
       return null;
     }
-    // Desktop browser: popup.
+
+    // All other cases (Android Chrome browser, iOS, desktop): use popup.
+    // signInWithRedirect is NOT used for regular Android Chrome because it
+    // relies on sessionStorage which Chrome wipes when the tab is killed
+    // during the Google redirect — causing getRedirectResult() to return
+    // null and the login screen to loop endlessly.
+    // Popup is triggered by user gesture so Chrome will NOT block it.
     const result = await signInWithPopup(auth, provider);
     return result.user;
   } catch (error) {
+    // If popup is blocked for any reason, fall back to redirect
+    if (error.code === "auth/popup-blocked" || error.code === "auth/cancelled-popup-request") {
+      await signInWithRedirect(auth, provider);
+      return null;
+    }
     console.error("Sign in error:", error);
     throw error;
   }
