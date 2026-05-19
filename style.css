@@ -2040,259 +2040,518 @@ input, select, textarea {
 
 
 /* ══════════════════════════════════════════════════════════
-   LIGHT THEME
+   LIGHT THEME — Cream + Burnt Orange
    Applied via data-theme="light" on <html>.
-   Overrides every hardcoded dark colour in the codebase.
+   Accent: #A85A1F (burnt orange). Replaces every green.
    ══════════════════════════════════════════════════════════ */
 [data-theme="light"] {
-  --bg:          #f3f6f4;
-  --card:        #ffffff;
-  --border:      #dde8e1;
-  --text:        #1a2e1e;
-  --text-dim:    rgba(0,0,0,0.45);
-  --text-faint:  rgba(0,0,0,0.2);
-  --green-dark:  rgba(126,217,154,0.25);
+  --bg:          #FAF4EC;
+  --card:        #FFFFFF;
+  --border:      #E8D9C2;
+  --text:        #3D2817;
+  --text-dim:    #8B6F4E;
+  --text-faint:  #B8A082;
+  --green:       #A85A1F;          /* accent override — all .nav-tab.active, var(--green) refs */
+  --green-muted: #C97A3F;
+  --green-dark:  rgba(168,90,31,0.25);
   color-scheme:  light;
 }
 
 /* ── Body & header ── */
-[data-theme="light"] body          { background: #f3f6f4; color: #1a2e1e; }
-[data-theme="light"] .app-header   { background: #f3f6f4; border-bottom-color: #dde8e1; }
+[data-theme="light"] body          { background: #FAF4EC; color: #3D2817; }
+[data-theme="light"] .app-header   { background: #FAF4EC; border-bottom-color: #E8D9C2; }
 [data-theme="light"] .app-header-title,
-[data-theme="light"] .app-logo     { color: #1a2e1e; }
-[data-theme="light"] .header-date  { color: rgba(0,0,0,0.4); }
+[data-theme="light"] .app-logo     { color: #3D2817; }
+[data-theme="light"] .header-date  { color: #8B6F4E; }
 
 /* ── Bottom nav ── */
-[data-theme="light"] .bottom-nav   { background: rgba(243,246,244,0.97); border-top-color: #dde8e1; }
-[data-theme="light"] .nav-tab      { color: rgba(0,0,0,0.3); }
-[data-theme="light"] .nav-tab.active { color: #7ed99a; }
-[data-theme="light"] .home-tab-ring { background: #f3f6f4; }
+[data-theme="light"] .bottom-nav   { background: #FFFFFF; border-top-color: #E8D9C2; }
+[data-theme="light"] .nav-tab,
+[data-theme="light"] .nav-item     { color: #B8A082; }
+[data-theme="light"] .nav-tab.active,
+[data-theme="light"] .nav-item.active { color: #A85A1F; }
+[data-theme="light"] .home-tab-ring { background: #A85A1F; }
+[data-theme="light"] .home-tab-ring .home-tab-icon { color: #FFFFFF; filter: brightness(0) invert(1); }
 
 /* ── Segmented control ── */
-[data-theme="light"] .seg-btn       { color: rgba(0,0,0,0.4); }
-[data-theme="light"] .seg-btn.active { background: #ffffff; color: #1a2e1e;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.12); }
+[data-theme="light"] .seg-btn       { color: #8B6F4E; }
+[data-theme="light"] .seg-btn.active { background: #FFFFFF; color: #3D2817;
+  box-shadow: 0 1px 4px rgba(61,40,23,0.08); }
 
 /* ── Cards / surfaces ── */
 [data-theme="light"] .card,
 [data-theme="light"] .section-group,
 [data-theme="light"] .meal-section,
 [data-theme="light"] .settings-card,
-[data-theme="light"] .macro-ring-card { background: #ffffff; border-color: #dde8e1; }
+[data-theme="light"] .macro-ring-card { background: #FFFFFF; border-color: #E8D9C2; }
 
 /* ── Section rows ── */
-[data-theme="light"] .section-row       { border-bottom-color: rgba(0,0,0,0.06); }
-[data-theme="light"] .section-row:hover { background: rgba(0,0,0,0.02); }
-[data-theme="light"] .section-row-label { color: #1a2e1e; }
-[data-theme="light"] .section-row-value { color: rgba(0,0,0,0.45); }
-[data-theme="light"] .section-row-icon.muted { background: rgba(0,0,0,0.05); }
+[data-theme="light"] .section-row       { border-bottom-color: #F0E1CC; }
+[data-theme="light"] .section-row:hover { background: #F0E1CC; }
+[data-theme="light"] .section-row-label { color: #3D2817; }
+[data-theme="light"] .section-row-value { color: #8B6F4E; }
+[data-theme="light"] .section-row-icon.muted { background: #F0E1CC; }
 
 /* ── Modals ── */
-[data-theme="light"] .modal           { background: #ffffff; border-color: #dde8e1; }
+[data-theme="light"] .modal           { background: #FFFFFF; border-color: #E8D9C2; }
 [data-theme="light"] .modal-header h2,
-[data-theme="light"] .modal h2        { color: #1a2e1e; }
-[data-theme="light"] .modal-close     { background: rgba(0,0,0,0.06); color: rgba(0,0,0,0.45); }
-[data-theme="light"] .modal-divider   { color: rgba(0,0,0,0.25); }
+[data-theme="light"] .modal h2        { color: #3D2817; }
+[data-theme="light"] .modal-close     { background: #F0E1CC; color: #8B6F4E; }
+[data-theme="light"] .modal-divider   { color: #B8A082; }
 
 /* ── Forms / inputs ── */
 [data-theme="light"] .form-group input,
 [data-theme="light"] .form-input,
 [data-theme="light"] .search-input,
-[data-theme="light"] .time-input       { background: rgba(0,0,0,0.04); border-color: #dde8e1; color: #1a2e1e; }
+[data-theme="light"] .time-input       { background: #F0E1CC; border-color: #E8D9C2; color: #3D2817; }
 [data-theme="light"] .form-group input::placeholder,
 [data-theme="light"] .form-input::placeholder,
-[data-theme="light"] .search-input::placeholder { color: rgba(0,0,0,0.25); }
-[data-theme="light"] .form-group label { color: rgba(0,0,0,0.45); }
-[data-theme="light"] .unit             { color: rgba(0,0,0,0.4); }
+[data-theme="light"] .search-input::placeholder { color: #B8A082; }
+[data-theme="light"] .form-group label { color: #8B6F4E; }
+[data-theme="light"] .unit             { color: #8B6F4E; }
 
 /* ── Buttons ── */
-[data-theme="light"] .toggle-btn      { background: rgba(0,0,0,0.04); border-color: #dde8e1; color: rgba(0,0,0,0.45); }
-[data-theme="light"] .option-btn      { background: rgba(0,0,0,0.04); border-color: #dde8e1; color: rgba(0,0,0,0.5); }
-[data-theme="light"] .goal-btn        { background: rgba(0,0,0,0.03); border-color: #dde8e1; }
-[data-theme="light"] .goal-title      { color: rgba(0,0,0,0.8); }
-[data-theme="light"] .goal-desc       { color: rgba(0,0,0,0.4); }
-[data-theme="light"] .secondary-btn   { background: rgba(0,0,0,0.04); border-color: #dde8e1; color: rgba(0,0,0,0.5); }
-[data-theme="light"] .secondary-btn:hover { background: rgba(0,0,0,0.07); }
+[data-theme="light"] .toggle-btn      { background: #F0E1CC; border-color: #E8D9C2; color: #8B6F4E; }
+[data-theme="light"] .option-btn      { background: #F0E1CC; border-color: #E8D9C2; color: #8B6F4E; }
+[data-theme="light"] .goal-btn        { background: #F0E1CC; border-color: #E8D9C2; }
+[data-theme="light"] .goal-title      { color: #3D2817; }
+[data-theme="light"] .goal-desc       { color: #8B6F4E; }
+[data-theme="light"] .secondary-btn   { background: #F0E1CC; border-color: #E8D9C2; color: #8B6F4E; }
+[data-theme="light"] .secondary-btn:hover { background: #E8D9C2; }
 
 /* ── Meal sections ── */
-[data-theme="light"] .meal-header     { border-bottom-color: rgba(0,0,0,0.06); }
-[data-theme="light"] .meal-name       { color: #1a2e1e; }
-[data-theme="light"] .meal-total      { color: rgba(0,0,0,0.4); }
-[data-theme="light"] .meal-item       { border-bottom-color: rgba(0,0,0,0.05); }
-[data-theme="light"] .meal-item-name  { color: rgba(0,0,0,0.75); }
-[data-theme="light"] .meal-item-macros { color: rgba(0,0,0,0.4); }
+[data-theme="light"] .meal-header     { border-bottom-color: #F0E1CC; }
+[data-theme="light"] .meal-name       { color: #3D2817; }
+[data-theme="light"] .meal-total      { color: #8B6F4E; }
+[data-theme="light"] .meal-item       { border-bottom-color: #F0E1CC; }
+[data-theme="light"] .meal-item-name  { color: #3D2817; }
+[data-theme="light"] .meal-item-macros { color: #8B6F4E; }
 
 /* ── Macro rings ── */
-[data-theme="light"] .macro-ring-val    { color: #7ed99a; }
-[data-theme="light"] .macro-ring-target { color: rgba(0,0,0,0.35); }
-[data-theme="light"] .macro-ring-lbl    { color: rgba(0,0,0,0.35); }
-[data-theme="light"] .macro-ring-bar    { background: rgba(0,0,0,0.08); }
+[data-theme="light"] .macro-ring-val    { color: #A85A1F; }
+[data-theme="light"] .macro-ring-target { color: #B8A082; }
+[data-theme="light"] .macro-ring-lbl    { color: #B8A082; }
+[data-theme="light"] .macro-ring-bar    { background: #F0E1CC; }
 
 /* ── Coach bar ── */
-[data-theme="light"] .coach-bar  { background: #ffffff; border-color: #dde8e1; }
-[data-theme="light"] .coach-text { color: rgba(0,0,0,0.65); }
+[data-theme="light"] .coach-bar  { background: #FFFFFF; border-color: #E8D9C2; }
+[data-theme="light"] .coach-text { color: #3D2817; }
 
 /* ── Onboarding card ── */
-[data-theme="light"] .onboarding-card { background: #ffffff; border-color: #dde8e1; }
-[data-theme="light"] .onboarding-card h2 { color: #1a2e1e; }
-[data-theme="light"] .onboarding-card p  { color: rgba(0,0,0,0.5); }
-[data-theme="light"] .info-box { background: rgba(0,0,0,0.04); border-color: #dde8e1; }
-[data-theme="light"] .info-title { color: rgba(0,0,0,0.7); }
-[data-theme="light"] .info-desc  { color: rgba(0,0,0,0.45); }
+[data-theme="light"] .onboarding-card { background: #FFFFFF; border-color: #E8D9C2; }
+[data-theme="light"] .onboarding-card h2 { color: #3D2817; }
+[data-theme="light"] .onboarding-card p  { color: #8B6F4E; }
+[data-theme="light"] .info-box { background: #F0E1CC; border-color: #E8D9C2; }
+[data-theme="light"] .info-title { color: #3D2817; }
+[data-theme="light"] .info-desc  { color: #8B6F4E; }
 
 /* ── Profile page ── */
-[data-theme="light"] .user-card        { background: #ffffff; border-color: #dde8e1; }
-[data-theme="light"] .user-name        { color: #1a2e1e; }
-[data-theme="light"] .user-email       { color: rgba(0,0,0,0.35); }
-[data-theme="light"] .stat-pill        { background: #ffffff; border-color: #dde8e1; }
-[data-theme="light"] .stat-lbl         { color: rgba(0,0,0,0.35); }
-[data-theme="light"] .settings-group   { background: #ffffff; border-color: #dde8e1; }
-[data-theme="light"] .settings-section.green .settings-group { border-color: rgba(126,217,154,0.3); }
+[data-theme="light"] .user-card        { background: #FFFFFF; border-color: #E8D9C2; }
+[data-theme="light"] .user-name        { color: #3D2817; }
+[data-theme="light"] .user-email       { color: #B8A082; }
+[data-theme="light"] .stat-pill        { background: #FFFFFF; border-color: #E8D9C2; }
+[data-theme="light"] .stat-lbl         { color: #B8A082; }
+[data-theme="light"] .settings-group   { background: #FFFFFF; border-color: #E8D9C2; }
+[data-theme="light"] .settings-section.green .settings-group { border-color: rgba(168,90,31,0.3); }
 [data-theme="light"] .settings-section.blue  .settings-group { border-color: rgba(91,200,245,0.3); }
 [data-theme="light"] .settings-section.orange .settings-group { border-color: rgba(245,166,35,0.3); }
 [data-theme="light"] .settings-section.purple .settings-group { border-color: rgba(167,139,250,0.3); }
-[data-theme="light"] .settings-row        { border-bottom-color: rgba(0,0,0,0.06); }
-[data-theme="light"] .settings-row-label  { color: rgba(0,0,0,0.75); }
-[data-theme="light"] .settings-row-value  { color: rgba(0,0,0,0.4); }
-[data-theme="light"] .green-btn { background: rgba(126,217,154,0.1); }
+[data-theme="light"] .settings-row        { border-bottom-color: #F0E1CC; }
+[data-theme="light"] .settings-row-label  { color: #3D2817; }
+[data-theme="light"] .settings-row-value  { color: #8B6F4E; }
+[data-theme="light"] .green-btn { background: rgba(168,90,31,0.1); color: #A85A1F; }
 
 /* ── Edit profile sheet ── */
-[data-theme="light"] .ep-overlay  { background: rgba(0,0,0,0.5); }
-[data-theme="light"] .ep-sheet    { background: #f3f6f4; }
-[data-theme="light"] .ep-header   { background: #f3f6f4; border-bottom-color: rgba(0,0,0,0.08); }
-[data-theme="light"] .ep-title    { color: #1a2e1e; }
-[data-theme="light"] .ep-handle   { background: rgba(0,0,0,0.15); }
-[data-theme="light"] .ep-close    { background: rgba(0,0,0,0.07); color: rgba(0,0,0,0.45); }
-[data-theme="light"] .ep-group label { color: rgba(0,0,0,0.4); }
-[data-theme="light"] .ep-input    { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.1); color: #1a2e1e; }
-[data-theme="light"] .ep-input::placeholder { color: rgba(0,0,0,0.25); }
-[data-theme="light"] .ep-unit-toggle { background: rgba(0,0,0,0.06); }
-[data-theme="light"] .ep-unit-btn    { color: rgba(0,0,0,0.4); }
-[data-theme="light"] .ep-option-btn  { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.1); color: rgba(0,0,0,0.55); }
-[data-theme="light"] .ep-goal-btn    { background: rgba(0,0,0,0.03); border-color: rgba(0,0,0,0.08); color: rgba(0,0,0,0.65); }
-[data-theme="light"] .ep-goal-desc   { color: rgba(0,0,0,0.35); }
-[data-theme="light"] .ep-goal-btn.active .ep-goal-desc { color: rgba(126,217,154,0.7); }
+[data-theme="light"] .ep-overlay  { background: rgba(61,40,23,0.5); }
+[data-theme="light"] .ep-sheet    { background: #FAF4EC; }
+[data-theme="light"] .ep-header   { background: #FAF4EC; border-bottom-color: #E8D9C2; }
+[data-theme="light"] .ep-title    { color: #3D2817; }
+[data-theme="light"] .ep-handle   { background: #B8A082; }
+[data-theme="light"] .ep-close    { background: #F0E1CC; color: #8B6F4E; }
+[data-theme="light"] .ep-group label { color: #8B6F4E; }
+[data-theme="light"] .ep-input    { background: #F0E1CC; border-color: #E8D9C2; color: #3D2817; }
+[data-theme="light"] .ep-input::placeholder { color: #B8A082; }
+[data-theme="light"] .ep-unit-toggle { background: #F0E1CC; }
+[data-theme="light"] .ep-unit-btn    { color: #8B6F4E; }
+[data-theme="light"] .ep-option-btn  { background: #F0E1CC; border-color: #E8D9C2; color: #8B6F4E; }
+[data-theme="light"] .ep-goal-btn    { background: #F0E1CC; border-color: #E8D9C2; color: #3D2817; }
+[data-theme="light"] .ep-goal-desc   { color: #8B6F4E; }
+[data-theme="light"] .ep-goal-btn.active .ep-goal-desc { color: rgba(168,90,31,0.85); }
 
 /* ── Progress tab ── */
-[data-theme="light"] .prog-stat-card  { background: #ffffff; border-color: #dde8e1; }
-[data-theme="light"] .prog-stat-lbl   { color: rgba(0,0,0,0.35); }
-[data-theme="light"] .prog-stat-note  { color: rgba(0,0,0,0.35); }
-[data-theme="light"] .prog-stat-note.good { color: #5ab87a; }
+[data-theme="light"] .prog-stat-card  { background: #FFFFFF; border-color: #E8D9C2; }
+[data-theme="light"] .prog-stat-lbl   { color: #B8A082; }
+[data-theme="light"] .prog-stat-note  { color: #B8A082; }
+[data-theme="light"] .prog-stat-note.good { color: #A85A1F; }
 [data-theme="light"] .prog-stat-note.warn { color: #d4891c; }
-[data-theme="light"] .chart-card       { background: #ffffff; border-color: #dde8e1; }
-[data-theme="light"] .chart-card-title { color: rgba(0,0,0,0.7); }
-[data-theme="light"] .chart-card-unit  { color: rgba(0,0,0,0.25); }
+[data-theme="light"] .chart-card       { background: #FFFFFF; border-color: #E8D9C2; }
+[data-theme="light"] .chart-card-title { color: #3D2817; }
+[data-theme="light"] .chart-card-unit  { color: #B8A082; }
 [data-theme="light"] .chart-reset-btn  { color: #c04040; background: rgba(224,92,92,0.07); border-color: rgba(224,92,92,0.25); }
-[data-theme="light"] .progress-form    { background: #ffffff; }
+[data-theme="light"] .progress-form    { background: #FFFFFF; }
 
 /* ── Food / add modal ── */
-[data-theme="light"] .food-item        { border-bottom-color: rgba(0,0,0,0.06); }
-[data-theme="light"] .food-item-name   { color: rgba(0,0,0,0.75); }
-[data-theme="light"] .food-item-macros { color: rgba(0,0,0,0.4); }
-[data-theme="light"] .manual-macros    { }
+[data-theme="light"] .food-item        { border-bottom-color: #F0E1CC; }
+[data-theme="light"] .food-item-name   { color: #3D2817; }
+[data-theme="light"] .food-item-macros { color: #8B6F4E; }
 
 /* ── Planner ── */
-[data-theme="light"] .planner-meal-card   { background: #ffffff; border-color: #dde8e1; }
-[data-theme="light"] .planner-meal-name   { color: #1a2e1e; }
-[data-theme="light"] .planner-meal-macros { color: rgba(0,0,0,0.4); }
-[data-theme="light"] .planner-meal-label  { color: rgba(0,0,0,0.5); }
-[data-theme="light"] .planner-total-item  { background: rgba(0,0,0,0.03); border-color: #dde8e1; }
-[data-theme="light"] .planner-total-val   { color: #1a2e1e; }
-[data-theme="light"] .planner-total-lbl   { color: rgba(0,0,0,0.4); }
-[data-theme="light"] .planner-targets     { background: rgba(0,0,0,0.03); border-color: #dde8e1; }
-[data-theme="light"] .planner-target-val  { color: #1a2e1e; }
-[data-theme="light"] .planner-target-lbl  { color: rgba(0,0,0,0.4); }
+[data-theme="light"] .planner-meal-card   { background: #FFFFFF; border-color: #E8D9C2; }
+[data-theme="light"] .planner-meal-name   { color: #3D2817; }
+[data-theme="light"] .planner-meal-macros { color: #8B6F4E; }
+[data-theme="light"] .planner-meal-label  { color: #8B6F4E; }
+[data-theme="light"] .planner-total-item  { background: #F0E1CC; border-color: #E8D9C2; }
+[data-theme="light"] .planner-total-val   { color: #3D2817; }
+[data-theme="light"] .planner-total-lbl   { color: #8B6F4E; }
+[data-theme="light"] .planner-targets     { background: #F0E1CC; border-color: #E8D9C2; }
+[data-theme="light"] .planner-target-val  { color: #3D2817; }
+[data-theme="light"] .planner-target-lbl  { color: #8B6F4E; }
 [data-theme="light"] .planner-mode-btn,
-[data-theme="light"] .planner-cuisine-btn { color: rgba(0,0,0,0.45); background: rgba(0,0,0,0.04); }
+[data-theme="light"] .planner-cuisine-btn { color: #8B6F4E; background: #F0E1CC; }
 [data-theme="light"] .planner-mode-toggle,
-[data-theme="light"] .planner-cuisine-toggle { background: rgba(0,0,0,0.05); }
-[data-theme="light"] .swap-item           { border-bottom-color: rgba(0,0,0,0.06); }
-[data-theme="light"] .swap-item-name      { color: rgba(0,0,0,0.75); }
-[data-theme="light"] .swap-item-macros    { color: rgba(0,0,0,0.4); }
+[data-theme="light"] .planner-cuisine-toggle { background: #F0E1CC; }
+[data-theme="light"] .swap-item           { border-bottom-color: #F0E1CC; }
+[data-theme="light"] .swap-item-name      { color: #3D2817; }
+[data-theme="light"] .swap-item-macros    { color: #8B6F4E; }
 
 /* ── Shopping list ── */
-[data-theme="light"] .shopping-list       { background: #ffffff; border-color: #dde8e1; }
-[data-theme="light"] .shopping-header     { border-bottom-color: rgba(0,0,0,0.06); }
-[data-theme="light"] .shopping-title      { color: #1a2e1e; }
-[data-theme="light"] .shopping-item       { border-bottom-color: rgba(0,0,0,0.05); }
-[data-theme="light"] .shopping-item-name  { color: rgba(0,0,0,0.75); }
-[data-theme="light"] .shopping-item-amount { color: rgba(0,0,0,0.4); }
+[data-theme="light"] .shopping-list       { background: #FFFFFF; border-color: #E8D9C2; }
+[data-theme="light"] .shopping-header     { border-bottom-color: #F0E1CC; }
+[data-theme="light"] .shopping-title      { color: #3D2817; }
+[data-theme="light"] .shopping-item       { border-bottom-color: #F0E1CC; }
+[data-theme="light"] .shopping-item-name  { color: #3D2817; }
+[data-theme="light"] .shopping-item-amount { color: #8B6F4E; }
 
 /* ── Recipes page ── */
-[data-theme="light"] .recipe-card        { background: #ffffff; border-color: #dde8e1; }
-[data-theme="light"] .recipe-name        { color: #1a2e1e; }
-[data-theme="light"] .recipe-macros      { color: rgba(0,0,0,0.4); }
-[data-theme="light"] .cuisine-toggle-row { background: rgba(0,0,0,0.04); border-color: #dde8e1; }
-[data-theme="light"] .cuisine-btn        { color: rgba(0,0,0,0.4); }
-[data-theme="light"] .category-chip      { background: rgba(0,0,0,0.05); color: rgba(0,0,0,0.45); }
-[data-theme="light"] .category-chip.active { background: rgba(126,217,154,0.15); }
+[data-theme="light"] .recipe-card        { background: #FFFFFF; border-color: #E8D9C2; }
+[data-theme="light"] .recipe-name        { color: #3D2817; }
+[data-theme="light"] .recipe-macros      { color: #8B6F4E; }
+[data-theme="light"] .cuisine-toggle-row { background: #F0E1CC; border-color: #E8D9C2; }
+[data-theme="light"] .cuisine-btn        { color: #8B6F4E; }
+[data-theme="light"] .category-chip      { background: #F0E1CC; color: #8B6F4E; }
+[data-theme="light"] .category-chip.active { background: rgba(168,90,31,0.15); color: #A85A1F; }
 
 /* ── Exercise / workout page ── */
 [data-theme="light"] .split-card,
 [data-theme="light"] .exercise-card,
-[data-theme="light"] .workout-card       { background: #ffffff; border-color: #dde8e1; }
+[data-theme="light"] .workout-card       { background: #FFFFFF; border-color: #E8D9C2; }
 [data-theme="light"] .split-name,
-[data-theme="light"] .exercise-name      { color: #1a2e1e; }
+[data-theme="light"] .exercise-name      { color: #3D2817; }
 [data-theme="light"] .exercise-meta,
-[data-theme="light"] .split-meta         { color: rgba(0,0,0,0.4); }
-[data-theme="light"] .muscle-chip        { background: rgba(0,0,0,0.05); color: rgba(0,0,0,0.45); }
-[data-theme="light"] .muscle-chip.active { background: rgba(126,217,154,0.15); }
-[data-theme="light"] .week-day           { background: rgba(0,0,0,0.03); border-color: #dde8e1; color: rgba(0,0,0,0.45); }
-[data-theme="light"] .week-day.active    { background: rgba(126,217,154,0.1); }
+[data-theme="light"] .split-meta         { color: #8B6F4E; }
+[data-theme="light"] .muscle-chip        { background: #F0E1CC; color: #8B6F4E; }
+[data-theme="light"] .muscle-chip.active { background: rgba(168,90,31,0.15); color: #A85A1F; }
+[data-theme="light"] .week-day           { background: #F0E1CC; border-color: transparent; color: #8B6F4E; }
+[data-theme="light"] .week-day.today     { background: rgba(168,90,31,0.12); border-color: #A85A1F; }
+[data-theme="light"] .week-day.today .week-day-name   { color: #A85A1F; }
+[data-theme="light"] .week-day.today .week-day-muscle { color: rgba(168,90,31,0.7); }
 
 /* ── Admin page ── */
-[data-theme="light"] .admin-item         { background: #ffffff; border-color: #dde8e1; }
-[data-theme="light"] .admin-item-name    { color: #1a2e1e; }
-[data-theme="light"] .admin-item-meta    { color: rgba(0,0,0,0.4); }
-[data-theme="light"] .tab-btn            { color: rgba(0,0,0,0.4); background: rgba(0,0,0,0.04); }
-[data-theme="light"] .tab-btn.active     { background: rgba(126,217,154,0.12); color: #5ab87a; }
-[data-theme="light"] .select-input       { background: rgba(0,0,0,0.04); border-color: #dde8e1; color: #1a2e1e; }
-[data-theme="light"] .macro-display-card { background: rgba(0,0,0,0.03); border-color: #dde8e1; }
-[data-theme="light"] .macro-display-val  { color: #1a2e1e; }
-[data-theme="light"] .macro-display-lbl  { color: rgba(0,0,0,0.4); }
-[data-theme="light"] .added-ing-row      { background: rgba(0,0,0,0.03); border-color: #dde8e1; }
-[data-theme="light"] .added-ing-name     { color: rgba(0,0,0,0.75); }
-[data-theme="light"] .added-ing-amount   { background: rgba(0,0,0,0.04); border-color: #dde8e1; color: #1a2e1e; }
-[data-theme="light"] .ing-result-item    { border-bottom-color: rgba(0,0,0,0.06); }
-[data-theme="light"] .ing-result-item span { color: rgba(0,0,0,0.75); }
-[data-theme="light"] .ing-result-macros  { color: rgba(0,0,0,0.4); }
+[data-theme="light"] .admin-item         { background: #FFFFFF; border-color: #E8D9C2; }
+[data-theme="light"] .admin-item-name    { color: #3D2817; }
+[data-theme="light"] .admin-item-meta    { color: #8B6F4E; }
+[data-theme="light"] .tab-btn            { color: #8B6F4E; background: #F0E1CC; }
+[data-theme="light"] .tab-btn.active     { background: rgba(168,90,31,0.12); color: #A85A1F; }
+[data-theme="light"] .select-input       { background: #F0E1CC; border-color: #E8D9C2; color: #3D2817; }
+[data-theme="light"] .macro-display-card { background: #F0E1CC; border-color: #E8D9C2; }
+[data-theme="light"] .macro-display-val  { color: #3D2817; }
+[data-theme="light"] .macro-display-lbl  { color: #8B6F4E; }
+[data-theme="light"] .added-ing-row      { background: #F0E1CC; border-color: #E8D9C2; }
+[data-theme="light"] .added-ing-name     { color: #3D2817; }
+[data-theme="light"] .added-ing-amount   { background: #FFFFFF; border-color: #E8D9C2; color: #3D2817; }
+[data-theme="light"] .ing-result-item    { border-bottom-color: #F0E1CC; }
+[data-theme="light"] .ing-result-item span { color: #3D2817; }
+[data-theme="light"] .ing-result-macros  { color: #8B6F4E; }
 
 /* ── Login page ── */
-[data-theme="light"] .login-card   { background: #ffffff; border-color: #dde8e1; }
-[data-theme="light"] .login-title  { color: #1a2e1e; }
-[data-theme="light"] .login-sub    { color: rgba(0,0,0,0.45); }
-
-/* ── Nav items (alias for nav-tab used on exercise/recipes pages) ── */
-[data-theme="light"] .nav-item       { color: rgba(0,0,0,0.3); }
-[data-theme="light"] .nav-item.active { color: #7ed99a; }
+[data-theme="light"] .login-card   { background: #FFFFFF; border-color: #E8D9C2; }
+[data-theme="light"] .login-title  { color: #3D2817; }
+[data-theme="light"] .login-sub    { color: #8B6F4E; }
 
 /* ── Home page (index.html inline styles) ── */
-[data-theme="light"] .ring-val        { color: #1a2e1e !important; }
-[data-theme="light"] .ring-goal       { color: rgba(0,0,0,0.4) !important; }
-[data-theme="light"] .mini-ring-card  { background: #ffffff !important; border-color: #dde8e1 !important; }
-[data-theme="light"] .mini-ring-name  { color: rgba(0,0,0,0.4) !important; }
-[data-theme="light"] .mini-ring-val   { color: #1a2e1e !important; }
-[data-theme="light"] .mini-ring-goal  { color: rgba(0,0,0,0.35) !important; }
-[data-theme="light"] .streak-card     { background: #ffffff !important; border-color: #dde8e1 !important; }
-[data-theme="light"] .streak-label    { color: rgba(0,0,0,0.4) !important; }
-[data-theme="light"] .today-workout-card { background: #ffffff !important; }
-[data-theme="light"] .workout-name    { color: #1a2e1e !important; }
-[data-theme="light"] .workout-name.empty { color: rgba(0,0,0,0.35) !important; }
-[data-theme="light"] .workout-label   { color: rgba(126,217,154,0.6); }
-[data-theme="light"] .quick-btn       { background: #ffffff !important; border-color: #dde8e1 !important; color: rgba(0,0,0,0.65) !important; }
-[data-theme="light"] .coach-msg-home  { background: rgba(126,217,154,0.07); border-color: rgba(126,217,154,0.2); }
-[data-theme="light"] .coach-msg-text  { color: rgba(0,0,0,0.55) !important; }
+[data-theme="light"] .ring-val        { color: #3D2817 !important; }
+[data-theme="light"] .ring-goal       { color: #8B6F4E !important; }
+[data-theme="light"] .mini-ring-card  { background: #FFFFFF !important; border-color: #E8D9C2 !important; }
+[data-theme="light"] .mini-ring-name  { color: #8B6F4E !important; }
+[data-theme="light"] .mini-ring-val   { color: #3D2817 !important; }
+[data-theme="light"] .mini-ring-goal  { color: #B8A082 !important; }
+[data-theme="light"] .streak-card     { background: #FFFFFF !important; border-color: #E8D9C2 !important; }
+[data-theme="light"] .streak-label    { color: #8B6F4E !important; }
+[data-theme="light"] .today-workout-card { background: #FFFFFF !important; }
+[data-theme="light"] .workout-name    { color: #3D2817 !important; }
+[data-theme="light"] .workout-name.empty { color: #B8A082 !important; }
+[data-theme="light"] .workout-label   { color: rgba(168,90,31,0.7); }
+[data-theme="light"] .quick-btn       { background: #FFFFFF !important; border-color: #E8D9C2 !important; color: #3D2817 !important; }
+[data-theme="light"] .coach-msg-home  { background: rgba(168,90,31,0.07); border-color: rgba(168,90,31,0.2); }
+[data-theme="light"] .coach-msg-text  { color: #3D2817 !important; }
 
 /* ── Exercise page modals (inline styles overridden with !important) ── */
-[data-theme="light"] #setPopupModal h2  { color: #1a2e1e !important; }
-[data-theme="light"] #setPopupModal p   { color: rgba(0,0,0,0.4) !important; }
-[data-theme="light"] #chooseSetB        { background: rgba(0,0,0,0.04) !important; border-color: rgba(0,0,0,0.15) !important; color: rgba(0,0,0,0.65) !important; }
-[data-theme="light"] #customSplitModal p { color: rgba(0,0,0,0.4) !important; }
-[data-theme="light"] #addCustomDay      { background: rgba(0,0,0,0.04) !important; border-color: rgba(0,0,0,0.12) !important; color: rgba(0,0,0,0.5) !important; }
+[data-theme="light"] #setPopupModal h2  { color: #3D2817 !important; }
+[data-theme="light"] #setPopupModal p   { color: #8B6F4E !important; }
+[data-theme="light"] #chooseSetB        { background: #F0E1CC !important; border-color: #E8D9C2 !important; color: #3D2817 !important; }
+[data-theme="light"] #customSplitModal p { color: #8B6F4E !important; }
+[data-theme="light"] #addCustomDay      { background: #F0E1CC !important; border-color: #E8D9C2 !important; color: #8B6F4E !important; }
 
 /* ── Misc ── */
-[data-theme="light"] .section-label { color: rgba(0,0,0,0.3); }
-[data-theme="light"] .page-title    { color: #1a2e1e; }
+[data-theme="light"] .section-label { color: #B8A082; }
+[data-theme="light"] .page-title    { color: #3D2817; }
+
+/* ══════════════════════════════════════════════════════════
+   WARM THEME — Deep Brown + Warm Gold
+   Applied via data-theme="warm" on <html>.
+   Accent: #E8B547 (warm gold). Dark base with cream text.
+   ══════════════════════════════════════════════════════════ */
+[data-theme="warm"] {
+  --bg:          #1A1410;
+  --card:        #2A2118;
+  --border:      #3D2F1F;
+  --text:        #F2E6CC;
+  --text-dim:    #8A7558;
+  --text-faint:  #5A4A35;
+  --green:       #E8B547;          /* accent override */
+  --green-muted: #B89238;
+  --green-dark:  rgba(232,181,71,0.25);
+  color-scheme:  dark;
+}
+
+/* ── Body & header ── */
+[data-theme="warm"] body          { background: #1A1410; color: #F2E6CC; }
+[data-theme="warm"] .app-header   { background: #1A1410; border-bottom-color: #3D2F1F; }
+[data-theme="warm"] .app-header-title,
+[data-theme="warm"] .app-logo     { color: #F2E6CC; }
+[data-theme="warm"] .header-date  { color: #8A7558; }
+
+/* ── Bottom nav ── */
+[data-theme="warm"] .bottom-nav   { background: #120D0A; border-top-color: #3D2F1F; }
+[data-theme="warm"] .nav-tab,
+[data-theme="warm"] .nav-item     { color: #5A4A35; }
+[data-theme="warm"] .nav-tab.active,
+[data-theme="warm"] .nav-item.active { color: #E8B547; }
+[data-theme="warm"] .home-tab-ring { background: #E8B547; }
+[data-theme="warm"] .home-tab-ring .home-tab-icon { color: #1A1410; }
+
+/* ── Segmented control ── */
+[data-theme="warm"] .seg-btn       { color: #8A7558; }
+[data-theme="warm"] .seg-btn.active { background: #2A2118; color: #F2E6CC;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4); }
+
+/* ── Cards / surfaces ── */
+[data-theme="warm"] .card,
+[data-theme="warm"] .section-group,
+[data-theme="warm"] .meal-section,
+[data-theme="warm"] .settings-card,
+[data-theme="warm"] .macro-ring-card { background: #2A2118; border-color: #3D2F1F; }
+
+/* ── Section rows ── */
+[data-theme="warm"] .section-row       { border-bottom-color: #3D2F1F; }
+[data-theme="warm"] .section-row:hover { background: #3D2F1F; }
+[data-theme="warm"] .section-row-label { color: #F2E6CC; }
+[data-theme="warm"] .section-row-value { color: #8A7558; }
+[data-theme="warm"] .section-row-icon.muted { background: #3D2F1F; }
+
+/* ── Modals ── */
+[data-theme="warm"] .modal           { background: #2A2118; border-color: #3D2F1F; }
+[data-theme="warm"] .modal-header h2,
+[data-theme="warm"] .modal h2        { color: #F2E6CC; }
+[data-theme="warm"] .modal-close     { background: #3D2F1F; color: #8A7558; }
+[data-theme="warm"] .modal-divider   { color: #5A4A35; }
+
+/* ── Forms / inputs ── */
+[data-theme="warm"] .form-group input,
+[data-theme="warm"] .form-input,
+[data-theme="warm"] .search-input,
+[data-theme="warm"] .time-input       { background: #3D2F1F; border-color: #3D2F1F; color: #F2E6CC; }
+[data-theme="warm"] .form-group input::placeholder,
+[data-theme="warm"] .form-input::placeholder,
+[data-theme="warm"] .search-input::placeholder { color: #5A4A35; }
+[data-theme="warm"] .form-group label { color: #8A7558; }
+[data-theme="warm"] .unit             { color: #8A7558; }
+
+/* ── Buttons ── */
+[data-theme="warm"] .toggle-btn      { background: #3D2F1F; border-color: #3D2F1F; color: #8A7558; }
+[data-theme="warm"] .option-btn      { background: #3D2F1F; border-color: #3D2F1F; color: #8A7558; }
+[data-theme="warm"] .goal-btn        { background: #3D2F1F; border-color: #3D2F1F; }
+[data-theme="warm"] .goal-title      { color: #F2E6CC; }
+[data-theme="warm"] .goal-desc       { color: #8A7558; }
+[data-theme="warm"] .secondary-btn   { background: #3D2F1F; border-color: #3D2F1F; color: #8A7558; }
+[data-theme="warm"] .secondary-btn:hover { background: #4D3D2A; }
+
+/* ── Meal sections ── */
+[data-theme="warm"] .meal-header     { border-bottom-color: #3D2F1F; }
+[data-theme="warm"] .meal-name       { color: #F2E6CC; }
+[data-theme="warm"] .meal-total      { color: #8A7558; }
+[data-theme="warm"] .meal-item       { border-bottom-color: #3D2F1F; }
+[data-theme="warm"] .meal-item-name  { color: #F2E6CC; }
+[data-theme="warm"] .meal-item-macros { color: #8A7558; }
+
+/* ── Macro rings ── */
+[data-theme="warm"] .macro-ring-val    { color: #E8B547; }
+[data-theme="warm"] .macro-ring-target { color: #5A4A35; }
+[data-theme="warm"] .macro-ring-lbl    { color: #5A4A35; }
+[data-theme="warm"] .macro-ring-bar    { background: #3D2F1F; }
+
+/* ── Coach bar ── */
+[data-theme="warm"] .coach-bar  { background: #2A2118; border-color: #3D2F1F; }
+[data-theme="warm"] .coach-text { color: #F2E6CC; }
+
+/* ── Onboarding card ── */
+[data-theme="warm"] .onboarding-card { background: #2A2118; border-color: #3D2F1F; }
+[data-theme="warm"] .onboarding-card h2 { color: #F2E6CC; }
+[data-theme="warm"] .onboarding-card p  { color: #8A7558; }
+[data-theme="warm"] .info-box { background: #3D2F1F; border-color: #3D2F1F; }
+[data-theme="warm"] .info-title { color: #F2E6CC; }
+[data-theme="warm"] .info-desc  { color: #8A7558; }
+
+/* ── Profile page ── */
+[data-theme="warm"] .user-card        { background: #2A2118; border-color: #3D2F1F; }
+[data-theme="warm"] .user-name        { color: #F2E6CC; }
+[data-theme="warm"] .user-email       { color: #5A4A35; }
+[data-theme="warm"] .stat-pill        { background: #2A2118; border-color: #3D2F1F; }
+[data-theme="warm"] .stat-lbl         { color: #5A4A35; }
+[data-theme="warm"] .settings-group   { background: #2A2118; border-color: #3D2F1F; }
+[data-theme="warm"] .settings-section.green .settings-group { border-color: rgba(232,181,71,0.3); }
+[data-theme="warm"] .settings-section.blue  .settings-group { border-color: rgba(91,200,245,0.3); }
+[data-theme="warm"] .settings-section.orange .settings-group { border-color: rgba(245,166,35,0.3); }
+[data-theme="warm"] .settings-section.purple .settings-group { border-color: rgba(167,139,250,0.3); }
+[data-theme="warm"] .settings-row        { border-bottom-color: #3D2F1F; }
+[data-theme="warm"] .settings-row-label  { color: #F2E6CC; }
+[data-theme="warm"] .settings-row-value  { color: #8A7558; }
+[data-theme="warm"] .green-btn { background: rgba(232,181,71,0.12); color: #E8B547; }
+
+/* ── Edit profile sheet ── */
+[data-theme="warm"] .ep-overlay  { background: rgba(0,0,0,0.6); }
+[data-theme="warm"] .ep-sheet    { background: #1A1410; }
+[data-theme="warm"] .ep-header   { background: #1A1410; border-bottom-color: #3D2F1F; }
+[data-theme="warm"] .ep-title    { color: #F2E6CC; }
+[data-theme="warm"] .ep-handle   { background: #5A4A35; }
+[data-theme="warm"] .ep-close    { background: #3D2F1F; color: #8A7558; }
+[data-theme="warm"] .ep-group label { color: #8A7558; }
+[data-theme="warm"] .ep-input    { background: #3D2F1F; border-color: #3D2F1F; color: #F2E6CC; }
+[data-theme="warm"] .ep-input::placeholder { color: #5A4A35; }
+[data-theme="warm"] .ep-unit-toggle { background: #3D2F1F; }
+[data-theme="warm"] .ep-unit-btn    { color: #8A7558; }
+[data-theme="warm"] .ep-option-btn  { background: #3D2F1F; border-color: #3D2F1F; color: #8A7558; }
+[data-theme="warm"] .ep-goal-btn    { background: #3D2F1F; border-color: #3D2F1F; color: #F2E6CC; }
+[data-theme="warm"] .ep-goal-desc   { color: #8A7558; }
+[data-theme="warm"] .ep-goal-btn.active .ep-goal-desc { color: rgba(232,181,71,0.85); }
+
+/* ── Progress tab ── */
+[data-theme="warm"] .prog-stat-card  { background: #2A2118; border-color: #3D2F1F; }
+[data-theme="warm"] .prog-stat-lbl   { color: #5A4A35; }
+[data-theme="warm"] .prog-stat-note  { color: #5A4A35; }
+[data-theme="warm"] .prog-stat-note.good { color: #E8B547; }
+[data-theme="warm"] .prog-stat-note.warn { color: #d4891c; }
+[data-theme="warm"] .chart-card       { background: #2A2118; border-color: #3D2F1F; }
+[data-theme="warm"] .chart-card-title { color: #F2E6CC; }
+[data-theme="warm"] .chart-card-unit  { color: #5A4A35; }
+[data-theme="warm"] .chart-reset-btn  { color: #e07070; background: rgba(224,92,92,0.1); border-color: rgba(224,92,92,0.3); }
+[data-theme="warm"] .progress-form    { background: #2A2118; }
+
+/* ── Food / add modal ── */
+[data-theme="warm"] .food-item        { border-bottom-color: #3D2F1F; }
+[data-theme="warm"] .food-item-name   { color: #F2E6CC; }
+[data-theme="warm"] .food-item-macros { color: #8A7558; }
+
+/* ── Planner ── */
+[data-theme="warm"] .planner-meal-card   { background: #2A2118; border-color: #3D2F1F; }
+[data-theme="warm"] .planner-meal-name   { color: #F2E6CC; }
+[data-theme="warm"] .planner-meal-macros { color: #8A7558; }
+[data-theme="warm"] .planner-meal-label  { color: #8A7558; }
+[data-theme="warm"] .planner-total-item  { background: #3D2F1F; border-color: #3D2F1F; }
+[data-theme="warm"] .planner-total-val   { color: #F2E6CC; }
+[data-theme="warm"] .planner-total-lbl   { color: #8A7558; }
+[data-theme="warm"] .planner-targets     { background: #3D2F1F; border-color: #3D2F1F; }
+[data-theme="warm"] .planner-target-val  { color: #F2E6CC; }
+[data-theme="warm"] .planner-target-lbl  { color: #8A7558; }
+[data-theme="warm"] .planner-mode-btn,
+[data-theme="warm"] .planner-cuisine-btn { color: #8A7558; background: #3D2F1F; }
+[data-theme="warm"] .planner-mode-toggle,
+[data-theme="warm"] .planner-cuisine-toggle { background: #3D2F1F; }
+[data-theme="warm"] .swap-item           { border-bottom-color: #3D2F1F; }
+[data-theme="warm"] .swap-item-name      { color: #F2E6CC; }
+[data-theme="warm"] .swap-item-macros    { color: #8A7558; }
+
+/* ── Shopping list ── */
+[data-theme="warm"] .shopping-list       { background: #2A2118; border-color: #3D2F1F; }
+[data-theme="warm"] .shopping-header     { border-bottom-color: #3D2F1F; }
+[data-theme="warm"] .shopping-title      { color: #F2E6CC; }
+[data-theme="warm"] .shopping-item       { border-bottom-color: #3D2F1F; }
+[data-theme="warm"] .shopping-item-name  { color: #F2E6CC; }
+[data-theme="warm"] .shopping-item-amount { color: #8A7558; }
+
+/* ── Recipes page ── */
+[data-theme="warm"] .recipe-card        { background: #2A2118; border-color: #3D2F1F; }
+[data-theme="warm"] .recipe-name        { color: #F2E6CC; }
+[data-theme="warm"] .recipe-macros      { color: #8A7558; }
+[data-theme="warm"] .cuisine-toggle-row { background: #3D2F1F; border-color: #3D2F1F; }
+[data-theme="warm"] .cuisine-btn        { color: #8A7558; }
+[data-theme="warm"] .category-chip      { background: #3D2F1F; color: #8A7558; }
+[data-theme="warm"] .category-chip.active { background: rgba(232,181,71,0.15); color: #E8B547; }
+
+/* ── Exercise / workout page ── */
+[data-theme="warm"] .split-card,
+[data-theme="warm"] .exercise-card,
+[data-theme="warm"] .workout-card       { background: #2A2118; border-color: #3D2F1F; }
+[data-theme="warm"] .split-name,
+[data-theme="warm"] .exercise-name      { color: #F2E6CC; }
+[data-theme="warm"] .exercise-meta,
+[data-theme="warm"] .split-meta         { color: #8A7558; }
+[data-theme="warm"] .muscle-chip        { background: #3D2F1F; color: #8A7558; }
+[data-theme="warm"] .muscle-chip.active { background: rgba(232,181,71,0.15); color: #E8B547; }
+[data-theme="warm"] .week-day           { background: #3D2F1F; border-color: transparent; color: #8A7558; }
+[data-theme="warm"] .week-day.today     { background: rgba(232,181,71,0.12); border-color: #E8B547; }
+[data-theme="warm"] .week-day.today .week-day-name   { color: #E8B547; }
+[data-theme="warm"] .week-day.today .week-day-muscle { color: rgba(232,181,71,0.7); }
+
+/* ── Admin page ── */
+[data-theme="warm"] .admin-item         { background: #2A2118; border-color: #3D2F1F; }
+[data-theme="warm"] .admin-item-name    { color: #F2E6CC; }
+[data-theme="warm"] .admin-item-meta    { color: #8A7558; }
+[data-theme="warm"] .tab-btn            { color: #8A7558; background: #3D2F1F; }
+[data-theme="warm"] .tab-btn.active     { background: rgba(232,181,71,0.12); color: #E8B547; }
+[data-theme="warm"] .select-input       { background: #3D2F1F; border-color: #3D2F1F; color: #F2E6CC; }
+[data-theme="warm"] .macro-display-card { background: #3D2F1F; border-color: #3D2F1F; }
+[data-theme="warm"] .macro-display-val  { color: #F2E6CC; }
+[data-theme="warm"] .macro-display-lbl  { color: #8A7558; }
+[data-theme="warm"] .added-ing-row      { background: #3D2F1F; border-color: #3D2F1F; }
+[data-theme="warm"] .added-ing-name     { color: #F2E6CC; }
+[data-theme="warm"] .added-ing-amount   { background: #2A2118; border-color: #3D2F1F; color: #F2E6CC; }
+[data-theme="warm"] .ing-result-item    { border-bottom-color: #3D2F1F; }
+[data-theme="warm"] .ing-result-item span { color: #F2E6CC; }
+[data-theme="warm"] .ing-result-macros  { color: #8A7558; }
+
+/* ── Login page ── */
+[data-theme="warm"] .login-card   { background: #2A2118; border-color: #3D2F1F; }
+[data-theme="warm"] .login-title  { color: #F2E6CC; }
+[data-theme="warm"] .login-sub    { color: #8A7558; }
+
+/* ── Home page (index.html inline styles) ── */
+[data-theme="warm"] .ring-val        { color: #F2E6CC !important; }
+[data-theme="warm"] .ring-goal       { color: #8A7558 !important; }
+[data-theme="warm"] .mini-ring-card  { background: #2A2118 !important; border-color: #3D2F1F !important; }
+[data-theme="warm"] .mini-ring-name  { color: #8A7558 !important; }
+[data-theme="warm"] .mini-ring-val   { color: #F2E6CC !important; }
+[data-theme="warm"] .mini-ring-goal  { color: #5A4A35 !important; }
+[data-theme="warm"] .streak-card     { background: #2A2118 !important; border-color: #3D2F1F !important; }
+[data-theme="warm"] .streak-label    { color: #8A7558 !important; }
+[data-theme="warm"] .today-workout-card { background: #2A2118 !important; }
+[data-theme="warm"] .workout-name    { color: #F2E6CC !important; }
+[data-theme="warm"] .workout-name.empty { color: #5A4A35 !important; }
+[data-theme="warm"] .workout-label   { color: rgba(232,181,71,0.7); }
+[data-theme="warm"] .quick-btn       { background: #2A2118 !important; border-color: #3D2F1F !important; color: #F2E6CC !important; }
+[data-theme="warm"] .coach-msg-home  { background: rgba(232,181,71,0.07); border-color: rgba(232,181,71,0.2); }
+[data-theme="warm"] .coach-msg-text  { color: #F2E6CC !important; }
+
+/* ── Exercise page modals (inline styles overridden with !important) ── */
+[data-theme="warm"] #setPopupModal h2  { color: #F2E6CC !important; }
+[data-theme="warm"] #setPopupModal p   { color: #8A7558 !important; }
+[data-theme="warm"] #chooseSetB        { background: #3D2F1F !important; border-color: #3D2F1F !important; color: #F2E6CC !important; }
+[data-theme="warm"] #customSplitModal p { color: #8A7558 !important; }
+[data-theme="warm"] #addCustomDay      { background: #3D2F1F !important; border-color: #3D2F1F !important; color: #8A7558 !important; }
+
+/* ── Misc ── */
+[data-theme="warm"] .section-label { color: #5A4A35; }
+[data-theme="warm"] .page-title    { color: #F2E6CC; }
 
 /* ── INLINE FIELD VALIDATION ─────────────────────────────── */
 .field-error {

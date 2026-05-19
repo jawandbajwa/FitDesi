@@ -237,9 +237,14 @@
 }
 
 /* Light theme overrides for the toggle itself */
-[data-theme="light"] .theme-seg          { background: rgba(0,0,0,0.07); }
-[data-theme="light"] .theme-seg-btn      { color: rgba(0,0,0,0.35); }
-[data-theme="light"] .theme-seg-btn.active { background: rgba(126,217,154,0.15); color: #3d9960; box-shadow: 0 0 0 1.5px #3d9960; }
+[data-theme="light"] .theme-seg          { background: #F0E1CC; }
+[data-theme="light"] .theme-seg-btn      { color: #8B6F4E; }
+[data-theme="light"] .theme-seg-btn.active { background: rgba(168,90,31,0.15); color: #A85A1F; box-shadow: 0 0 0 1.5px #A85A1F; }
+
+/* Warm theme overrides for the toggle itself */
+[data-theme="warm"] .theme-seg          { background: #3D2F1F; }
+[data-theme="warm"] .theme-seg-btn      { color: #8A7558; }
+[data-theme="warm"] .theme-seg-btn.active { background: rgba(232,181,71,0.15); color: #E8B547; box-shadow: 0 0 0 1.5px #E8B547; }
 
 /* ── EDIT PROFILE BOTTOM SHEET ───────────────────────────────── */
 .ep-overlay {

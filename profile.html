@@ -22,8 +22,9 @@
     <link rel="apple-touch-icon" href="icon-192.png" />
     <script>
       try {
-        if (localStorage.getItem("fitdesi_theme") === "light")
-          document.documentElement.setAttribute("data-theme", "light");
+        var t = localStorage.getItem("fitdesi_theme");
+        if (t === "light" || t === "warm")
+          document.documentElement.setAttribute("data-theme", t);
       } catch (e) {}
     </script>
     <link rel="stylesheet" href="style.css" />
@@ -122,8 +123,9 @@
           <div class="settings-row last">
             <span class="settings-row-label">Theme</span>
             <div class="theme-seg">
-              <button class="theme-seg-btn" id="themeBtnDark">Dark</button>
               <button class="theme-seg-btn" id="themeBtnLight">Light</button>
+              <button class="theme-seg-btn" id="themeBtnWarm">Warm</button>
+              <button class="theme-seg-btn" id="themeBtnDark">Dark</button>
             </div>
           </div>
         </div>
@@ -156,7 +158,7 @@
         <div class="settings-group">
           <div class="settings-row">
             <span class="settings-row-label">App Version</span>
-            <span class="settings-row-value">4.0.0</span>
+            <span class="settings-row-value">4.1.0</span>
           </div>
           <div class="settings-row">
             <span class="settings-row-label">Data Storage</span>
@@ -959,37 +961,29 @@
           );
       })();
 
-      // ── Theme toggle ──────────────────────────────────────────
+      // ── Theme picker (3 themes: light / warm / dark) ──────────
       function applyTheme(theme) {
-        if (theme === "light") {
-          document.documentElement.setAttribute("data-theme", "light");
+        if (theme === "light" || theme === "warm") {
+          document.documentElement.setAttribute("data-theme", theme);
         } else {
           document.documentElement.removeAttribute("data-theme");
+          theme = "dark";
         }
         localStorage.setItem("fitdesi_theme", theme);
-        document
-          .getElementById("themeBtnDark")
-          .classList.toggle("active", theme === "dark" || theme === null);
-        document
-          .getElementById("themeBtnLight")
-          .classList.toggle("active", theme === "light");
+        document.getElementById("themeBtnLight").classList.toggle("active", theme === "light");
+        document.getElementById("themeBtnWarm").classList.toggle("active", theme === "warm");
+        document.getElementById("themeBtnDark").classList.toggle("active", theme === "dark");
       }
 
       // Init active state (theme already applied by inline script in <head>)
       const _t = localStorage.getItem("fitdesi_theme") || "dark";
-      document
-        .getElementById("themeBtnDark")
-        .classList.toggle("active", _t !== "light");
-      document
-        .getElementById("themeBtnLight")
-        .classList.toggle("active", _t === "light");
+      document.getElementById("themeBtnLight").classList.toggle("active", _t === "light");
+      document.getElementById("themeBtnWarm").classList.toggle("active", _t === "warm");
+      document.getElementById("themeBtnDark").classList.toggle("active", _t !== "light" && _t !== "warm");
 
-      document
-        .getElementById("themeBtnDark")
-        .addEventListener("click", () => applyTheme("dark"));
-      document
-        .getElementById("themeBtnLight")
-        .addEventListener("click", () => applyTheme("light"));
+      document.getElementById("themeBtnLight").addEventListener("click", () => applyTheme("light"));
+      document.getElementById("themeBtnWarm").addEventListener("click", () => applyTheme("warm"));
+      document.getElementById("themeBtnDark").addEventListener("click", () => applyTheme("dark"));
     </script>
 
     <!-- Coach -->
