@@ -213,29 +213,62 @@ wrangler deploy
 ## Versioning
 
 Version is stored in two places: `manifest.json` and `profile.html` (About section).
-Current version: **3.2.0**
+Current version: **4.2.0**
 
 Rules:
 - Small change → `node bump-version.js patch` (+1 patch, 0–9, rolls to minor at 10)
 - Notable update → `node bump-version.js minor` (+1 minor, 0–9, rolls to major at 10)
 - Big release → `node bump-version.js major` (+1 major)
 
-The script also bumps `sw.js` cache version automatically (current: `fitdesi-v74`).
+The script also bumps `sw.js` cache version automatically (current: `fitdesi-v81`).
 
 ---
 
 ## Key CSS Conventions
 
-- **Dark theme** is the default. All base styles are dark.
-- **Light theme** is applied via `[data-theme="light"]` on the `<html>` element.
-- All light theme overrides live at the **bottom of `style.css`** in one block.
+### 3-Theme system — Light, Warm, Dark
+- **Dark** is the default. No `data-theme` attribute on `<html>`.
+- **Light** (cream + burnt orange): `[data-theme="light"]` — accent `#A85A1F`, bg `#FAF4EC`
+- **Warm** (deep brown + gold): `[data-theme="warm"]` — accent `#E8B547`, bg `#1A1410`
+- Both override blocks live at the **bottom of `style.css`** in sequence — light first, then warm.
+- Both new themes override `--green` CSS variable so `var(--green)` references across the codebase automatically pick the right accent.
+- Theme switcher: profile.html → Display & Units → Theme (3 buttons: Light / Warm / Dark)
 - Flash prevention: every HTML page has this inline script in `<head>` before any CSS:
   ```html
-  <script>try{if(localStorage.getItem("fitdesi_theme")==="light")document.documentElement.setAttribute("data-theme","light")}catch(e){}</script>
+  <script>try{var t=localStorage.getItem("fitdesi_theme");if(t==="light"||t==="warm")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
   ```
-- CSS variables: `--bg`, `--card`, `--border`, `--text`, `--text-dim`, `--green`, `--radius`
+- CSS variables: `--bg`, `--card`, `--border`, `--text`, `--text-dim`, `--text-faint`, `--green` (accent), `--green-muted`, `--green-dark`, `--radius`
+
+### Theme palette reference
+| Variable | Light (Cream) | Warm (Gold) | Dark (default) |
+|---|---|---|---|
+| `--bg` | `#FAF4EC` | `#1A1410` | (base) |
+| `--card` | `#FFFFFF` | `#2A2118` | (base) |
+| `--border` | `#E8D9C2` | `#3D2F1F` | (base) |
+| `--text` | `#3D2817` | `#F2E6CC` | (base) |
+| `--text-dim` | `#8B6F4E` | `#8A7558` | (base) |
+| `--text-faint` | `#B8A082` | `#5A4A35` | (base) |
+| `--green` (accent) | `#A85A1F` | `#E8B547` | `#7ed99a` |
+| Track/bar bg | `#F0E1CC` | `#3D2F1F` | (base) |
+| Nav bg | `#FFFFFF` | `#120D0A` | (base) |
+| Home circle | orange fill, white icon | gold fill, dark icon | (base) |
+
+### Other CSS rules
 - Page-specific styles go in their own CSS file (e.g. `tracker.css`). Global/shared styles go in `style.css`.
 - Modals are bottom-sheets by default (`align-items: flex-end`). Exception: `#plannerModal` is centered.
+
+### Bottom Nav Icons — Canonical SVG Reference
+All 5 pages must use these exact SVG paths (verified pixel-identical). Each nav icon uses `width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"`.
+
+| Icon | Paths |
+|---|---|
+| **Recipes** (book) | `M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2` · `M7 2v20` · `M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7` |
+| **Nutrition** (bar chart) | `M18 20V10` · `M12 20V4` · `M6 20v-6` |
+| **Home** (house, `stroke-width="2"`, inside `.home-tab-ring`) | `M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z` · polyline `9 22 9 12 15 12 15 22` |
+| **Workout** (dumbbell) | `M6.5 6.5h11M6.5 17.5h11M4 12h16M4 12l-2-2M4 12l-2 2M20 12l2-2M20 12l2 2` |
+| **Profile** (person) | `M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2` · `circle cx="12" cy="7" r="4"` |
+
+Active page only changes the icon **color** (via `var(--green)`), never the shape.
 
 ---
 
@@ -243,7 +276,7 @@ The script also bumps `sw.js` cache version automatically (current: `fitdesi-v74
 
 - All Firebase operations go through `firebase.js`. Never import Firebase SDK directly in other files.
 - `localStorage` keys in use:
-  - `fitdesi_theme` — `"dark"` or `"light"`
+  - `fitdesi_theme` — `"dark"` | `"light"` | `"warm"`
   - `fitdesi_onboarding_done` — `"true"` fast-path cache so onboarding skips the Firestore read on repeat visits (source of truth is `onboardingDone` in Firestore)
   - `fitdesi_cycle_ack` — date string `"YYYY-MM-DD"`, prevents cycle popup from re-showing same day
   - `proteinGoal` — user's daily protein target (used by nav ring on all pages)
@@ -328,7 +361,7 @@ First-time user intro shown once, ever. Implemented in `onboarding.js`, triggere
 ## Common Gotchas
 
 1. **Service worker caching** — always run `node bump-version.js patch` (or `minor`/`major`) before pushing JS/CSS changes.
-2. **`nav-item` vs `nav-tab`** — exercise.html and recipes.html use `.nav-item`; tracker.html uses `.nav-tab`. Both are styled in `style.css`.
+2. **`nav-item` vs `nav-tab`** — exercise.html/recipes.html/profile.html use `.nav-item`; index.html/tracker.html use `.nav-tab`. Both are styled identically in `style.css` (aliases). **SVG icons are now standardized** across all 5 pages — see "Bottom Nav Icons" reference above. If you add a new page or edit an icon, use the canonical SVG markup so the icon shape never changes between pages.
 3. **Inline styles on modals** — some modal buttons in exercise.html have hardcoded dark colors as inline styles. Override with `!important` in style.css targeting the element's ID.
 4. **Chart.js** — loaded via CDN. Use `type: "category"` for x-axis (not `"time"` — no date adapter loaded). Always call `.destroy()` on old chart instance before creating a new one.
 5. **`deleteField()`** — imported from `firebase/firestore`, used in `clearWeightHistory` / `clearBodyFatHistory` to surgically remove one field from a progress doc without deleting the whole doc.
