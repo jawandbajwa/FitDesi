@@ -125,8 +125,8 @@ body {
 }
 
 .tab-btn.active {
-  background: rgba(126, 217, 154, 0.1);
-  border: 0.5px solid rgba(126, 217, 154, 0.25);
+  background: rgb(var(--green-rgb) / 0.1);
+  border: 0.5px solid rgb(var(--green-rgb) / 0.25);
   color: var(--green);
 }
 
@@ -170,8 +170,8 @@ body {
 }
 
 .cuisine-tab.active {
-  background: rgba(126, 217, 154, 0.1);
-  border: 0.5px solid rgba(126, 217, 154, 0.25);
+  background: rgb(var(--green-rgb) / 0.1);
+  border: 0.5px solid rgb(var(--green-rgb) / 0.25);
   color: var(--green);
 }
 
@@ -189,8 +189,8 @@ body {
 }
 
 .admin-add-btn {
-  background: rgba(126, 217, 154, 0.1);
-  border: 0.5px solid rgba(126, 217, 154, 0.3);
+  background: rgb(var(--green-rgb) / 0.1);
+  border: 0.5px solid rgb(var(--green-rgb) / 0.3);
   border-radius: 20px;
   color: var(--green);
   font-size: 12px;
@@ -201,7 +201,7 @@ body {
 }
 
 .admin-add-btn:hover {
-  background: rgba(126, 217, 154, 0.18);
+  background: rgb(var(--green-rgb) / 0.18);
   transform: translateY(-1px);
 }
 
@@ -224,7 +224,7 @@ body {
 }
 
 .search-input:focus {
-  border-color: rgba(126, 217, 154, 0.4);
+  border-color: rgb(var(--green-rgb) / 0.4);
 }
 .search-input::placeholder {
   color: rgba(255, 255, 255, 0.2);
@@ -253,7 +253,7 @@ body {
 }
 
 .admin-item:hover {
-  border-color: rgba(126, 217, 154, 0.2);
+  border-color: rgb(var(--green-rgb) / 0.2);
 }
 
 .admin-item-icon {
@@ -283,8 +283,8 @@ body {
 }
 
 .admin-edit-btn {
-  background: rgba(126, 217, 154, 0.08);
-  border: 0.5px solid rgba(126, 217, 154, 0.2);
+  background: rgb(var(--green-rgb) / 0.08);
+  border: 0.5px solid rgb(var(--green-rgb) / 0.2);
   border-radius: 8px;
   color: var(--green);
   font-size: 11px;
@@ -295,7 +295,7 @@ body {
 }
 
 .admin-edit-btn:hover {
-  background: rgba(126, 217, 154, 0.15);
+  background: rgb(var(--green-rgb) / 0.15);
 }
 
 .admin-delete-btn {
@@ -389,7 +389,7 @@ body {
 }
 
 .form-group input:focus {
-  border-color: rgba(126, 217, 154, 0.4);
+  border-color: rgb(var(--green-rgb) / 0.4);
 }
 .form-group input::placeholder {
   color: rgba(255, 255, 255, 0.15);
@@ -413,7 +413,7 @@ body {
 }
 
 .form-group textarea:focus {
-  border-color: rgba(126, 217, 154, 0.4);
+  border-color: rgb(var(--green-rgb) / 0.4);
 }
 
 .form-group textarea::placeholder {
@@ -464,7 +464,7 @@ body {
 }
 
 .option-btn.selected {
-  background: rgba(126, 217, 154, 0.12);
+  background: rgb(var(--green-rgb) / 0.12);
   border-color: var(--green);
   color: var(--green);
 }
@@ -500,7 +500,7 @@ body {
 }
 
 .ing-result-item:hover {
-  border-color: rgba(126, 217, 154, 0.3);
+  border-color: rgb(var(--green-rgb) / 0.3);
   color: rgba(255, 255, 255, 0.85);
 }
 .ing-result-macros {
@@ -519,8 +519,8 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(126, 217, 154, 0.05);
-  border: 0.5px solid rgba(126, 217, 154, 0.15);
+  background: rgb(var(--green-rgb) / 0.05);
+  border: 0.5px solid rgb(var(--green-rgb) / 0.15);
   border-radius: 10px;
   padding: 8px 12px;
 }
@@ -602,8 +602,8 @@ body {
 
 .modal {
   background: #0d1a10;
-  border: 0.5px solid rgba(126, 217, 154, 0.15);
-  border-top: 0.5px solid rgba(126, 217, 154, 0.25);
+  border: 0.5px solid rgb(var(--green-rgb) / 0.15);
+  border-top: 0.5px solid rgb(var(--green-rgb) / 0.25);
   border-radius: 20px;
   padding: 28px;
   width: 100%;
@@ -646,7 +646,7 @@ body {
 .save-btn {
   width: 100%;
   padding: 13px;
-  background: rgba(126, 217, 154, 0.12);
+  background: rgb(var(--green-rgb) / 0.12);
   border: 0.5px solid var(--green);
   border-radius: 12px;
   color: var(--green);
@@ -660,7 +660,7 @@ body {
 }
 
 .save-btn:hover {
-  background: rgba(126, 217, 154, 0.2);
+  background: rgb(var(--green-rgb) / 0.2);
 }
 
 @keyframes toastIn {
@@ -684,8 +684,8 @@ body {
 }
 
 .admin-toast.success {
-  background: rgba(126, 217, 154, 0.15);
-  border: 1px solid rgba(126, 217, 154, 0.4);
+  background: rgb(var(--green-rgb) / 0.15);
+  border: 1px solid rgb(var(--green-rgb) / 0.4);
   color: var(--green);
 }
 
