@@ -23,7 +23,7 @@
   height: 52px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid rgba(126,217,154,0.3);
+  border: 2px solid rgb(var(--green-rgb) / 0.3);
   flex-shrink: 0;
 }
 
@@ -51,8 +51,8 @@
 }
 
 .user-badge {
-  background: rgba(126,217,154,0.12);
-  border: 0.5px solid rgba(126,217,154,0.4);
+  background: rgb(var(--green-rgb) / 0.12);
+  border: 0.5px solid rgb(var(--green-rgb) / 0.4);
   color: var(--green);
   font-size: 10px;
   font-weight: 600;
@@ -143,7 +143,7 @@
 }
 
 /* Section-colored border accents */
-.settings-section.green .settings-group { border-color: rgba(126,217,154,0.12); }
+.settings-section.green .settings-group { border-color: rgb(var(--green-rgb) / 0.12); }
 .settings-section.blue  .settings-group { border-color: rgba(91,200,245,0.12); }
 .settings-section.orange .settings-group { border-color: rgba(245,166,35,0.12); }
 .settings-section.purple .settings-group { border-color: rgba(167,139,250,0.12); }
@@ -161,12 +161,12 @@
 }
 
 .green-btn {
-  background: rgba(126,217,154,0.08);
-  border: 0.5px solid rgba(126,217,154,0.25);
+  background: rgb(var(--green-rgb) / 0.08);
+  border: 0.5px solid rgb(var(--green-rgb) / 0.25);
   color: var(--green);
 }
 
-.green-btn:hover { background: rgba(126,217,154,0.14); }
+.green-btn:hover { background: rgb(var(--green-rgb) / 0.14); }
 
 /* iOS TOGGLE — styles inherited from style.css */
 
@@ -231,7 +231,7 @@
 }
 
 .theme-seg-btn.active {
-  background: rgba(126,217,154,0.12);
+  background: rgb(var(--green-rgb) / 0.12);
   color: var(--green);
   box-shadow: 0 0 0 1.5px var(--green);
 }
@@ -322,7 +322,7 @@
   font-family: inherit;
   box-sizing: border-box;
 }
-.ep-input:focus { outline: none; border-color: rgba(126,217,154,0.45); }
+.ep-input:focus { outline: none; border-color: rgb(var(--green-rgb) / 0.45); }
 
 .ep-unit-toggle {
   display: flex;
@@ -338,7 +338,7 @@
   color: rgba(255,255,255,0.4); font-size: 12px; font-weight: 600;
   cursor: pointer; font-family: inherit; transition: all 0.15s;
 }
-.ep-unit-btn.active { background: rgba(126,217,154,0.15); color: var(--green); }
+.ep-unit-btn.active { background: rgb(var(--green-rgb) / 0.15); color: var(--green); }
 
 .ep-input-row { display: flex; align-items: center; gap: 8px; }
 .ep-input-row .ep-input { flex: 1; }
@@ -355,8 +355,8 @@
   transition: all 0.15s;
 }
 .ep-option-btn.active {
-  background: rgba(126,217,154,0.12);
-  border-color: rgba(126,217,154,0.4);
+  background: rgb(var(--green-rgb) / 0.12);
+  border-color: rgb(var(--green-rgb) / 0.4);
   color: var(--green);
 }
 
@@ -371,14 +371,14 @@
   transition: all 0.15s; width: 100%;
 }
 .ep-goal-btn.active {
-  background: rgba(126,217,154,0.1);
-  border-color: rgba(126,217,154,0.35);
+  background: rgb(var(--green-rgb) / 0.1);
+  border-color: rgb(var(--green-rgb) / 0.35);
   color: var(--green);
 }
 .ep-goal-icon { font-size: 20px; flex-shrink: 0; }
 .ep-goal-title { font-size: 13px; font-weight: 600; display: block; }
 .ep-goal-desc { font-size: 11px; color: rgba(255,255,255,0.3); display: block; margin-top: 2px; }
-.ep-goal-btn.active .ep-goal-desc { color: rgba(126,217,154,0.5); }
+.ep-goal-btn.active .ep-goal-desc { color: rgb(var(--green-rgb) / 0.5); }
 
 .ep-save-btn {
   width: 100%; padding: 15px;
@@ -395,7 +395,7 @@
   bottom: calc(env(safe-area-inset-bottom, 0px) + 90px);
   left: 50%;
   transform: translateX(-50%) translateY(10px);
-  background: rgba(126,217,154,0.95);
+  background: rgb(var(--green-rgb) / 0.95);
   color: #0a1a0f; padding: 10px 20px;
   border-radius: 20px; font-size: 13px; font-weight: 600;
   opacity: 0; transition: all 0.3s;

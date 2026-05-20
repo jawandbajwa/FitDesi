@@ -5,6 +5,7 @@
   --card: #111a13;
   --border: #1a2e1e;
   --green: #7ed99a;
+  --green-rgb: 126 217 154;  /* for rgba() with alpha */
   --green-muted: #5a7a62;
   --green-dark: #3d5a44;
   --blue: #5bc8f5;
@@ -247,7 +248,7 @@ body {
   flex-shrink: 0;
 }
 
-.section-row-icon.green  { background: rgba(126,217,154,0.12); }
+.section-row-icon.green  { background: rgb(var(--green-rgb) / 0.12); }
 .section-row-icon.blue   { background: rgba(91,200,245,0.12); }
 .section-row-icon.orange { background: rgba(245,166,35,0.12); }
 .section-row-icon.purple { background: rgba(167,139,250,0.12); }
@@ -296,9 +297,9 @@ body {
 .btn-primary:hover { opacity: 0.88; }
 
 .btn-ghost {
-  background: rgba(126,217,154,0.09);
+  background: rgb(var(--green-rgb) / 0.09);
   color: var(--green);
-  border: 1px solid rgba(126,217,154,0.25);
+  border: 1px solid rgb(var(--green-rgb) / 0.25);
   border-radius: 12px;
   font-size: 14px;
   font-weight: 500;
@@ -309,7 +310,7 @@ body {
   width: 100%;
 }
 
-.btn-ghost:hover { background: rgba(126,217,154,0.15); }
+.btn-ghost:hover { background: rgb(var(--green-rgb) / 0.15); }
 
 .btn-danger {
   background: rgba(224,92,92,0.08);
@@ -392,7 +393,7 @@ body {
 
 .form-group input:focus,
 .form-input:focus,
-.search-input:focus { border-color: rgba(126,217,154,0.45); }
+.search-input:focus { border-color: rgb(var(--green-rgb) / 0.45); }
 
 .form-group input::placeholder,
 .form-input::placeholder,
@@ -417,7 +418,7 @@ body {
 }
 
 .toggle-btn.active {
-  background: rgba(126,217,154,0.12);
+  background: rgb(var(--green-rgb) / 0.12);
   border-color: var(--green);
   color: var(--green);
 }
@@ -441,7 +442,7 @@ body {
 }
 
 .option-btn.selected {
-  background: rgba(126,217,154,0.12);
+  background: rgb(var(--green-rgb) / 0.12);
   border-color: var(--green);
   color: var(--green);
 }
@@ -464,8 +465,8 @@ body {
 }
 
 .goal-btn.selected {
-  background: rgba(126,217,154,0.08);
-  border-color: rgba(126,217,154,0.4);
+  background: rgb(var(--green-rgb) / 0.08);
+  border-color: rgb(var(--green-rgb) / 0.4);
 }
 
 .goal-icon { font-size: 20px; min-width: 28px; }
@@ -586,8 +587,8 @@ body {
 }
 
 .food-item:hover {
-  border-color: rgba(126,217,154,0.3);
-  background: rgba(126,217,154,0.05);
+  border-color: rgb(var(--green-rgb) / 0.3);
+  background: rgb(var(--green-rgb) / 0.05);
 }
 
 .food-item-name { font-size: 13px; color: rgba(255,255,255,0.75); }
@@ -609,8 +610,8 @@ body {
 
 /* ─── INFO COMPONENTS ────────────────────────────────────────── */
 .info-btn {
-  background: rgba(126,217,154,0.1);
-  border: 1px solid rgba(126,217,154,0.3);
+  background: rgb(var(--green-rgb) / 0.1);
+  border: 1px solid rgb(var(--green-rgb) / 0.3);
   border-radius: 50%;
   color: var(--green);
   font-size: 10px;
@@ -627,8 +628,8 @@ body {
 }
 
 .info-box {
-  background: rgba(126,217,154,0.04);
-  border: 1px solid rgba(126,217,154,0.12);
+  background: rgb(var(--green-rgb) / 0.04);
+  border: 1px solid rgb(var(--green-rgb) / 0.12);
   border-radius: 10px;
   padding: 12px 14px;
   margin-bottom: 12px;
@@ -661,7 +662,7 @@ body {
 .spinner {
   width: 28px;
   height: 28px;
-  border: 2.5px solid rgba(126,217,154,0.15);
+  border: 2.5px solid rgb(var(--green-rgb) / 0.15);
   border-radius: 50%;
   border-top-color: var(--green);
   animation: spin 0.8s linear infinite;
@@ -769,9 +770,9 @@ body {
 .macro-result-lbl { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
 
 .coach-message {
-  background: rgba(126,217,154,0.05);
-  border: 1px solid rgba(126,217,154,0.12);
-  border-left: 3px solid rgba(126,217,154,0.4);
+  background: rgb(var(--green-rgb) / 0.05);
+  border: 1px solid rgb(var(--green-rgb) / 0.12);
+  border-left: 3px solid rgb(var(--green-rgb) / 0.4);
   border-radius: 10px;
   padding: 14px 16px;
   font-size: 13px;
@@ -804,11 +805,11 @@ body {
 
 .meal-icon { font-size: 18px; }
 .meal-name { font-size: 14px; font-weight: 500; color: rgba(255,255,255,0.85); flex: 1; }
-.meal-total { font-size: 11px; color: rgba(126,217,154,0.7); margin-right: 4px; }
+.meal-total { font-size: 11px; color: rgb(var(--green-rgb) / 0.7); margin-right: 4px; }
 
 .add-meal-btn {
-  background: rgba(126,217,154,0.09);
-  border: 1px solid rgba(126,217,154,0.2);
+  background: rgb(var(--green-rgb) / 0.09);
+  border: 1px solid rgb(var(--green-rgb) / 0.2);
   border-radius: 18px;
   color: var(--green);
   font-size: 11px;
@@ -818,7 +819,7 @@ body {
   transition: all 0.2s;
 }
 
-.add-meal-btn:hover { background: rgba(126,217,154,0.16); }
+.add-meal-btn:hover { background: rgb(var(--green-rgb) / 0.16); }
 
 .meal-items { padding: 0 14px 12px; display: flex; flex-direction: column; gap: 5px; }
 
@@ -933,8 +934,8 @@ body {
   width: calc(100% - 32px);
   margin: 12px 16px 8px;
   padding: 12px;
-  background: rgba(126,217,154,0.09);
-  border: 1px solid rgba(126,217,154,0.25);
+  background: rgb(var(--green-rgb) / 0.09);
+  border: 1px solid rgb(var(--green-rgb) / 0.25);
   border-radius: 10px;
   color: var(--green);
   font-size: 13px;
@@ -943,7 +944,7 @@ body {
   transition: background 0.2s;
 }
 
-.save-notif-btn:hover { background: rgba(126,217,154,0.16); }
+.save-notif-btn:hover { background: rgb(var(--green-rgb) / 0.16); }
 
 .reset-btn {
   width: calc(100% - 32px);
@@ -1004,8 +1005,8 @@ body {
 }
 
 .planner-mode-btn.active, .planner-cuisine-btn.active {
-  background: rgba(126,217,154,0.1);
-  border: 1px solid rgba(126,217,154,0.25);
+  background: rgb(var(--green-rgb) / 0.1);
+  border: 1px solid rgb(var(--green-rgb) / 0.25);
   color: var(--green);
 }
 
@@ -1068,15 +1069,15 @@ body {
   transition: all 0.2s;
 }
 
-.planner-swap-btn:hover { border-color: rgba(126,217,154,0.3); color: var(--green); }
+.planner-swap-btn:hover { border-color: rgb(var(--green-rgb) / 0.3); color: var(--green); }
 
 .planner-meal-name { font-size: 14px; font-weight: 500; color: rgba(255,255,255,0.85); margin-bottom: 5px; }
 .planner-meal-macros { font-size: 11px; color: var(--text-dim); }
-.planner-meal-macros span { color: rgba(126,217,154,0.7); font-weight: 500; }
+.planner-meal-macros span { color: rgb(var(--green-rgb) / 0.7); font-weight: 500; }
 
 .planner-totals {
-  background: rgba(126,217,154,0.05);
-  border: 1px solid rgba(126,217,154,0.15);
+  background: rgb(var(--green-rgb) / 0.05);
+  border: 1px solid rgb(var(--green-rgb) / 0.15);
   border-radius: 12px;
   padding: 14px;
   margin-bottom: 14px;
@@ -1090,7 +1091,7 @@ body {
 .planner-total-lbl { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 3px; }
 .planner-total-diff { font-size: 9px; margin-top: 2px; }
 .planner-total-diff.over { color: rgba(255,150,100,0.7); }
-.planner-total-diff.under { color: rgba(126,217,154,0.5); }
+.planner-total-diff.under { color: rgb(var(--green-rgb) / 0.5); }
 
 .planner-actions { display: flex; gap: 12px; margin-top: 16px; }
 
@@ -1109,7 +1110,7 @@ body {
   transition: all 0.2s;
 }
 
-.swap-item:hover { border-color: rgba(126,217,154,0.3); background: rgba(126,217,154,0.04); }
+.swap-item:hover { border-color: rgb(var(--green-rgb) / 0.3); background: rgb(var(--green-rgb) / 0.04); }
 .swap-item-name { flex: 1; font-size: 13px; color: rgba(255,255,255,0.75); }
 .swap-item-macros { font-size: 11px; color: var(--text-dim); }
 
@@ -1227,7 +1228,7 @@ body {
   flex-shrink: 0;
 }
 
-.split-pill.active { background: rgba(126,217,154,0.12); border-color: var(--green); color: var(--green); }
+.split-pill.active { background: rgb(var(--green-rgb) / 0.12); border-color: var(--green); color: var(--green); }
 
 .custom-pill {
   background: rgba(255,255,255,0.03);
@@ -1261,11 +1262,11 @@ body {
 }
 .week-day:not(.today):active { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.12); }
 
-.week-day.today { border-color: var(--green); background: rgba(126,217,154,0.08); }
+.week-day.today { border-color: var(--green); background: rgb(var(--green-rgb) / 0.08); }
 .week-day-name { font-size: 9px; color: var(--text-faint); text-transform: uppercase; }
 .week-day-muscle { font-size: 9px; color: var(--text-faint); text-align: center; line-height: 1.3; }
 .week-day.today .week-day-name { color: var(--green); }
-.week-day.today .week-day-muscle { color: rgba(126,217,154,0.6); }
+.week-day.today .week-day-muscle { color: rgb(var(--green-rgb) / 0.6); }
 
 .muscle-container { padding: 0 16px 8px; }
 .muscle-scroll { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
@@ -1284,13 +1285,13 @@ body {
   transition: all 0.2s;
 }
 
-.muscle-btn.active { background: rgba(126,217,154,0.12); border-color: var(--green); color: var(--green); }
+.muscle-btn.active { background: rgb(var(--green-rgb) / 0.12); border-color: var(--green); color: var(--green); }
 
 .exercise-grid { padding: 0 16px calc(var(--nav-h) + 16px); display: flex; flex-direction: column; gap: 10px; }
 
 .exercise-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
 .card-body { padding: 14px; }
-.card-muscle-tag { display: inline-block; background: rgba(126,217,154,0.1); color: var(--green); font-size: 10px; font-weight: 500; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+.card-muscle-tag { display: inline-block; background: rgb(var(--green-rgb) / 0.1); color: var(--green); font-size: 10px; font-weight: 500; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
 .card-title { font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
 .card-targets { font-size: 12px; color: var(--text-dim); }
 
@@ -1329,8 +1330,8 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(126,217,154,0.1);
-  border: 1px solid rgba(126,217,154,0.2);
+  background: rgb(var(--green-rgb) / 0.1);
+  border: 1px solid rgb(var(--green-rgb) / 0.2);
   border-radius: 20px;
   padding: 4px 12px;
   font-size: 12px;
@@ -1343,7 +1344,7 @@ body {
 .workout-exercises { display: flex; flex-direction: column; gap: 10px; }
 
 .workout-ex-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-.workout-ex-target { display: inline-block; background: rgba(126,217,154,0.1); color: var(--green); font-size: 10px; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+.workout-ex-target { display: inline-block; background: rgb(var(--green-rgb) / 0.1); color: var(--green); font-size: 10px; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
 .workout-ex-name { font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 12px; }
 
 .video-wrapper { position: relative; width: 100%; padding-top: 56.25%; margin-bottom: 12px; }
@@ -1354,8 +1355,8 @@ body {
 .logging-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 12px; color: var(--text-dim); }
 
 .add-set-btn {
-  background: rgba(126,217,154,0.08);
-  border: 1px solid rgba(126,217,154,0.2);
+  background: rgb(var(--green-rgb) / 0.08);
+  border: 1px solid rgb(var(--green-rgb) / 0.2);
   border-radius: 8px;
   color: var(--green);
   font-size: 12px;
@@ -1365,7 +1366,7 @@ body {
   transition: all 0.2s;
 }
 
-.add-set-btn:hover { background: rgba(126,217,154,0.14); }
+.add-set-btn:hover { background: rgb(var(--green-rgb) / 0.14); }
 
 .sets-container { display: flex; flex-direction: column; gap: 6px; }
 
@@ -1387,7 +1388,7 @@ body {
 
 .reps-input { width: 60px; }
 .weight-input { width: 70px; }
-.set-input:focus { border-color: rgba(126,217,154,0.4); }
+.set-input:focus { border-color: rgb(var(--green-rgb) / 0.4); }
 
 .remove-set-btn {
   background: none;
@@ -1437,7 +1438,7 @@ body {
   transition: all 0.15s;
 }
 
-.custom-day-option.selected { background: rgba(126,217,154,0.12); border-color: var(--green); color: var(--green); }
+.custom-day-option.selected { background: rgb(var(--green-rgb) / 0.12); border-color: var(--green); color: var(--green); }
 .custom-day-option.cardio-sel { background: rgba(245,166,35,0.1); border-color: rgba(245,166,35,0.3); color: var(--orange); }
 
 /* ─── RECIPES ────────────────────────────────────────────────── */
@@ -1491,7 +1492,7 @@ body {
   flex-shrink: 0;
 }
 
-.cat-btn.active { background: rgba(126,217,154,0.12); border-color: var(--green); color: var(--green); }
+.cat-btn.active { background: rgb(var(--green-rgb) / 0.12); border-color: var(--green); color: var(--green); }
 
 .recipe-list {
   padding: 10px 16px calc(var(--nav-h) + 16px);
@@ -1537,8 +1538,8 @@ body {
 
 .recipe-cat-tag {
   display: inline-block;
-  background: rgba(126,217,154,0.08);
-  color: rgba(126,217,154,0.65);
+  background: rgb(var(--green-rgb) / 0.08);
+  color: rgb(var(--green-rgb) / 0.65);
   font-size: 10px;
   padding: 2px 8px;
   border-radius: 6px;
@@ -1627,7 +1628,7 @@ body {
 .step-number {
   width: 24px;
   height: 24px;
-  background: rgba(126,217,154,0.12);
+  background: rgb(var(--green-rgb) / 0.12);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -1678,7 +1679,7 @@ body {
   transition: all 0.2s;
 }
 
-.meal-sel-btn.selected { background: rgba(126,217,154,0.1); border-color: var(--green); color: var(--green); }
+.meal-sel-btn.selected { background: rgb(var(--green-rgb) / 0.1); border-color: var(--green); color: var(--green); }
 .meal-sel-icon { font-size: 20px; }
 .meal-sel-name { font-size: 12px; }
 
@@ -1729,8 +1730,8 @@ body {
 .admin-item-actions { display: flex; gap: 6px; }
 
 .admin-edit-btn {
-  background: rgba(126,217,154,0.08);
-  border: 1px solid rgba(126,217,154,0.2);
+  background: rgb(var(--green-rgb) / 0.08);
+  border: 1px solid rgb(var(--green-rgb) / 0.2);
   border-radius: 8px;
   color: var(--green);
   font-size: 11px;
@@ -1777,7 +1778,7 @@ body {
   transition: all 0.2s;
 }
 
-.ing-result-item:hover { border-color: rgba(126,217,154,0.3); }
+.ing-result-item:hover { border-color: rgb(var(--green-rgb) / 0.3); }
 .ing-result-macros { font-size: 11px; color: var(--text-dim); }
 
 /* ─── iOS TOGGLE ─────────────────────────────────────────────── */
@@ -1864,8 +1865,8 @@ body {
 .edit-profile-text { font-size: 12px; color: var(--text-dim); }
 
 .edit-profile-btn {
-  background: rgba(126,217,154,0.08);
-  border: 1px solid rgba(126,217,154,0.2);
+  background: rgb(var(--green-rgb) / 0.08);
+  border: 1px solid rgb(var(--green-rgb) / 0.2);
   border-radius: 18px;
   color: var(--green);
   font-size: 11px;
@@ -1875,7 +1876,7 @@ body {
   transition: all 0.2s;
 }
 
-.edit-profile-btn:hover { background: rgba(126,217,154,0.14); }
+.edit-profile-btn:hover { background: rgb(var(--green-rgb) / 0.14); }
 
 /* Coach bar */
 .coach-bar {
@@ -1883,8 +1884,8 @@ body {
   gap: 10px;
   align-items: flex-start;
   margin: 12px 16px 12px;
-  background: rgba(126,217,154,0.05);
-  border: 1px solid rgba(126,217,154,0.12);
+  background: rgb(var(--green-rgb) / 0.05);
+  border: 1px solid rgb(var(--green-rgb) / 0.12);
   border-radius: var(--radius);
   padding: 12px 14px;
 }
@@ -2052,6 +2053,7 @@ input, select, textarea {
   --text-dim:    #8B6F4E;
   --text-faint:  #B8A082;
   --green:       #A85A1F;          /* accent override — all .nav-tab.active, var(--green) refs */
+  --green-rgb:   168 90 31;        /* for rgba() with alpha */
   --green-muted: #C97A3F;
   --green-dark:  rgba(168,90,31,0.25);
   color-scheme:  light;
@@ -2309,6 +2311,7 @@ input, select, textarea {
   --text-dim:    #8A7558;
   --text-faint:  #5A4A35;
   --green:       #E8B547;          /* accent override */
+  --green-rgb:   232 181 71;       /* for rgba() with alpha */
   --green-muted: #B89238;
   --green-dark:  rgba(232,181,71,0.25);
   color-scheme:  dark;

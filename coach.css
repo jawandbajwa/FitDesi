@@ -86,8 +86,8 @@
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background: rgba(126,217,154,0.08);
-  border: 1px solid rgba(126,217,154,0.25);
+  background: rgb(var(--green-rgb) / 0.08);
+  border: 1px solid rgb(var(--green-rgb) / 0.25);
   color: var(--green);
   font-size: 14px;
   display: flex;
@@ -103,8 +103,8 @@
   justify-self: start;
   padding: 5px 12px;
   border-radius: 20px;
-  background: rgba(126,217,154,0.08);
-  border: 1px solid rgba(126,217,154,0.25);
+  background: rgb(var(--green-rgb) / 0.08);
+  border: 1px solid rgb(var(--green-rgb) / 0.25);
   color: var(--green);
   font-size: 12px;
   font-weight: 600;
@@ -194,7 +194,7 @@
   padding: 8px 16px;
   border: 1px solid var(--border);
   border-radius: 16px;
-  background: rgba(126,217,154,0.1);
+  background: rgb(var(--green-rgb) / 0.1);
   color: var(--green);
   cursor: pointer;
   font-size: 14px;
@@ -249,7 +249,7 @@
   transition: box-shadow 0.2s;
 }
 .mic-btn.listening {
-  box-shadow: 0 0 0 3px rgba(126,217,154,0.3);
+  box-shadow: 0 0 0 3px rgb(var(--green-rgb) / 0.3);
 }
 
 /* ── Coach picker ────────────────────────────────────────────── */
@@ -286,7 +286,7 @@
 }
 .coach-pick-card.selected {
   border-color: var(--green);
-  background: rgba(126,217,154,0.1);
+  background: rgb(var(--green-rgb) / 0.1);
 }
 .coach-pick-avatar {
   width: 48px;
