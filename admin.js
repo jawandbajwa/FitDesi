@@ -35,6 +35,11 @@ let activeCuisine = "indian";
 let allUserRecipes = [];
 let userRecipesLoaded = false;
 
+// ─── CSS VARIABLE HELPER (theme-aware colors) ─────────────────
+function getGreenColor() {
+  return getComputedStyle(document.documentElement).getPropertyValue('--green').trim();
+}
+
 // ─── INLINE VALIDATION HELPER ────────────────────────────────
 function validateField(id, required = true) {
   const el = document.getElementById(id);
@@ -188,7 +193,7 @@ function renderUsers() {
     avatar.textContent = initials;
     avatar.style.cssText = `
       width: 42px; height: 42px; border-radius: 50%;
-      background: rgba(126,217,154,0.15); color: #7ed99a;
+      background: rgba(126,217,154,0.15); color: \${getGreenColor()};
       display: flex; align-items: center; justify-content: center;
       font-size: 18px; font-weight: 700; flex-shrink: 0;
     `;
@@ -211,7 +216,7 @@ function renderUsers() {
       : "No Coach";
     coachBadge.style.cssText = `
       font-size: 11px; margin-top: 4px;
-      color: ${enabled ? "#7ed99a" : "rgba(255,255,255,0.25)"};
+      color: ${enabled ? "\${getGreenColor()}" : "rgba(255,255,255,0.25)"};
     `;
 
     const joinDate = document.createElement("div");
@@ -238,8 +243,8 @@ function renderUsers() {
       cursor: pointer; border: 1.5px solid;
       flex-shrink: 0;
       background: ${enabled ? "rgba(239,68,68,0.1)" : "rgba(126,217,154,0.1)"};
-      border-color: ${enabled ? "#f87171" : "#7ed99a"};
-      color: ${enabled ? "#f87171" : "#7ed99a"};
+      border-color: ${enabled ? "#f87171" : "\${getGreenColor()}"};
+      color: ${enabled ? "#f87171" : "\${getGreenColor()}"};
     `;
 
     toggleBtn.addEventListener("click", async () => {
@@ -275,7 +280,7 @@ function renderUsers() {
       opt.style.cssText = `
         display: flex; align-items: center; gap: 8px;
         padding: 10px 12px; border-radius: 12px; cursor: pointer;
-        border: 1.5px solid ${isActive ? "#7ed99a" : "rgba(255,255,255,0.1)"};
+        border: 1.5px solid ${isActive ? "\${getGreenColor()}" : "rgba(255,255,255,0.1)"};
         background: ${isActive ? "rgba(126,217,154,0.1)" : "rgba(255,255,255,0.03)"};
         color: #fff; font-size: 13px; text-align: left;
       `;
@@ -329,8 +334,8 @@ function renderUsers() {
     editBtn.addEventListener("click", () => {
       const open = picker.style.display === "grid";
       picker.style.display = open ? "none" : "grid";
-      editBtn.style.borderColor = open ? "rgba(255,255,255,0.15)" : "#7ed99a";
-      editBtn.style.color = open ? "rgba(255,255,255,0.5)" : "#7ed99a";
+      editBtn.style.borderColor = open ? "rgba(255,255,255,0.15)" : "\${getGreenColor()}";
+      editBtn.style.color = open ? "rgba(255,255,255,0.5)" : "\${getGreenColor()}";
     });
 
     // ── Recipes button ──
@@ -360,8 +365,8 @@ function renderUsers() {
         recipesBtn.style.color = "rgba(255,255,255,0.5)";
         return;
       }
-      recipesBtn.style.borderColor = "#7ed99a";
-      recipesBtn.style.color = "#7ed99a";
+      recipesBtn.style.borderColor = "\${getGreenColor()}";
+      recipesBtn.style.color = "\${getGreenColor()}";
       recipesPanel.style.display = "block";
       recipesPanel.innerHTML = `<div style="font-size:12px;color:rgba(255,255,255,0.3);padding:10px 0">Loading recipes…</div>`;
       try {

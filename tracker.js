@@ -18,6 +18,11 @@ import {
 // ─── CONSTANTS ───────────────────────────────────────────────
 const MEALS = ["breakfast", "lunch", "snack", "dinner"];
 
+// ─── CSS VARIABLE HELPER (theme-aware colors) ─────────────────
+function getGreenColor() {
+  return getComputedStyle(document.documentElement).getPropertyValue('--green').trim();
+}
+
 // ─── INLINE VALIDATION HELPER ────────────────────────────────
 /**
  * Validates a numeric input by id.
@@ -1359,11 +1364,11 @@ function renderProgressCharts(history) {
           labels: wEntries.map((h) => fmtDate(h.date)),
           datasets: [{
             data: wEntries.map((h) => h.weight),
-            borderColor: "#7ed99a",
+            borderColor: getGreenColor(),
             backgroundColor: makeGradient(ctx, 126, 217, 154),
             borderWidth: 2,
             pointRadius: 4,
-            pointBackgroundColor: "#7ed99a",
+            pointBackgroundColor: getGreenColor(),
             pointBorderColor: "#0d1f10",
             pointBorderWidth: 2,
             tension: 0.4,

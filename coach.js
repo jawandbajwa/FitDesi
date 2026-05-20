@@ -17,6 +17,11 @@ import {
 } from "./firebase.js";
 import { COACHES, getCoach, getCoachPersonality } from "./coaches.js";
 
+// ─── CSS VARIABLE HELPER (theme-aware colors) ───────────────────
+function getGreenColor() {
+  return getComputedStyle(document.documentElement).getPropertyValue('--green').trim();
+}
+
 // ─── STATE ──────────────────────────────────────────────────────
 let currentCoach = null;
 let conversationHistory = [];
@@ -61,7 +66,7 @@ function createFloatingButton() {
   coachButton.id = "coachButton";
   coachButton.innerHTML = `
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-      <path d="M12 1C5.93 1 1 5.93 1 12c0 2.76.94 5.3 2.51 7.35L1 23l3.65-1.51C7.7 22.06 10.24 23 13 23c6.07 0 11-4.93 11-11S19.07 1 12 1z" fill="#7ed99a"/>
+      <path d="M12 1C5.93 1 1 5.93 1 12c0 2.76.94 5.3 2.51 7.35L1 23l3.65-1.51C7.7 22.06 10.24 23 13 23c6.07 0 11-4.93 11-11S19.07 1 12 1z" fill="${getGreenColor()}"/>
       <circle cx="9" cy="9" r="1.5" fill="#1e3a24"/>
       <circle cx="15" cy="9" r="1.5" fill="#1e3a24"/>
       <path d="M12 15c-1.5 0-2.5 1-2.5 2.5" stroke="#1e3a24" stroke-width="2" stroke-linecap="round"/>
@@ -109,8 +114,8 @@ function createChatSheet() {
       </button>
       <button class="mic-btn">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-          <path d="M12 1a4 4 0 0 0-4 4v6a4 4 0 0 0 8 0V5a4 4 0 0 0-4-4z" fill="#7ed99a"/>
-          <path d="M19 11a1 1 0 0 0-2 0c0 2.76-2.24 5-5 5s-5-2.24-5-5a1 1 0 0 0-2 0c0 3.53 2.61 6.43 6 6.92V21a1 1 0 0 0 2 0v-3.08c3.39-.49 6-3.39 6-6.92z" fill="#7ed99a"/>
+          <path d="M12 1a4 4 0 0 0-4 4v6a4 4 0 0 0 8 0V5a4 4 0 0 0-4-4z" fill="${getGreenColor()}"/>
+          <path d="M19 11a1 1 0 0 0-2 0c0 2.76-2.24 5-5 5s-5-2.24-5-5a1 1 0 0 0-2 0c0 3.53 2.61 6.43 6 6.92V21a1 1 0 0 0 2 0v-3.08c3.39-.49 6-3.39 6-6.92z" fill="${getGreenColor()}"/>
         </svg>
       </button>
     </div>

@@ -53,7 +53,7 @@
 .user-badge {
   background: rgba(126,217,154,0.12);
   border: 0.5px solid rgba(126,217,154,0.4);
-  color: #7ed99a;
+  color: var(--green);
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 1px;
@@ -81,7 +81,7 @@
 .stat-val {
   font-size: 18px;
   font-weight: 600;
-  color: #7ed99a;
+  color: var(--green);
   margin-bottom: 4px;
   line-height: 1;
 }
@@ -108,7 +108,7 @@
   padding: 0 4px;
 }
 
-.settings-section.green .settings-section-label { color: #7ed99a; }
+.settings-section.green .settings-section-label { color: var(--green); }
 .settings-section.blue  .settings-section-label { color: #5bc8f5; }
 .settings-section.orange .settings-section-label { color: #f5a623; }
 .settings-section.purple .settings-section-label { color: #a78bfa; }
@@ -163,7 +163,7 @@
 .green-btn {
   background: rgba(126,217,154,0.08);
   border: 0.5px solid rgba(126,217,154,0.25);
-  color: #7ed99a;
+  color: var(--green);
 }
 
 .green-btn:hover { background: rgba(126,217,154,0.14); }
@@ -232,8 +232,8 @@
 
 .theme-seg-btn.active {
   background: rgba(126,217,154,0.12);
-  color: #7ed99a;
-  box-shadow: 0 0 0 1.5px #7ed99a;
+  color: var(--green);
+  box-shadow: 0 0 0 1.5px var(--green);
 }
 
 /* Light theme overrides for the toggle itself */
@@ -338,7 +338,7 @@
   color: rgba(255,255,255,0.4); font-size: 12px; font-weight: 600;
   cursor: pointer; font-family: inherit; transition: all 0.15s;
 }
-.ep-unit-btn.active { background: rgba(126,217,154,0.15); color: #7ed99a; }
+.ep-unit-btn.active { background: rgba(126,217,154,0.15); color: var(--green); }
 
 .ep-input-row { display: flex; align-items: center; gap: 8px; }
 .ep-input-row .ep-input { flex: 1; }
@@ -357,7 +357,7 @@
 .ep-option-btn.active {
   background: rgba(126,217,154,0.12);
   border-color: rgba(126,217,154,0.4);
-  color: #7ed99a;
+  color: var(--green);
 }
 
 .ep-goal-grid { display: flex; flex-direction: column; gap: 8px; }
@@ -373,7 +373,7 @@
 .ep-goal-btn.active {
   background: rgba(126,217,154,0.1);
   border-color: rgba(126,217,154,0.35);
-  color: #7ed99a;
+  color: var(--green);
 }
 .ep-goal-icon { font-size: 20px; flex-shrink: 0; }
 .ep-goal-title { font-size: 13px; font-weight: 600; display: block; }
@@ -382,7 +382,7 @@
 
 .ep-save-btn {
   width: 100%; padding: 15px;
-  background: #7ed99a; border: none; border-radius: 14px;
+  background: var(--green); border: none; border-radius: 14px;
   color: #0a1a0f; font-size: 15px; font-weight: 700;
   cursor: pointer; font-family: inherit; margin-top: 4px;
   transition: opacity 0.2s;

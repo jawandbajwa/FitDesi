@@ -1,6 +1,8 @@
 /* ─── COACH.CSS ─────────────────────────────────────────────────
    Styles for the AI coach floating button, chat sheet, and all
    inner components. coach.js only handles logic + class toggles.
+
+   Uses CSS variables from style.css so themes automatically work.
    ──────────────────────────────────────────────────────────────── */
 
 /* ── Floating button ─────────────────────────────────────────── */
@@ -11,9 +13,9 @@
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: #1e3a24;
-  border: 2px solid #7ed99a;
-  color: #7ed99a;
+  background: var(--green-dark);
+  border: 2px solid var(--green);
+  color: var(--green);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -48,7 +50,7 @@
   left: 0;
   right: 0;
   height: 60vh;
-  background: #0d150f;
+  background: var(--card);
   border-radius: 20px 20px 0 0;
   z-index: 1001;
   display: none;               /* JS sets to "flex" when open */
@@ -64,7 +66,7 @@
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   padding: 14px 16px 14px;
-  border-bottom: 1px solid rgba(126, 217, 154, 0.15);
+  border-bottom: 1px solid var(--border);
   flex-shrink: 0;
   gap: 8px;
 }
@@ -72,7 +74,7 @@
 .chat-handle {
   width: 36px;
   height: 4px;
-  background: rgba(126, 217, 154, 0.4);
+  background: var(--green-muted);
   border-radius: 2px;
   cursor: grab;
   justify-self: center;
@@ -86,7 +88,7 @@
   border-radius: 50%;
   background: rgba(126,217,154,0.08);
   border: 1px solid rgba(126,217,154,0.25);
-  color: #7ed99a;
+  color: var(--green);
   font-size: 14px;
   display: flex;
   align-items: center;
@@ -103,7 +105,7 @@
   border-radius: 20px;
   background: rgba(126,217,154,0.08);
   border: 1px solid rgba(126,217,154,0.25);
-  color: #7ed99a;
+  color: var(--green);
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
@@ -133,15 +135,15 @@
 }
 .message.user {
   align-self: flex-end;
-  background: #7ed99a;
-  color: #1e3a24;
-  border: 1px solid #7ed99a;
+  background: var(--green);
+  color: var(--bg);
+  border: 1px solid var(--green);
 }
 .message.assistant {
   align-self: flex-start;
-  background: #1e3a24;
-  color: #7ed99a;
-  border: 1px solid rgba(126,217,154,0.3);
+  background: var(--green-dark);
+  color: var(--green);
+  border: 1px solid var(--border);
 }
 .message-content {
   white-space: pre-wrap;
@@ -153,8 +155,8 @@
   align-self: flex-start;
   padding: 14px 18px;
   border-radius: 18px;
-  background: #1e3a24;
-  border: 1px solid rgba(126,217,154,0.3);
+  background: var(--green-dark);
+  border: 1px solid var(--border);
   display: flex;
   gap: 5px;
   align-items: center;
@@ -163,7 +165,7 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #7ed99a;
+  background: var(--green);
   opacity: 0.4;
   animation: coachDot 1.2s ease-in-out infinite;
 }
@@ -190,10 +192,10 @@
 }
 .quick-reply-btn {
   padding: 8px 16px;
-  border: 1px solid rgba(126,217,154,0.3);
+  border: 1px solid var(--border);
   border-radius: 16px;
   background: rgba(126,217,154,0.1);
-  color: #7ed99a;
+  color: var(--green);
   cursor: pointer;
   font-size: 14px;
   font-family: inherit;
@@ -202,7 +204,7 @@
 /* ── Input area ──────────────────────────────────────────────── */
 .input-area {
   padding: 16px 20px;
-  border-top: 1px solid rgba(126,217,154,0.2);
+  border-top: 1px solid var(--border);
   display: flex;
   gap: 12px;
   align-items: center;
@@ -210,21 +212,21 @@
 .input-area input {
   flex: 1;
   padding: 12px 16px;
-  border: 1px solid rgba(126,217,154,0.3);
+  border: 1px solid var(--border);
   border-radius: 24px;
   background: rgba(255,255,255,0.05);
-  color: #7ed99a;
+  color: var(--text);
   font-size: 16px;
   font-family: inherit;
   outline: none;
 }
-.input-area input::placeholder { color: rgba(126,217,154,0.4); }
+.input-area input::placeholder { color: var(--text-faint); }
 
 .send-btn {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: #7ed99a;
+  background: var(--green);
   border: none;
   display: flex;
   align-items: center;
@@ -236,9 +238,9 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: #1e3a24;
-  border: 2px solid #7ed99a;
-  color: #7ed99a;
+  background: var(--green-dark);
+  border: 2px solid var(--green);
+  color: var(--green);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -259,13 +261,13 @@
 .coach-picker-title {
   font-size: 18px;
   font-weight: 700;
-  color: #7ed99a;
+  color: var(--text);
   text-align: center;
   margin-bottom: 4px;
 }
 .coach-picker-sub {
   font-size: 12px;
-  color: rgba(255,255,255,0.4);
+  color: var(--text-dim);
   text-align: center;
   margin-bottom: 16px;
 }
@@ -274,7 +276,7 @@
   align-items: center;
   gap: 14px;
   background: rgba(255,255,255,0.04);
-  border: 1.5px solid rgba(126,217,154,0.15);
+  border: 1.5px solid var(--border);
   border-radius: 14px;
   padding: 14px;
   margin-bottom: 10px;
@@ -283,7 +285,7 @@
   position: relative;
 }
 .coach-pick-card.selected {
-  border-color: #7ed99a;
+  border-color: var(--green);
   background: rgba(126,217,154,0.1);
 }
 .coach-pick-avatar {
@@ -303,7 +305,7 @@
 .coach-pick-name {
   font-size: 15px;
   font-weight: 700;
-  color: #fff;
+  color: var(--text);
   margin-bottom: 3px;
 }
 .coach-pick-tag {
@@ -318,7 +320,7 @@
 }
 .coach-pick-desc {
   font-size: 12px;
-  color: rgba(255,255,255,0.45);
+  color: var(--text-dim);
   line-height: 1.4;
 }
 .pick-check {
@@ -328,8 +330,8 @@
   transform: translateY(-50%);
   width: 22px;
   height: 22px;
-  background: #7ed99a;
-  color: #0d150f;
+  background: var(--green);
+  color: var(--bg);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -342,8 +344,8 @@
 .coach-cta-btn {
   width: 100%;
   padding: 14px;
-  background: #7ed99a;
-  color: #0d150f;
+  background: var(--green);
+  color: var(--bg);
   font-size: 15px;
   font-weight: 700;
   border: none;
@@ -366,287 +368,12 @@
   bottom: 100px;
   left: 50%;
   transform: translateX(-50%);
-  background: #7ed99a;
-  color: #1e3a24;
+  background: var(--green);
+  color: var(--bg);
   padding: 12px 24px;
   border-radius: 24px;
   z-index: 1002;
   font-weight: 700;
   font-family: inherit;
   pointer-events: none;
-}
-
-/* ══════════════════════════════════════════════════════════
-   LIGHT THEME — Cream + Burnt Orange
-   Applied via data-theme="light" on <html>.
-   Accent: #A85A1F. Light background with warm tones.
-   ══════════════════════════════════════════════════════════ */
-
-[data-theme="light"] #coachButton {
-  background: #FFFFFF;
-  border-color: #A85A1F;
-  color: #A85A1F;
-}
-
-[data-theme="light"] #coachBackdrop {
-  background: rgba(0, 0, 0, 0.3);
-}
-
-[data-theme="light"] #chatSheet {
-  background: #FFFFFF;
-  box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
-}
-
-[data-theme="light"] .chat-header {
-  border-bottom-color: rgba(168,90,31,0.2);
-}
-
-[data-theme="light"] .chat-handle {
-  background: rgba(168,90,31,0.4);
-}
-
-[data-theme="light"] .chat-close {
-  background: rgba(168,90,31,0.1);
-  border-color: rgba(168,90,31,0.25);
-  color: #A85A1F;
-}
-
-[data-theme="light"] .coach-switch-btn {
-  background: rgba(168,90,31,0.1);
-  border-color: rgba(168,90,31,0.25);
-  color: #A85A1F;
-}
-
-[data-theme="light"] .message.user {
-  background: #A85A1F;
-  color: #FFFFFF;
-  border-color: #A85A1F;
-}
-
-[data-theme="light"] .message.assistant {
-  background: #F0E1CC;
-  color: #3D2817;
-  border-color: rgba(168,90,31,0.3);
-}
-
-[data-theme="light"] #coach-typing {
-  background: #F0E1CC;
-  border-color: rgba(168,90,31,0.3);
-}
-
-[data-theme="light"] #coach-typing span {
-  background: #A85A1F;
-}
-
-[data-theme="light"] .quick-reply-btn {
-  border-color: rgba(168,90,31,0.3);
-  background: rgba(168,90,31,0.08);
-  color: #A85A1F;
-}
-
-[data-theme="light"] .input-area {
-  border-top-color: rgba(168,90,31,0.2);
-}
-
-[data-theme="light"] .input-area input {
-  border-color: rgba(168,90,31,0.3);
-  background: #F0E1CC;
-  color: #3D2817;
-}
-
-[data-theme="light"] .input-area input::placeholder {
-  color: rgba(61,40,23,0.4);
-}
-
-[data-theme="light"] .send-btn {
-  background: #A85A1F;
-}
-
-[data-theme="light"] .mic-btn {
-  background: #FFFFFF;
-  border-color: #A85A1F;
-  color: #A85A1F;
-}
-
-[data-theme="light"] .mic-btn.listening {
-  box-shadow: 0 0 0 3px rgba(168,90,31,0.3);
-}
-
-[data-theme="light"] .coach-picker-title {
-  color: #3D2817;
-}
-
-[data-theme="light"] .coach-picker-sub {
-  color: #8B6F4E;
-}
-
-[data-theme="light"] .coach-pick-card {
-  background: #F0E1CC;
-  border-color: rgba(168,90,31,0.2);
-}
-
-[data-theme="light"] .coach-pick-card.selected {
-  border-color: #A85A1F;
-  background: rgba(168,90,31,0.12);
-}
-
-[data-theme="light"] .coach-pick-name {
-  color: #3D2817;
-}
-
-[data-theme="light"] .coach-pick-desc {
-  color: #8B6F4E;
-}
-
-[data-theme="light"] .pick-check {
-  background: #A85A1F;
-  color: #FFFFFF;
-}
-
-[data-theme="light"] .coach-cta-btn {
-  background: #A85A1F;
-  color: #FFFFFF;
-}
-
-[data-theme="light"] .coach-toast {
-  background: #A85A1F;
-  color: #FFFFFF;
-}
-
-/* ══════════════════════════════════════════════════════════
-   WARM THEME — Deep Brown + Warm Gold
-   Applied via data-theme="warm" on <html>.
-   Accent: #E8B547. Dark base with cream text.
-   ══════════════════════════════════════════════════════════ */
-
-[data-theme="warm"] #coachButton {
-  background: #2A2118;
-  border-color: #E8B547;
-  color: #E8B547;
-}
-
-[data-theme="warm"] #coachBackdrop {
-  background: rgba(0, 0, 0, 0.55);
-}
-
-[data-theme="warm"] #chatSheet {
-  background: #1A1410;
-  box-shadow: 0 -4px 20px rgba(0,0,0,0.6);
-}
-
-[data-theme="warm"] .chat-header {
-  border-bottom-color: rgba(232,181,71,0.2);
-}
-
-[data-theme="warm"] .chat-handle {
-  background: rgba(232,181,71,0.4);
-}
-
-[data-theme="warm"] .chat-close {
-  background: rgba(232,181,71,0.1);
-  border-color: rgba(232,181,71,0.25);
-  color: #E8B547;
-}
-
-[data-theme="warm"] .coach-switch-btn {
-  background: rgba(232,181,71,0.1);
-  border-color: rgba(232,181,71,0.25);
-  color: #E8B547;
-}
-
-[data-theme="warm"] .message.user {
-  background: #E8B547;
-  color: #1A1410;
-  border-color: #E8B547;
-}
-
-[data-theme="warm"] .message.assistant {
-  background: #2A2118;
-  color: #F2E6CC;
-  border-color: rgba(232,181,71,0.3);
-}
-
-[data-theme="warm"] #coach-typing {
-  background: #2A2118;
-  border-color: rgba(232,181,71,0.3);
-}
-
-[data-theme="warm"] #coach-typing span {
-  background: #E8B547;
-}
-
-[data-theme="warm"] .quick-reply-btn {
-  border-color: rgba(232,181,71,0.3);
-  background: rgba(232,181,71,0.1);
-  color: #E8B547;
-}
-
-[data-theme="warm"] .input-area {
-  border-top-color: rgba(232,181,71,0.2);
-}
-
-[data-theme="warm"] .input-area input {
-  border-color: rgba(232,181,71,0.3);
-  background: #2A2118;
-  color: #F2E6CC;
-}
-
-[data-theme="warm"] .input-area input::placeholder {
-  color: rgba(242,230,204,0.4);
-}
-
-[data-theme="warm"] .send-btn {
-  background: #E8B547;
-  color: #1A1410;
-}
-
-[data-theme="warm"] .mic-btn {
-  background: #2A2118;
-  border-color: #E8B547;
-  color: #E8B547;
-}
-
-[data-theme="warm"] .mic-btn.listening {
-  box-shadow: 0 0 0 3px rgba(232,181,71,0.3);
-}
-
-[data-theme="warm"] .coach-picker-title {
-  color: #F2E6CC;
-}
-
-[data-theme="warm"] .coach-picker-sub {
-  color: #8A7558;
-}
-
-[data-theme="warm"] .coach-pick-card {
-  background: #2A2118;
-  border-color: rgba(232,181,71,0.2);
-}
-
-[data-theme="warm"] .coach-pick-card.selected {
-  border-color: #E8B547;
-  background: rgba(232,181,71,0.12);
-}
-
-[data-theme="warm"] .coach-pick-name {
-  color: #F2E6CC;
-}
-
-[data-theme="warm"] .coach-pick-desc {
-  color: #8A7558;
-}
-
-[data-theme="warm"] .pick-check {
-  background: #E8B547;
-  color: #1A1410;
-}
-
-[data-theme="warm"] .coach-cta-btn {
-  background: #E8B547;
-  color: #1A1410;
-}
-
-[data-theme="warm"] .coach-toast {
-  background: #E8B547;
-  color: #1A1410;
 }

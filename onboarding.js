@@ -7,6 +7,11 @@ import { onAuthStateChanged, auth, getUserProfile, markOnboardingDone } from "./
 
 const CACHE_KEY = "fitdesi_onboarding_done";
 
+// ─── CSS VARIABLE HELPER (theme-aware colors) ─────────────────
+function getGreenColor() {
+  return getComputedStyle(document.documentElement).getPropertyValue('--green').trim();
+}
+
 export function initOnboarding() {
   // Fast local cache — skip Firestore read if already confirmed on this device
   if (localStorage.getItem(CACHE_KEY)) return;
@@ -29,7 +34,7 @@ export function initOnboarding() {
 const SLIDES = [
   {
     tag: "Welcome",
-    tagBg: "rgba(126,217,154,0.12)", tagText: "#7ed99a",
+    tagBg: "rgba(126,217,154,0.12)", tagText: "${getGreenColor()}",
     title: "Welcome to FitDesi",
     body: "Track your macros, meals, and workouts — all in one place.",
     buildVisual: buildMacroGrid,
@@ -144,7 +149,7 @@ function buildOnboarding(uid) {
   // Next / Let's Go button
   const nextBtn = document.createElement("button");
   nextBtn.style.cssText = `
-    background: #7ed99a; color: #0d150f;
+    background: ${getGreenColor()}; color: #0d150f;
     border: none; border-radius: 50px;
     padding: 11px 22px; font-size: 14px; font-weight: 700;
     cursor: pointer; font-family: inherit;
@@ -195,7 +200,7 @@ function buildOnboarding(uid) {
     // Sync dots
     dots.forEach((d, i) => {
       d.style.width = i === current ? "22px" : "7px";
-      d.style.background = i === current ? "#7ed99a" : "rgba(126,217,154,0.25)";
+      d.style.background = i === current ? "${getGreenColor()}" : "rgba(126,217,154,0.25)";
     });
 
     // Sync left button
@@ -214,7 +219,7 @@ function buildOnboarding(uid) {
       nextBtn.style.color = "#fff";
     } else {
       nextBtn.textContent = "Next →";
-      nextBtn.style.background = "#7ed99a";
+      nextBtn.style.background = "${getGreenColor()}";
       nextBtn.style.color = "#0d150f";
     }
   }
@@ -272,7 +277,7 @@ function buildMacroGrid() {
     `;
     card.innerHTML = `
       <div style="font-size:20px">${icon}</div>
-      <div style="color:#7ed99a;font-size:15px;font-weight:800;line-height:1">${val}</div>
+      <div style="color:${getGreenColor()};font-size:15px;font-weight:800;line-height:1">${val}</div>
       <div style="color:rgba(255,255,255,0.4);font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px">${lbl}</div>
     `;
     grid.appendChild(card);
@@ -318,12 +323,12 @@ function buildWorkoutVisual() {
     c.style.cssText = `
       flex:1; border-radius:12px; padding:10px 4px; text-align:center;
       background:${today ? "rgba(126,217,154,0.15)" : "rgba(126,217,154,0.05)"};
-      border:1px solid ${today ? "#7ed99a" : "rgba(126,217,154,0.15)"};
+      border:1px solid ${today ? "${getGreenColor()}" : "rgba(126,217,154,0.15)"};
     `;
     c.innerHTML = `
-      <div style="color:${today ? "#7ed99a" : "rgba(255,255,255,0.4)"};font-size:9px;font-weight:700;text-transform:uppercase">${day}</div>
+      <div style="color:${today ? "${getGreenColor()}" : "rgba(255,255,255,0.4)"};font-size:9px;font-weight:700;text-transform:uppercase">${day}</div>
       <div style="font-size:18px;margin:5px 0">${icon}</div>
-      <div style="color:${today ? "#7ed99a" : "rgba(255,255,255,0.35)"};font-size:9px;font-weight:${today ? "600" : "400"}">${label}</div>
+      <div style="color:${today ? "${getGreenColor()}" : "rgba(255,255,255,0.35)"};font-size:9px;font-weight:${today ? "600" : "400"}">${label}</div>
     `;
     row.appendChild(c);
   });
@@ -349,11 +354,11 @@ function buildCoachVisual() {
       <div style="
         width:${size};height:${size};border-radius:50%;
         background:${bg};
-        border:${big ? "2px solid #7ed99a" : "1.5px solid rgba(126,217,154,0.2)"};
+        border:${big ? "2px solid ${getGreenColor()}" : "1.5px solid rgba(126,217,154,0.2)"};
         box-shadow:${big ? "0 0 18px rgba(126,217,154,0.3)" : "none"};
         display:flex;align-items:center;justify-content:center;font-size:${fs};
       ">${emoji}</div>
-      <div style="font-size:9px;color:${big ? "#7ed99a" : "rgba(255,255,255,0.45)"};font-weight:600;text-align:center;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${name}</div>
+      <div style="font-size:9px;color:${big ? "${getGreenColor()}" : "rgba(255,255,255,0.45)"};font-weight:600;text-align:center;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${name}</div>
     `;
     row.appendChild(wrap);
   });
