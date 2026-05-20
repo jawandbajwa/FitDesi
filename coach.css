@@ -375,3 +375,278 @@
   font-family: inherit;
   pointer-events: none;
 }
+
+/* ══════════════════════════════════════════════════════════
+   LIGHT THEME — Cream + Burnt Orange
+   Applied via data-theme="light" on <html>.
+   Accent: #A85A1F. Light background with warm tones.
+   ══════════════════════════════════════════════════════════ */
+
+[data-theme="light"] #coachButton {
+  background: #FFFFFF;
+  border-color: #A85A1F;
+  color: #A85A1F;
+}
+
+[data-theme="light"] #coachBackdrop {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="light"] #chatSheet {
+  background: #FFFFFF;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+}
+
+[data-theme="light"] .chat-header {
+  border-bottom-color: rgba(168,90,31,0.2);
+}
+
+[data-theme="light"] .chat-handle {
+  background: rgba(168,90,31,0.4);
+}
+
+[data-theme="light"] .chat-close {
+  background: rgba(168,90,31,0.1);
+  border-color: rgba(168,90,31,0.25);
+  color: #A85A1F;
+}
+
+[data-theme="light"] .coach-switch-btn {
+  background: rgba(168,90,31,0.1);
+  border-color: rgba(168,90,31,0.25);
+  color: #A85A1F;
+}
+
+[data-theme="light"] .message.user {
+  background: #A85A1F;
+  color: #FFFFFF;
+  border-color: #A85A1F;
+}
+
+[data-theme="light"] .message.assistant {
+  background: #F0E1CC;
+  color: #3D2817;
+  border-color: rgba(168,90,31,0.3);
+}
+
+[data-theme="light"] #coach-typing {
+  background: #F0E1CC;
+  border-color: rgba(168,90,31,0.3);
+}
+
+[data-theme="light"] #coach-typing span {
+  background: #A85A1F;
+}
+
+[data-theme="light"] .quick-reply-btn {
+  border-color: rgba(168,90,31,0.3);
+  background: rgba(168,90,31,0.08);
+  color: #A85A1F;
+}
+
+[data-theme="light"] .input-area {
+  border-top-color: rgba(168,90,31,0.2);
+}
+
+[data-theme="light"] .input-area input {
+  border-color: rgba(168,90,31,0.3);
+  background: #F0E1CC;
+  color: #3D2817;
+}
+
+[data-theme="light"] .input-area input::placeholder {
+  color: rgba(61,40,23,0.4);
+}
+
+[data-theme="light"] .send-btn {
+  background: #A85A1F;
+}
+
+[data-theme="light"] .mic-btn {
+  background: #FFFFFF;
+  border-color: #A85A1F;
+  color: #A85A1F;
+}
+
+[data-theme="light"] .mic-btn.listening {
+  box-shadow: 0 0 0 3px rgba(168,90,31,0.3);
+}
+
+[data-theme="light"] .coach-picker-title {
+  color: #3D2817;
+}
+
+[data-theme="light"] .coach-picker-sub {
+  color: #8B6F4E;
+}
+
+[data-theme="light"] .coach-pick-card {
+  background: #F0E1CC;
+  border-color: rgba(168,90,31,0.2);
+}
+
+[data-theme="light"] .coach-pick-card.selected {
+  border-color: #A85A1F;
+  background: rgba(168,90,31,0.12);
+}
+
+[data-theme="light"] .coach-pick-name {
+  color: #3D2817;
+}
+
+[data-theme="light"] .coach-pick-desc {
+  color: #8B6F4E;
+}
+
+[data-theme="light"] .pick-check {
+  background: #A85A1F;
+  color: #FFFFFF;
+}
+
+[data-theme="light"] .coach-cta-btn {
+  background: #A85A1F;
+  color: #FFFFFF;
+}
+
+[data-theme="light"] .coach-toast {
+  background: #A85A1F;
+  color: #FFFFFF;
+}
+
+/* ══════════════════════════════════════════════════════════
+   WARM THEME — Deep Brown + Warm Gold
+   Applied via data-theme="warm" on <html>.
+   Accent: #E8B547. Dark base with cream text.
+   ══════════════════════════════════════════════════════════ */
+
+[data-theme="warm"] #coachButton {
+  background: #2A2118;
+  border-color: #E8B547;
+  color: #E8B547;
+}
+
+[data-theme="warm"] #coachBackdrop {
+  background: rgba(0, 0, 0, 0.55);
+}
+
+[data-theme="warm"] #chatSheet {
+  background: #1A1410;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.6);
+}
+
+[data-theme="warm"] .chat-header {
+  border-bottom-color: rgba(232,181,71,0.2);
+}
+
+[data-theme="warm"] .chat-handle {
+  background: rgba(232,181,71,0.4);
+}
+
+[data-theme="warm"] .chat-close {
+  background: rgba(232,181,71,0.1);
+  border-color: rgba(232,181,71,0.25);
+  color: #E8B547;
+}
+
+[data-theme="warm"] .coach-switch-btn {
+  background: rgba(232,181,71,0.1);
+  border-color: rgba(232,181,71,0.25);
+  color: #E8B547;
+}
+
+[data-theme="warm"] .message.user {
+  background: #E8B547;
+  color: #1A1410;
+  border-color: #E8B547;
+}
+
+[data-theme="warm"] .message.assistant {
+  background: #2A2118;
+  color: #F2E6CC;
+  border-color: rgba(232,181,71,0.3);
+}
+
+[data-theme="warm"] #coach-typing {
+  background: #2A2118;
+  border-color: rgba(232,181,71,0.3);
+}
+
+[data-theme="warm"] #coach-typing span {
+  background: #E8B547;
+}
+
+[data-theme="warm"] .quick-reply-btn {
+  border-color: rgba(232,181,71,0.3);
+  background: rgba(232,181,71,0.1);
+  color: #E8B547;
+}
+
+[data-theme="warm"] .input-area {
+  border-top-color: rgba(232,181,71,0.2);
+}
+
+[data-theme="warm"] .input-area input {
+  border-color: rgba(232,181,71,0.3);
+  background: #2A2118;
+  color: #F2E6CC;
+}
+
+[data-theme="warm"] .input-area input::placeholder {
+  color: rgba(242,230,204,0.4);
+}
+
+[data-theme="warm"] .send-btn {
+  background: #E8B547;
+  color: #1A1410;
+}
+
+[data-theme="warm"] .mic-btn {
+  background: #2A2118;
+  border-color: #E8B547;
+  color: #E8B547;
+}
+
+[data-theme="warm"] .mic-btn.listening {
+  box-shadow: 0 0 0 3px rgba(232,181,71,0.3);
+}
+
+[data-theme="warm"] .coach-picker-title {
+  color: #F2E6CC;
+}
+
+[data-theme="warm"] .coach-picker-sub {
+  color: #8A7558;
+}
+
+[data-theme="warm"] .coach-pick-card {
+  background: #2A2118;
+  border-color: rgba(232,181,71,0.2);
+}
+
+[data-theme="warm"] .coach-pick-card.selected {
+  border-color: #E8B547;
+  background: rgba(232,181,71,0.12);
+}
+
+[data-theme="warm"] .coach-pick-name {
+  color: #F2E6CC;
+}
+
+[data-theme="warm"] .coach-pick-desc {
+  color: #8A7558;
+}
+
+[data-theme="warm"] .pick-check {
+  background: #E8B547;
+  color: #1A1410;
+}
+
+[data-theme="warm"] .coach-cta-btn {
+  background: #E8B547;
+  color: #1A1410;
+}
+
+[data-theme="warm"] .coach-toast {
+  background: #E8B547;
+  color: #1A1410;
+}
