@@ -155,9 +155,17 @@ body {
   left: 0 !important;
   z-index: 1;
   line-height: 1;
+  stroke: var(--green);          /* themed via --green override per theme */
+}
+
+/* Home protein ring — base (dark theme) colors.
+   Themes override .nav-ring-bg, .nav-protein-ring, .home-tab-icon strokes. */
+.nav-ring-bg {
+  stroke: var(--border);         /* dark theme: dark green border */
 }
 
 .nav-protein-ring {
+  stroke: var(--green);          /* themed via --green override per theme */
   transition: stroke-dashoffset 0.6s ease;
 }
 
@@ -2073,7 +2081,9 @@ input, select, textarea {
 [data-theme="light"] .nav-tab.active,
 [data-theme="light"] .nav-item.active { color: #A85A1F; }
 [data-theme="light"] .home-tab-ring { background: #A85A1F; }
-[data-theme="light"] .home-tab-ring .home-tab-icon { color: #FFFFFF; filter: brightness(0) invert(1); }
+[data-theme="light"] .nav-ring-bg      { stroke: rgba(255,255,255,0.22); } /* faint white track on orange disc */
+[data-theme="light"] .nav-protein-ring { stroke: #FFFFFF; }                /* white progress arc */
+[data-theme="light"] .home-tab-icon    { stroke: #FFFFFF; }                /* white house icon */
 
 /* ── Segmented control ── */
 [data-theme="light"] .seg-btn       { color: #8B6F4E; }
@@ -2331,7 +2341,9 @@ input, select, textarea {
 [data-theme="warm"] .nav-tab.active,
 [data-theme="warm"] .nav-item.active { color: #E8B547; }
 [data-theme="warm"] .home-tab-ring { background: #E8B547; }
-[data-theme="warm"] .home-tab-ring .home-tab-icon { color: #1A1410; }
+[data-theme="warm"] .nav-ring-bg      { stroke: rgba(26,20,16,0.22); }  /* faint dark track on gold disc */
+[data-theme="warm"] .nav-protein-ring { stroke: #1A1410; }              /* dark progress arc */
+[data-theme="warm"] .home-tab-icon    { stroke: #1A1410; }              /* dark house icon */
 
 /* ── Segmented control ── */
 [data-theme="warm"] .seg-btn       { color: #8A7558; }
