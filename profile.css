@@ -206,6 +206,27 @@
 
 .signout-btn:hover { background: rgba(224,92,92,0.15); }
 
+/* DELETE ACCOUNT — quieter than sign-out, since it's a rare destructive action */
+.delete-account-btn {
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  border: none;
+  color: var(--text-faint);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: "Inter", sans-serif;
+  margin-top: 12px;
+  text-decoration: underline;
+  text-decoration-color: var(--text-faint);
+  text-underline-offset: 3px;
+}
+.delete-account-btn:hover {
+  color: #e05c5c;
+  text-decoration-color: #e05c5c;
+}
+
 .hidden { display: none !important; }
 
 /* ── THEME TOGGLE ────────────────────────────────────────── */

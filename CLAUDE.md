@@ -244,14 +244,14 @@ wrangler deploy
 ## Versioning
 
 Version is stored in two places: `manifest.json` and `profile.html` (About section).
-Current version: **4.5.1**
+Current version: **4.6.0**
 
 Rules:
 - Small change → `node bump-version.js patch` (+1 patch, 0–9, rolls to minor at 10)
 - Notable update → `node bump-version.js minor` (+1 minor, 0–9, rolls to major at 10)
 - Big release → `node bump-version.js major` (+1 major)
 
-The script also bumps `sw.js` cache version automatically (current: `fitdesi-v95`).
+The script also bumps `sw.js` cache version automatically (current: `fitdesi-v96`).
 
 ---
 
@@ -458,6 +458,41 @@ First-time user intro shown once, ever. Implemented in `onboarding.js`, triggere
 
 ---
 
+## Security & Compliance (v4.6+)
+
+### Account deletion (GDPR right-to-be-forgotten)
+- Button: Profile → "Delete my account & data" (quieter than Sign Out — underlined text link)
+- Confirmation: must type "DELETE" in the modal before the red button enables
+- `deleteAllUserData(uid)` in firebase.js iterates 5 sub-collections (`data`, `logs`, `progress`, `workoutLogs`, `recipes`) and deletes every doc, then the top-level stub
+- Does NOT delete the Firebase Auth account itself — user must revoke at [myaccount.google.com/permissions](https://myaccount.google.com/permissions)
+- Local storage also cleared on successful delete
+
+### Admin audit log
+- Every sensitive admin action writes to `audit/{auto-id}`: setAdminStatus, assignCoach, deleteIngredient, deleteRecipe, deleteUserRecipe, promoteUserRecipe
+- Schema: `{ at: Timestamp, actor: uid, actorEmail, action: string, ...details }`
+- Firestore rules: `allow create: if isAdmin()`, `allow update,delete: if false` — append-only, tamper-evident
+- Failure to log NEVER blocks the action itself (fire-and-forget try/catch)
+- `deleteUserRecipe` only logs when admin deletes someone else's recipe, not when a user deletes their own
+
+### Cloudflare Worker rate limiting
+- Per-UID (with IP fallback) sliding window via Workers KV
+- Limits: user 30/min + 200/hour, admin 100/min + 1000/hour
+- Returns 429 with `Retry-After` header
+- Requires KV namespace `RATE_LIMIT` bound in `wrangler.toml`; no-ops if missing
+- coach.js sends `X-User-Uid` header so Worker can identify the user
+
+### Subresource Integrity (SRI)
+- Chart.js CDN script has `integrity="sha384-..."` + `crossorigin="anonymous"` (pinned to 4.4.7)
+- Firebase SDK ES module imports CANNOT have SRI — only `<script>` tags do. Pinned version (10.7.1) is the only protection there.
+- To bump Chart.js: `curl -sL <new-url> | openssl dgst -sha384 -binary | openssl base64 -A`
+
+### Privacy + Terms pages
+- `privacy.html` — what data is collected, where stored, user rights, third-party services
+- `terms.html` — usage rules, "not medical advice" disclaimer, liability waiver
+- Both linked from Profile About section. Both in sitemap.xml.
+
+---
+
 ## Common Gotchas
 
 1. **Service worker caching** — always run `node bump-version.js patch` (or `minor`/`major`) before pushing JS/CSS changes.
@@ -476,6 +511,9 @@ First-time user intro shown once, ever. Implemented in `onboarding.js`, triggere
 14. **All green colors must use CSS variables** — never hardcode `#7ed99a`, `#A85A1F`, or `#E8B547`. Use `var(--green)` for solid colors and `rgb(var(--green-rgb) / alpha)` for transparency. Works directly inside JS template literals for `style.cssText` — no helper needed (browsers resolve CSS variables when the style is applied). The old `getGreenColor()` helper was removed in v4.3.0; use `var(--green)` instead.
 15. **Beware `\v` in JS template literals** — When writing CSS into a JS template literal (`` ` ... ` ``), don't accidentally introduce `\var(--green)` — JS interprets `\v` as the vertical-tab escape char, so the string becomes `<0x0B>ar(--green)` and the browser drops the whole declaration as invalid. Always write `var(--green)` (no leading backslash) in template literals.
 16. **Admin panel: NEVER hardcode `rgba(255,255,255,X)`** — these are invisible in Light theme (cream bg). Use `var(--text)`, `var(--text-dim)`, `var(--text-faint)`, `var(--card)`, `var(--bg)`, or `var(--border)`. For form-label hints, use the `.field-hint` class. For empty-state messages, use `.muted-message`. For destructive/cancel buttons, use `.danger-btn` / `.cancel-btn`. See "Admin Panel — Current State → Theming" above.
+17. **Account deletion uses `auth.currentUser.uid`** — not a passed-in arg from outside. The button in profile.html reads `auth.currentUser` and calls `deleteAllUserData(user.uid)`. After deletion, also `localStorage.clear()` before redirecting. Firebase Auth account itself stays — user must revoke at myaccount.google.com to fully sever.
+18. **Adding a new admin action? Call `logAdminAction()` from inside the firebase.js function** — not from admin.js. Centralized so we never forget. Pattern: `try { ...; logAdminAction("name", { ...details }); } catch { ... }`.
+19. **Cloudflare Worker rate limiting requires KV namespace `RATE_LIMIT`** — set up via Cloudflare dashboard, bind in wrangler.toml, then `wrangler deploy`. Without it the worker still works (gracefully no-ops on rate check). Don't ship the worker without the binding once you're getting real traffic — runaway tabs can drain your Gemini quota.
 
 ---
 

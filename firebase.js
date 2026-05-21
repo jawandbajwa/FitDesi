@@ -1,4 +1,96 @@
+// ─── TYPE DEFINITIONS (JSDoc — for VS Code autocomplete + tsc --checkJs) ───
+/**
+ * @typedef {Object} UserProfile
+ * @property {string} [name]
+ * @property {string} [email]
+ * @property {string} [photoURL]
+ * @property {number} [age]
+ * @property {number} [weight]                       Weight in kg (canonical, even if entered in lbs)
+ * @property {number} [height]                       Height in cm
+ * @property {"male"|"female"} [gender]
+ * @property {"sedentary"|"light"|"moderate"|"heavy"} [activityLevel]
+ * @property {"recomp"|"muscle"|"fatloss"} [goal]
+ * @property {"kg"|"lbs"} [weightUnit]
+ * @property {"cm"|"ft"} [heightUnit]
+ * @property {boolean} [isAdmin]
+ * @property {boolean} [coachEnabled]
+ * @property {"vegeta"|"hinata"|"levi"|"allmight"|"gojo"} [chosenCoach]
+ * @property {boolean} [onboardingDone]
+ * @property {string} [createdAt]                    ISO timestamp
+ */
+
+/**
+ * @typedef {Object} MealItem
+ * @property {string} name
+ * @property {number} protein
+ * @property {number} carbs
+ * @property {number} fat
+ * @property {number} calories
+ * @property {string} [recipeId]                     If from saved recipe
+ */
+
+/**
+ * @typedef {Object} DailyLog
+ * @property {MealItem[]} breakfast
+ * @property {MealItem[]} lunch
+ * @property {MealItem[]} snack
+ * @property {MealItem[]} dinner
+ */
+
+/**
+ * @typedef {Object} WorkoutCycle
+ * @property {string} startDate                      ISO timestamp — DO NOT reset on cycle complete
+ * @property {"A"|"B"} [currentSet]
+ * @property {number} [cycleCount]
+ * @property {number} [acknowledgedCycles]
+ * @property {string} [activeSplit]                  "mysplit", "ppl", "upperlower", etc.
+ * @property {Object[]} [customSplitDays]
+ * @property {string} [lastSetPickedDate]            ISO date
+ */
+
+/**
+ * @typedef {Object} Recipe
+ * @property {string} id
+ * @property {string} name
+ * @property {"breakfast"|"lunch"|"dinner"|"snack"} [category]
+ * @property {"indian"|"canadian"} [cuisine]
+ * @property {string} [serving]
+ * @property {Object[]} [ingredients]
+ * @property {number} protein
+ * @property {number} carbs
+ * @property {number} fat
+ * @property {number} calories
+ * @property {string} [videoId]
+ * @property {string} [instructions]
+ * @property {string} [notes]
+ */
+
+/**
+ * @typedef {Object} Ingredient
+ * @property {string} id
+ * @property {string} name
+ * @property {number} protein
+ * @property {number} carbs
+ * @property {number} fat
+ * @property {number} calories
+ * @property {number} [fiber]
+ * @property {string} category
+ */
+
+/**
+ * @typedef {Object} ProgressEntry
+ * @property {number} [weight]                       kg
+ * @property {number} [bodyFat]                      Percent (e.g. 18.5)
+ */
+
 // ─── FIREBASE CONFIGURATION ──────────────────────────────────
+// Note on Subresource Integrity: ES module `import` statements do NOT
+// support the `integrity` attribute — that's only available for
+// `<script integrity="...">` tags. So we can't add SRI hashes here.
+// Our only protection against gstatic.com supply-chain compromise is
+// pinning the SDK version (10.7.1 below) — the URL is immutable.
+// When bumping the version, do it deliberately and check the Firebase
+// release notes for any security advisories.
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getAuth,
@@ -21,6 +113,8 @@ import {
   collectionGroup,
   query,
   getDocs,
+  addDoc,
+  serverTimestamp,
   deleteDoc,
   deleteField,
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -78,6 +172,11 @@ function isAndroidPWA() {
     window.matchMedia("(display-mode: standalone)").matches;
 }
 
+/**
+ * Sign in via Google. Uses popup on browsers + iOS; redirect on Android PWA
+ * (popups are blocked in WebView shell). Falls back to redirect if popup is blocked.
+ * @returns {Promise<import("firebase/auth").User | null>}  User on popup success, null on redirect
+ */
 async function signInWithGoogle() {
   try {
     // Android standalone PWA: signInWithPopup may be blocked inside the
@@ -120,11 +219,22 @@ async function signOutUser() {
   }
 }
 
+/**
+ * Whether the given Firebase Auth user has admin privileges.
+ * @param {import("firebase/auth").User | null | undefined} user
+ * @returns {boolean}
+ */
 function isAdmin(user) {
   return user && user.email === ADMIN_EMAIL;
 }
 
 // ─── USER PROFILE ────────────────────────────────────────────
+/**
+ * Save a user's profile to Firestore (also writes top-level stub doc).
+ * @param {string} userId
+ * @param {UserProfile} profile
+ * @returns {Promise<void>}
+ */
 async function saveUserProfile(userId, profile) {
   try {
     await setDoc(doc(db, "users", userId, "data", "profile"), profile);
@@ -138,6 +248,14 @@ async function saveUserProfile(userId, profile) {
   }
 }
 
+/**
+ * Read a user's profile. Auto-creates a minimal profile from Google auth
+ * data if none exists yet, plus a top-level `users/{uid}` stub doc so the
+ * admin panel's collectionGroup query discovers them. Falls back to
+ * IndexedDB cache on Firestore failure.
+ * @param {string} userId
+ * @returns {Promise<UserProfile|null>}
+ */
 async function getUserProfile(userId) {
   try {
     const snap = await getDoc(doc(db, "users", userId, "data", "profile"));
@@ -173,6 +291,13 @@ async function getUserProfile(userId) {
 }
 
 // ─── DAILY LOGS ──────────────────────────────────────────────
+/**
+ * Save the meal log for one date.
+ * @param {string} userId
+ * @param {string} dateKey  Format: "YYYY-MM-DD"
+ * @param {DailyLog} log
+ * @returns {Promise<void>}
+ */
 async function saveDailyLog(userId, dateKey, log) {
   try {
     await setDoc(doc(db, "users", userId, "logs", dateKey), log);
@@ -182,6 +307,13 @@ async function saveDailyLog(userId, dateKey, log) {
   }
 }
 
+/**
+ * Read the meal log for one date. Returns empty 4-meal structure if no log exists.
+ * Falls back to IndexedDB cache on Firestore failure.
+ * @param {string} userId
+ * @param {string} dateKey  Format: "YYYY-MM-DD"
+ * @returns {Promise<DailyLog>}
+ */
 async function getDailyLog(userId, dateKey) {
   const empty = { breakfast: [], lunch: [], snack: [], dinner: [] };
   try {
@@ -240,6 +372,11 @@ async function saveRecipe(recipe, cuisine = "indian") {
   }
 }
 
+/**
+ * Read all shared recipes for one cuisine. Falls back to IndexedDB on Firestore failure.
+ * @param {"indian"|"canadian"} [cuisine]
+ * @returns {Promise<Recipe[]>}
+ */
 async function getRecipes(cuisine = "indian") {
   try {
     // Always try Firestore first — navigator.onLine is unreliable on mobile
@@ -273,6 +410,7 @@ async function deleteRecipe(id, cuisine = "indian") {
   try {
     const col = cuisine === "canadian" ? "recipes_canadian" : "recipes_indian";
     await deleteDoc(doc(db, "shared", col, "items", id));
+    logAdminAction("deleteRecipe", { recipeId: id, cuisine });
   } catch (error) {
     console.error("Error deleting recipe:", error);
     throw error;
@@ -297,6 +435,10 @@ async function saveIngredient(ingredient) {
   }
 }
 
+/**
+ * Read all shared ingredients. Falls back to IndexedDB on Firestore failure.
+ * @returns {Promise<Ingredient[]>}
+ */
 async function getIngredients() {
   try {
     const snap = await getDocs(
@@ -318,6 +460,7 @@ async function getIngredients() {
 async function deleteIngredient(ingredientId) {
   try {
     await deleteDoc(doc(db, "shared", "ingredients", "items", ingredientId));
+    logAdminAction("deleteIngredient", { ingredientId });
   } catch (error) {
     console.error("Error deleting ingredient:", error);
     throw error;
@@ -349,6 +492,13 @@ async function getNotifTimes(userId) {
 }
 
 // ─── WORKOUT CYCLE ───────────────────────────────────────────
+/**
+ * Save the user's workout cycle state. NEVER reset startDate when a cycle
+ * completes — see CLAUDE.md Workout/Cycle System.
+ * @param {string} userId
+ * @param {WorkoutCycle} cycle
+ * @returns {Promise<void>}
+ */
 async function saveWorkoutCycle(userId, cycle) {
   try {
     await setDoc(doc(db, "users", userId, "data", "cycle"), cycle);
@@ -358,6 +508,11 @@ async function saveWorkoutCycle(userId, cycle) {
   }
 }
 
+/**
+ * Read the user's workout cycle state. Returns null if not set up yet.
+ * @param {string} userId
+ * @returns {Promise<WorkoutCycle|null>}
+ */
 async function getWorkoutCycle(userId) {
   try {
     const snap = await getDoc(doc(db, "users", userId, "data", "cycle"));
@@ -410,6 +565,11 @@ async function saveProgressEntry(userId, entry) {
   }
 }
 
+/**
+ * Read all progress entries (weight + body-fat history) for the user.
+ * @param {string} userId
+ * @returns {Promise<Array<ProgressEntry & {date: string}>>}
+ */
 async function getProgressHistory(userId) {
   try {
     const snap = await getDocs(collection(db, "users", userId, "progress"));
@@ -587,6 +747,7 @@ async function assignCoach(uid, enabled) {
   try {
     const profileRef = doc(db, "users", uid, "data", "profile");
     await setDoc(profileRef, { coachEnabled: enabled }, { merge: true });
+    logAdminAction("assignCoach", { target: uid, enabled });
   } catch (error) {
     console.error("Error assigning coach:", error);
     throw error;
@@ -597,6 +758,7 @@ async function setAdminStatus(uid, adminStatus) {
   try {
     const profileRef = doc(db, "users", uid, "data", "profile");
     await setDoc(profileRef, { isAdmin: adminStatus }, { merge: true });
+    logAdminAction("setAdminStatus", { target: uid, adminStatus });
   } catch (error) {
     console.error("Error setting admin status:", error);
     throw error;
@@ -635,6 +797,11 @@ async function getUserRecipes(uid) {
 async function deleteUserRecipe(uid, recipeId) {
   try {
     await deleteDoc(doc(db, "users", uid, "recipes", recipeId));
+    // Only log when admin deletes someone else's recipe — not when the
+    // user deletes their own from the recipes page.
+    if (auth.currentUser && auth.currentUser.uid !== uid) {
+      logAdminAction("deleteUserRecipe", { targetUser: uid, recipeId });
+    }
   } catch (error) {
     console.error("Error deleting user recipe:", error);
     throw error;
@@ -689,6 +856,12 @@ async function promoteUserRecipe(uid, recipeId, cuisine = "indian") {
       _promotedFrom: uid,
       _promotedAt: new Date().toISOString(),
     });
+    logAdminAction("promoteUserRecipe", {
+      fromUser: uid,
+      recipeId,
+      cuisine,
+      sharedId: ref.id,
+    });
     return ref.id;
   } catch (error) {
     console.error("Error promoting user recipe:", error);
@@ -714,6 +887,82 @@ async function getAllUsers() {
   } catch (error) {
     console.error("Error fetching users:", error);
     return [];
+  }
+}
+
+// ─── ADMIN AUDIT LOG ─────────────────────────────────────────
+/**
+ * Append a record to the audit/ collection whenever the admin takes
+ * a sensitive action (grants admin, deletes a recipe, promotes a user
+ * recipe, etc.). Fire-and-forget — never blocks the action itself.
+ *
+ * Stored at audit/{auto-id} with: at (serverTimestamp), actor, action,
+ * target (optional uid), details (optional object).
+ *
+ * @param {string} action - Short action name, e.g. "setAdminStatus", "deleteRecipe"
+ * @param {object} [details] - Extra context (target uid, name, cuisine, etc.)
+ */
+async function logAdminAction(action, details = {}) {
+  const actor = auth.currentUser;
+  if (!actor) return; // not signed in — shouldn't happen for admin actions
+  try {
+    await addDoc(collection(db, "audit"), {
+      at: serverTimestamp(),
+      actor: actor.uid,
+      actorEmail: actor.email || null,
+      action,
+      ...details,
+    });
+  } catch (e) {
+    // Audit failure must never block the actual admin action
+    console.warn("Audit log write failed:", e);
+  }
+}
+
+// ─── ACCOUNT DELETION ────────────────────────────────────────
+/**
+ * GDPR right-to-be-forgotten — permanently delete all of a user's data.
+ *
+ * Deletes from Firestore:
+ *  - users/{uid}/data/profile
+ *  - users/{uid}/data/cycle
+ *  - users/{uid}/data/notifications
+ *  - users/{uid}/data/coachHistory (if exists)
+ *  - users/{uid}/logs/*               (every dated meal log)
+ *  - users/{uid}/progress/*           (weight + body fat history)
+ *  - users/{uid}/workoutLogs/*        (workout completion + sets)
+ *  - users/{uid}/recipes/*            (personal recipes)
+ *  - users/{uid}                      (top-level stub)
+ *
+ * NOTE: This does NOT delete the user's Firebase Auth account — that
+ * requires Firebase Admin SDK (server-side). User can revoke Google
+ * access at https://myaccount.google.com/permissions to fully sever.
+ *
+ * @param {string} uid - The user ID to delete data for.
+ * @returns {Promise<void>}
+ */
+async function deleteAllUserData(uid) {
+  if (!uid) throw new Error("deleteAllUserData: uid required");
+
+  // List of sub-collections to wipe
+  const subCollections = ["data", "logs", "progress", "workoutLogs", "recipes"];
+
+  for (const sub of subCollections) {
+    try {
+      const snap = await getDocs(collection(db, "users", uid, sub));
+      // Delete each doc in the sub-collection
+      await Promise.all(snap.docs.map((d) => deleteDoc(d.ref)));
+    } catch (e) {
+      console.warn(`Failed to delete users/${uid}/${sub}:`, e);
+      // Continue with the next sub-collection — don't leave half-deleted data
+    }
+  }
+
+  // Finally, delete the top-level stub doc
+  try {
+    await deleteDoc(doc(db, "users", uid));
+  } catch (e) {
+    console.warn("Failed to delete top-level user doc:", e);
   }
 }
 
@@ -766,4 +1015,6 @@ export {
   getAllUserRecipes,
   promoteUserRecipe,
   markOnboardingDone,
+  deleteAllUserData,
+  logAdminAction,
 };

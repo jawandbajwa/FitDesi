@@ -168,7 +168,7 @@
         <div class="settings-group">
           <div class="settings-row">
             <span class="settings-row-label">App Version</span>
-            <span class="settings-row-value">4.5.1</span>
+            <span class="settings-row-value">4.6.0</span>
           </div>
           <div class="settings-row">
             <span class="settings-row-label">Data Storage</span>
@@ -204,6 +204,22 @@
             <span class="settings-row-label">💡 Request a Feature</span>
             <span class="settings-row-value">GitHub →</span>
           </a>
+          <a
+            class="settings-row"
+            href="privacy.html"
+            style="text-decoration: none; color: inherit; cursor: pointer"
+          >
+            <span class="settings-row-label">🔒 Privacy Policy</span>
+            <span class="settings-row-value">View →</span>
+          </a>
+          <a
+            class="settings-row"
+            href="terms.html"
+            style="text-decoration: none; color: inherit; cursor: pointer"
+          >
+            <span class="settings-row-label">📜 Terms of Service</span>
+            <span class="settings-row-value">View →</span>
+          </a>
           <div class="settings-row last">
             <span class="settings-row-label">Made for</span>
             <span class="settings-row-value">South Asian Fitness 🇮🇳</span>
@@ -218,9 +234,72 @@
       </a>
 
       <!-- SIGN OUT -->
-      <button class="signout-btn" id="signOutBtn">Sign Out</button>
+      <button type="button" class="signout-btn" id="signOutBtn">Sign Out</button>
+
+      <!-- DELETE ACCOUNT — destructive action, kept visually quieter than Sign Out -->
+      <button type="button" class="delete-account-btn" id="deleteAccountBtn">
+        Delete my account & data
+      </button>
     </div>
     <!-- end profile-scroll -->
+
+    <!-- DELETE ACCOUNT CONFIRMATION MODAL -->
+    <div class="ep-overlay" id="deleteAccountOverlay">
+      <div class="ep-sheet" style="max-height: 80vh">
+        <div class="ep-handle"></div>
+        <div class="ep-header">
+          <span class="ep-title">Delete account?</span>
+          <button type="button" class="ep-close" id="deleteAccountClose" aria-label="Close">✕</button>
+        </div>
+        <div class="ep-body" style="padding-bottom: 24px">
+          <p style="font-size: 14px; color: var(--text-dim); line-height: 1.6; margin-bottom: 20px">
+            This will <strong style="color: var(--text)">permanently delete</strong> all your data:
+          </p>
+          <ul style="font-size: 13px; color: var(--text-dim); padding-left: 22px; margin-bottom: 20px; line-height: 1.8">
+            <li>Your profile (name, weight, height, goals)</li>
+            <li>Every meal you've logged</li>
+            <li>Your workout cycle + set history</li>
+            <li>Weight + body-fat progress history</li>
+            <li>Your personal recipes</li>
+            <li>Notification settings, coach history</li>
+          </ul>
+          <p style="font-size: 12px; color: var(--text-faint); margin-bottom: 16px">
+            This cannot be undone. To also revoke FitDesi's Google access,
+            visit <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener" style="color: var(--green)">myaccount.google.com/permissions</a>.
+          </p>
+          <p style="font-size: 13px; color: var(--text-dim); margin-bottom: 8px">
+            Type <strong style="color: var(--text)">DELETE</strong> below to confirm:
+          </p>
+          <input
+            type="text"
+            id="deleteConfirmInput"
+            class="ep-input"
+            placeholder="Type DELETE"
+            autocomplete="off"
+            style="margin-bottom: 16px"
+          />
+          <div style="display: flex; gap: 10px">
+            <button
+              type="button"
+              class="ep-save-btn"
+              id="deleteAccountConfirm"
+              disabled
+              style="background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.5); color: #ef4444; opacity: 0.5; cursor: not-allowed"
+            >
+              Delete forever
+            </button>
+            <button
+              type="button"
+              class="ep-save-btn"
+              id="deleteAccountCancel"
+              style="background: var(--bg); border-color: var(--border); color: var(--text-dim)"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- ── EDIT PROFILE BOTTOM SHEET ─────────────────────── -->
     <div class="ep-overlay" id="epOverlay">
@@ -578,6 +657,7 @@
         getUserProfile,
         saveUserProfile,
         isAdmin,
+        deleteAllUserData,
       } from "./firebase.js";
 
       // ── Label maps ───────────────────────────────────────────
@@ -976,6 +1056,67 @@
           await signOutUser();
           window.location.href = "login.html";
         });
+
+      // ── Delete Account flow ──────────────────────────────────
+      // Double confirmation required: typing "DELETE" then clicking the
+      // red button. After deletion, Firestore data is gone and we sign
+      // the user out (their Firebase Auth account remains — they must
+      // revoke at myaccount.google.com/permissions to fully sever).
+      const delOverlay = document.getElementById("deleteAccountOverlay");
+      const delInput = document.getElementById("deleteConfirmInput");
+      const delConfirmBtn = document.getElementById("deleteAccountConfirm");
+
+      function openDeleteModal() {
+        delInput.value = "";
+        delConfirmBtn.disabled = true;
+        delConfirmBtn.style.opacity = "0.5";
+        delConfirmBtn.style.cursor = "not-allowed";
+        delOverlay.classList.add("open");
+      }
+      function closeDeleteModal() {
+        delOverlay.classList.remove("open");
+      }
+
+      document.getElementById("deleteAccountBtn").addEventListener("click", openDeleteModal);
+      document.getElementById("deleteAccountClose").addEventListener("click", closeDeleteModal);
+      document.getElementById("deleteAccountCancel").addEventListener("click", closeDeleteModal);
+      delOverlay.addEventListener("click", (e) => {
+        if (e.target === delOverlay) closeDeleteModal();
+      });
+
+      // Enable Delete button only when user types exactly "DELETE"
+      delInput.addEventListener("input", () => {
+        const match = delInput.value.trim() === "DELETE";
+        delConfirmBtn.disabled = !match;
+        delConfirmBtn.style.opacity = match ? "1" : "0.5";
+        delConfirmBtn.style.cursor = match ? "pointer" : "not-allowed";
+      });
+
+      delConfirmBtn.addEventListener("click", async () => {
+        if (delConfirmBtn.disabled) return;
+        const user = auth.currentUser;
+        if (!user) {
+          closeDeleteModal();
+          window.location.href = "login.html";
+          return;
+        }
+        delConfirmBtn.textContent = "Deleting…";
+        delConfirmBtn.disabled = true;
+        try {
+          await deleteAllUserData(user.uid);
+          // Clear local caches too
+          try {
+            localStorage.clear();
+          } catch (e) {}
+          await signOutUser();
+          window.location.href = "login.html";
+        } catch (err) {
+          console.error("Account deletion failed:", err);
+          delConfirmBtn.textContent = "Error — try again";
+          delConfirmBtn.disabled = false;
+          alert("Failed to delete account: " + (err.message || err));
+        }
+      });
 
       // Notification toggles
       ["toggleMealReminders", "toggleWorkoutReminders"].forEach((id) => {

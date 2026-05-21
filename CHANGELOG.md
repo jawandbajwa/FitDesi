@@ -6,6 +6,22 @@ This project uses [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH.
 
 ---
 
+## [4.6.0] — 2026-05-21
+### Added
+- **Account deletion flow** (GDPR right-to-be-forgotten). Profile → "Delete my account & data" → confirmation modal requires typing "DELETE" → wipes all Firestore data (profile, meal logs, workouts, progress, recipes) and signs out. `deleteAllUserData(uid)` in firebase.js.
+- **Admin action audit log** at `audit/{auto-id}`. Every sensitive admin action (setAdminStatus, assignCoach, deleteIngredient, deleteRecipe, deleteUserRecipe, promoteUserRecipe) now writes an immutable record with actor UID, action, target, timestamp. `logAdminAction()` helper in firebase.js. Append-only by admin in Firestore rules; nobody can update or delete entries.
+- **Cloudflare Worker rate limiting** (`cloudflare-worker.js`). Sliding-window per-UID (or per-IP fallback) limits via Workers KV: family users 30/min + 200/hour, admin 100/min + 1000/hour. Returns 429 with `Retry-After`. No-ops if `RATE_LIMIT` KV binding isn't set (graceful degradation). Requires `wrangler deploy` from `C:\Users\jawan\fitdesi-gemini` after a one-time KV namespace creation in Cloudflare dashboard.
+- **Privacy Policy** (`privacy.html`) and **Terms of Service** (`terms.html`) pages. Linked from Profile About section. Cover what data is collected, where it's stored, third-party services, user rights, and a clear "not medical advice" disclaimer.
+- **Subresource Integrity (SRI)** hash on Chart.js CDN script tag. Pinned to chart.js@4.4.7 with sha384 integrity check + `crossorigin="anonymous"`. Browser will reject any tampered version from the CDN.
+- **JSDoc type definitions** for core Firebase APIs (UserProfile, DailyLog, WorkoutCycle, Recipe, Ingredient, ProgressEntry) plus annotations on the most-used functions in firebase.js. Enables VS Code autocomplete + type checking without a TypeScript migration.
+
+### Changed
+- coach.js now sends `X-User-Uid` header to the Worker so per-UID rate limiting works (was IP-only before).
+- Firestore rules: new `audit/{document}` collection — admin can create+read, nobody can update or delete (preserves tamper-evident history).
+
+### Documented
+- Firebase ES module imports can't have SRI hashes (only `<script>` tags support `integrity`). Only protection is the pinned 10.7.1 SDK version. Documented in firebase.js header comment.
+
 ## [4.5.1] — 2026-05-20
 ### Added
 - **Lighthouse CI** workflow runs after every deploy + on PRs, audits Performance / Accessibility / Best Practices / SEO with public clickable report links.

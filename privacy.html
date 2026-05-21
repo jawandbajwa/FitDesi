@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" />
+    <link rel="icon" href="icon-192.png" />
+    <title>FitDesi — Privacy Policy</title>
+
+    <!-- SEO -->
+    <meta name="description" content="FitDesi privacy policy — what data we collect, where it's stored, and how to delete it." />
+    <link rel="canonical" href="https://jawandbajwa.github.io/FitDesi/privacy.html" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="FitDesi" />
+    <meta property="og:title" content="FitDesi — Privacy Policy" />
+    <meta property="og:image" content="https://jawandbajwa.github.io/FitDesi/icon-512.png" />
+
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#7ed99a" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="apple-touch-icon" href="icon-192.png" />
+    <script>
+      try {
+        var t = localStorage.getItem("fitdesi_theme");
+        if (t === "light" || t === "warm") document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    </script>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      .legal-page {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 24px 20px 80px;
+        line-height: 1.65;
+      }
+      .legal-page h1 {
+        font-size: 26px;
+        font-weight: 600;
+        color: var(--text);
+        margin: 16px 0 4px;
+      }
+      .legal-page .legal-updated {
+        font-size: 12px;
+        color: var(--text-faint);
+        margin-bottom: 28px;
+      }
+      .legal-page h2 {
+        font-size: 17px;
+        font-weight: 600;
+        color: var(--text);
+        margin: 28px 0 8px;
+      }
+      .legal-page p,
+      .legal-page li {
+        font-size: 14px;
+        color: var(--text-dim);
+      }
+      .legal-page ul {
+        padding-left: 20px;
+        margin: 8px 0 16px;
+      }
+      .legal-page a {
+        color: var(--green);
+        text-decoration: none;
+      }
+      .legal-page a:hover {
+        text-decoration: underline;
+      }
+      .legal-page strong {
+        color: var(--text);
+      }
+    </style>
+  </head>
+  <body>
+    <header class="app-header">
+      <a href="profile.html" class="back-btn">← Back</a>
+      <div class="app-header-title">Privacy Policy</div>
+    </header>
+
+    <main class="legal-page">
+      <h1>Privacy Policy</h1>
+      <div class="legal-updated">Last updated: May 21, 2026</div>
+
+      <p>
+        FitDesi is a personal fitness app made by one person for family use.
+        This policy explains exactly what data is stored, where, and how to delete it.
+      </p>
+
+      <h2>1. What we collect</h2>
+      <p>When you sign in with Google, we receive (from Google):</p>
+      <ul>
+        <li>Your Google display name</li>
+        <li>Your email address</li>
+        <li>Your Google profile photo URL</li>
+      </ul>
+      <p>When you use the app, we store (your inputs):</p>
+      <ul>
+        <li>Your fitness profile: age, gender, weight, height, body-fat measurements, fitness goal, activity level, weight unit preference</li>
+        <li>Your meal logs: dates, meals, and macro totals</li>
+        <li>Your workout cycle: start date, split selection, completed sets and reps</li>
+        <li>Your weight + body-fat history (if you log progress)</li>
+        <li>Your personal recipes (if you submit any)</li>
+        <li>Your AI coach conversation history (last 16 messages, for context)</li>
+        <li>Your theme preference (stored locally on your device only)</li>
+      </ul>
+      <p><strong>We never collect:</strong> location, contacts, photos, payment information, browsing history, advertising IDs.</p>
+
+      <h2>2. Where it's stored</h2>
+      <p>All your data is stored in <strong>Google Firestore</strong> under your Google account UID. The database is owned by the developer (jawandbajwa@gmail.com) and hosted on Google Cloud (Firebase). Firestore security rules ensure only you and the admin can read your data.</p>
+      <p>Your theme preference and small caches are stored in your browser's <strong>localStorage</strong> and <strong>IndexedDB</strong> — they never leave your device.</p>
+
+      <h2>3. Who can see your data</h2>
+      <ul>
+        <li><strong>You</strong> — when signed in</li>
+        <li><strong>The admin</strong> (jawandbajwa@gmail.com) — has read access to all user profiles to manage the app. Admin actions are logged.</li>
+        <li><strong>Google</strong> — as the cloud host, subject to <a href="https://cloud.google.com/security" target="_blank" rel="noopener">Google Cloud's security</a></li>
+      </ul>
+      <p>We never sell, share, or rent your data. We never run ads.</p>
+
+      <h2>4. Third-party services</h2>
+      <ul>
+        <li><strong>Google Sign-In</strong> — for authentication only. See <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google's privacy policy</a>.</li>
+        <li><strong>Cloudflare Worker proxy</strong> (fitdesi-gemini.jawandbajwa.workers.dev) — relays AI-coach prompts to Google Gemini. Cloudflare does not retain message content.</li>
+        <li><strong>Google Gemini API</strong> — processes your coach chat prompts (only when you use the coach). Subject to <a href="https://ai.google.dev/gemini-api/terms" target="_blank" rel="noopener">Google's API terms</a>. We do not send your name or email to Gemini — only your profile macros, recent meals, and the conversation.</li>
+        <li><strong>jsDelivr CDN</strong> — serves Chart.js library for progress charts.</li>
+        <li><strong>Google Fonts</strong> — serves the Inter font.</li>
+      </ul>
+
+      <h2>5. Your rights</h2>
+      <p>You can:</p>
+      <ul>
+        <li><strong>View</strong> your data — it's all visible in the app while signed in</li>
+        <li><strong>Edit</strong> any data — Profile, Tracker, Exercise pages</li>
+        <li><strong>Delete your account</strong> — Profile → Account → Delete Account. This purges all your Firestore data immediately and irreversibly.</li>
+        <li><strong>Export your data</strong> — contact <a href="mailto:jawandbajwa@gmail.com">jawandbajwa@gmail.com</a> (manual export, not yet automated)</li>
+        <li><strong>Revoke Google access</strong> — at <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener">myaccount.google.com/permissions</a></li>
+      </ul>
+
+      <h2>6. Cookies</h2>
+      <p>FitDesi does not use tracking cookies. The only browser storage we use is for authentication tokens (managed by Firebase) and your theme/cache (in localStorage and IndexedDB). No cookies are sent to advertisers.</p>
+
+      <h2>7. Children</h2>
+      <p>FitDesi is not directed at children under 13. If you become aware that a child has provided data, contact us and it will be deleted.</p>
+
+      <h2>8. Changes</h2>
+      <p>If this policy changes, the "Last updated" date above changes too. Significant changes will be announced in the in-app changelog.</p>
+
+      <h2>9. Contact</h2>
+      <p>
+        Questions about your data? Email <a href="mailto:jawandbajwa@gmail.com">jawandbajwa@gmail.com</a> or
+        <a href="https://github.com/jawandbajwa/FitDesi/issues/new" target="_blank" rel="noopener">open a GitHub issue</a>.
+      </p>
+
+      <p style="margin-top: 40px; font-size: 12px; color: var(--text-faint)">
+        <a href="terms.html">Terms of Service</a> · <a href="profile.html">Back to app</a>
+      </p>
+    </main>
+  </body>
+</html>

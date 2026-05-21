@@ -30,5 +30,15 @@ service cloud.firestore {
       allow read:  if request.auth != null;
       allow write: if isAdmin();
     }
+
+    // Admin audit log — append-only by admin; readable only by admin.
+    // Tracks every sensitive action (setAdminStatus, deleteRecipe,
+    // deleteUserRecipe, promoteUserRecipe, deleteIngredient, assignCoach).
+    // No update/delete allowed — preserves a tamper-evident history.
+    match /audit/{document} {
+      allow read:   if isAdmin();
+      allow create: if isAdmin();
+      allow update, delete: if false;
+    }
   }
 }

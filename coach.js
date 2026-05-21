@@ -696,6 +696,9 @@ SUPPLEMENTS (only recommend if relevant):
     headers: {
       "Content-Type": "application/json",
       "X-Is-Admin": isAdmin(auth.currentUser) ? "true" : "false",
+      // Identifies the user for per-UID rate limiting in the Worker.
+      // Falls back to IP-based limiting if absent.
+      "X-User-Uid": auth.currentUser?.uid || "",
     },
     body: JSON.stringify(payload),
   });
