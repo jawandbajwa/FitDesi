@@ -24,10 +24,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
 
       - name: Install dev dependencies
-        run: npm ci || npm install
+        # No package-lock.json checked in (this repo has no build step),
+        # so use plain `npm install` not `npm ci`.
+        run: npm install --no-audit --no-fund
 
       - name: Run ESLint
         run: npm run lint
