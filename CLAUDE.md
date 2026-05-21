@@ -60,6 +60,26 @@ This updates `manifest.json`, `profile.html` (About section), and `sw.js` cache 
 | `coach-config.js` | **Gitignored** — local dev overrides (e.g. `GEMINI_PROXY_URL`) |
 | `coach-config.example.js` | Template for coach-config.js |
 
+### Tooling & CI files (added in v4.4-4.5)
+| File | Purpose |
+|------|---------|
+| `package.json` | Lists ESLint + Prettier as dev deps. No build step — only used for `npm run lint` / `npm run format`. No `"type": "module"` (so `bump-version.js` keeps working with `require`). |
+| `eslint.config.mjs` | ESLint 9+ flat config. Modern recommended rules + browser/SW globals. Warns (doesn't fail) on unused vars + smart-eqeqeq + prefer-const. |
+| `.prettierrc.json` | Formatter config — 2-space, double-quote, ES5 trailing commas, 100-col (120 for HTML, 80 for MD). |
+| `.prettierignore` | Skips vendor data files (ingredients*.js, recipes_canada.js) and sw.js. |
+| `CHANGELOG.md` | Human-readable release notes. Linked from profile.html About section as "📋 What's New". |
+| `sitemap.xml` | SEO — lists 5 public pages. |
+| `robots.txt` | Disallows crawling of `/admin.html` and `/profile.html`; allows everything else; links sitemap. |
+| `.github/dependabot.yml` | Weekly auto-PRs for GitHub Actions + npm dev-deps. |
+| `.github/workflows/lighthouse.yml` | Runs Lighthouse on every deploy + PR; reports go to temporaryPublicStorage. |
+| `.github/lighthouserc.json` | Lighthouse config — desktop preset, warn thresholds (Perf 70+, A11y 85+, BP 85+, SEO 85+). |
+| `.github/workflows/lint.yml` | Runs ESLint + Prettier check on every PR + main push. `continue-on-error: true` for now. |
+| `.github/workflows/pages.yml` | Deploys site to GitHub Pages on every push to main. |
+| `.github/ISSUE_TEMPLATE/bug_report.md` | Structured bug-report template. |
+| `.github/ISSUE_TEMPLATE/feature_request.md` | Structured feature-request template. |
+| `.github/ISSUE_TEMPLATE/config.yml` | Disables blank issues, links to CLAUDE.md docs. |
+| `firestore.rules` | Firestore security rules. Deploy via `firebase deploy --only firestore:rules` — NOT via git push. |
+
 ---
 
 ## Admin Panel — Current State
@@ -224,14 +244,59 @@ wrangler deploy
 ## Versioning
 
 Version is stored in two places: `manifest.json` and `profile.html` (About section).
-Current version: **4.3.1**
+Current version: **4.5.1**
 
 Rules:
 - Small change → `node bump-version.js patch` (+1 patch, 0–9, rolls to minor at 10)
 - Notable update → `node bump-version.js minor` (+1 minor, 0–9, rolls to major at 10)
 - Big release → `node bump-version.js major` (+1 major)
 
-The script also bumps `sw.js` cache version automatically (current: `fitdesi-v92`).
+The script also bumps `sw.js` cache version automatically (current: `fitdesi-v95`).
+
+---
+
+## Tooling & CI (v4.4-4.5)
+
+### Linting & formatting (optional local install)
+```bash
+npm install            # installs ESLint + Prettier dev deps
+npm run lint           # ESLint check
+npm run lint:fix       # ESLint auto-fix
+npm run format         # Prettier write
+npm run format:check   # Prettier verify (used in CI)
+```
+- `eslint.config.mjs` uses ESLint 9 flat config + `@eslint/js` recommended rules
+- `.prettierrc.json` defines formatting (2-space, double-quote, ES5 trailing commas, 100-col)
+- Vendor data files (`ingredients*.js`, `recipes_canada.js`) are ignored by both
+- **Not required for commits or deploy** — purely an opt-in quality tool. `node_modules` is gitignored.
+
+### GitHub Actions workflows
+| Workflow | Trigger | What it does | Blocks deploy? |
+|---|---|---|---|
+| `pages.yml` | Push to main | Deploys site to GitHub Pages | n/a |
+| `lighthouse.yml` | After Pages deploy + on PRs + manual | Runs Lighthouse 3× per URL, reports Perf/A11y/BP/SEO scores with clickable report links | No (warn only) |
+| `lint.yml` | Every PR + push to main | Runs ESLint + Prettier check | No (`continue-on-error: true` until codebase is clean) |
+
+### Automated dependency updates
+`.github/dependabot.yml` opens weekly PRs for:
+- GitHub Actions versions (e.g., `actions/checkout@v4 → v5`)
+- npm dev-deps (ESLint, Prettier, etc.) — only when running `npm install`
+
+GitHub also has built-in security alerts (Security tab) for CVEs in any pinned versions — enable in repo settings.
+
+### SEO & link previews
+Every public HTML page has:
+- `<meta name="description">` — page-specific description (~150 chars)
+- Open Graph tags (`og:title`, `og:description`, `og:image`, `og:url`, `og:type`, `og:site_name`)
+- Twitter Card tags (`twitter:card="summary"`, `twitter:title`, `twitter:description`, `twitter:image`)
+- `<link rel="canonical">` — absolute URL
+
+Admin and profile pages have `<meta name="robots" content="noindex">` (defence-in-depth alongside the `robots.txt` disallow rule).
+
+`sitemap.xml` and `robots.txt` live at site root.
+
+### Issue templates
+`.github/ISSUE_TEMPLATE/{bug_report,feature_request,config}.md` — drives the "🐛 Report a Bug" / "💡 Request a Feature" links in profile.html About section. Blank issues are disabled (`config.yml`).
 
 ---
 
@@ -253,14 +318,26 @@ The script also bumps `sw.js` cache version automatically (current: `fitdesi-v92
 ### How colors work with themes
 - **Never hardcode colors** — all green colors must use `var(--green)` so they adapt to Light/Warm/Dark themes
 - **For transparency**: use `rgb(var(--green-rgb) / 0.12)` instead of `rgba(126,217,154,0.12)`
-- **In JavaScript**: when setting inline styles, use `getGreenColor()` helper:
-  ```javascript
-  function getGreenColor() {
-    return getComputedStyle(document.documentElement).getPropertyValue('--green').trim();
-  }
-  ```
+- **In JavaScript inline styles**: CSS variables work directly inside `style.cssText` template literals — `el.style.cssText = "color: var(--green);"` resolves correctly per theme. No helper function needed. (The old `getGreenColor()` helper was removed in v4.3.0.)
+- **Beware `\v` in template literals**: writing `` `color: \var(--green);` `` makes JS interpret `\v` as the vertical-tab escape character → emits `<0x0B>ar(--green)` → invalid CSS. Always write `var(--green)` (no leading backslash).
 - **Never use hardcoded hex**: `#7ed99a`, `#A85A1F`, `#E8B547` are theme-specific — always use the CSS variable
-- Files that use `getGreenColor()`: admin.js, tracker.js, onboarding.js, coach.js
+
+### Utility classes (v4.5+)
+| Class | Use case |
+|------|---------|
+| `.skeleton` | Apply to any element you want shimmering. Hides its text (`color: transparent !important`) and animates a gradient overlay. Themed for all 3 themes. Respects `prefers-reduced-motion`. |
+| `.skeleton-card` + `.skeleton-icon` + `.skeleton-info` + `.skeleton-line` (with `.short` / `.medium` / `.long` modifiers) | Pre-built skeleton row matching the `.admin-item` layout. Use via the JS helper `renderSkeletonList(containerId, count)` in `admin.js`. |
+| `.empty-state` + `.empty-icon` + `.empty-title` + `.empty-desc` + `.empty-cta` | Friendly empty-list card with icon, heading, body, and optional CTA button. Used when admin tabs / lists have no items. Themed automatically. |
+| `.field-hint` | Small "optional" inline hint inside a `<label>`. Themed via `var(--text-faint)`. |
+| `.muted-message` | Inline empty-state text for compact contexts (used inside expanded per-user panels). |
+| `.danger-btn` | Red themed destructive action (delete modal). |
+| `.cancel-btn` | Neutral themed cancel action (delete modal). |
+| `.delete-message` | Delete-modal subtitle text, themed via `var(--text-dim)`. |
+
+### Accessibility
+- **Focus rings**: `:focus-visible` outline using `var(--green)` is applied to all interactive elements (`button`, `a`, `input`, `select`, `textarea`, `.tab-btn`, `.nav-tab`, `.nav-item`, `.theme-seg-btn`). Only shows on keyboard nav, never on click.
+- **Reduced motion**: a global `@media (prefers-reduced-motion: reduce)` block caps all animations/transitions to 0.01ms across the app. Skeleton shimmer also respects this.
+- **ARIA**: all icon-only buttons (✕ close, ✏️ edit, 📖 view, 🗑️ delete) have `aria-label`; toggle buttons (coach picker) use `aria-pressed`; modals close buttons use `type="button"` to prevent accidental form submission.
 
 ### Theme palette reference
 | Variable | Light (Cream) | Warm (Gold) | Dark (default) |
@@ -405,7 +482,11 @@ First-time user intro shown once, ever. Implemented in `onboarding.js`, triggere
 ## How to Make Changes
 
 1. Edit the relevant file(s) directly — no compilation needed
-2. Run `node bump-version.js patch` (or `minor`/`major`) to bump version + SW cache
-3. `git add`, `git commit`, `git push origin main`
-4. Site is live at https://jawandbajwa.github.io/FitDesi/ within ~1 minute
-5. If `cloudflare-worker.js` changed: also redeploy via `wrangler deploy` from `C:\Users\jawan\fitdesi-gemini`
+2. (Optional) Run `npm run format` to auto-format with Prettier, or `npm run lint` to check ESLint
+3. Run `node bump-version.js patch` (or `minor`/`major`) to bump version + SW cache
+4. Add a section to `CHANGELOG.md` describing what changed (one bullet per item, grouped under Added / Fixed / Changed / Removed)
+5. `git add`, `git commit`, `git push origin main`
+6. Site is live at https://jawandbajwa.github.io/FitDesi/ within ~1 minute
+7. GitHub Actions automatically runs Lighthouse + ESLint + Prettier check — see the Actions tab for reports
+8. If `cloudflare-worker.js` changed: also redeploy via `wrangler deploy` from `C:\Users\jawan\fitdesi-gemini`
+9. If `firestore.rules` changed: also redeploy via `firebase deploy --only firestore:rules`

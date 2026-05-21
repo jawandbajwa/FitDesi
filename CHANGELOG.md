@@ -6,6 +6,29 @@ This project uses [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH.
 
 ---
 
+## [4.5.1] — 2026-05-20
+### Added
+- **Lighthouse CI** workflow runs after every deploy + on PRs, audits Performance / Accessibility / Best Practices / SEO with public clickable report links.
+- **ESLint** (flat config) + **Prettier** for code quality. Optional local install via `npm install`; runs automatically on PRs via `lint.yml` workflow.
+- **Dependabot** extended to also watch npm dev-dependencies.
+
+### Fixed
+- `bump-version.js` was breaking after package.json was added (was incompatibly typed as ES module). Removed `"type": "module"` and renamed `eslint.config.js` → `.mjs` instead.
+
+## [4.5.0] — 2026-05-20
+### Added
+- **Skeleton loading states** — shimmering placeholders shown in admin tabs (Ingredients, Recipes, Users, Personal Recipes) during the Firestore load. Replaces the 1-2s blank flash. Themed for all 3 themes. Respects `prefers-reduced-motion`.
+- **Empty-state designs** — friendly cards (icon + heading + body + CTA) when lists are empty. Different copy and icons for "no items yet" vs "no search results".
+- **Accessibility quick wins**: `:focus-visible` outlines using theme accent on all interactive elements; `aria-label` + `type="button"` on all icon-only buttons (✕ close, ✏️ edit, 📖 view, 🗑️ delete, coach picker); global `prefers-reduced-motion` handler caps animations to 0.01ms.
+
+## [4.4.0] — 2026-05-20
+### Added
+- **Dependabot config** for weekly automated GitHub Actions update PRs.
+- **SEO meta tags** on all 7 HTML pages (meta description, Open Graph, Twitter Card, canonical URL). Link previews now show proper cards in iMessage, WhatsApp, Slack.
+- **sitemap.xml** and **robots.txt** at site root. Admin and Profile pages also have `<meta name="robots" content="noindex">`.
+- **CHANGELOG.md** with categorised history, linked from profile.html About section as "📋 What's New".
+- **Bug-report and feature-request flow** — `.github/ISSUE_TEMPLATE/{bug_report,feature_request,config}.md` plus "🐛 Report a Bug" and "💡 Request a Feature" rows in profile About section with pre-filled GitHub issue URLs. Blank issues disabled.
+
 ## [4.3.1] — 2026-05-20
 ### Fixed
 - Admin panel: invalid `\v` escape in JS template literals broke 9 inline styles. Coach badge, Assign/Remove Coach button, edit ✏️/recipes 📖 toggle states, and coach picker active state are now properly themed.
