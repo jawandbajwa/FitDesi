@@ -1,0 +1,24 @@
+# Dependabot configuration — automated security + dependency updates.
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+#
+# FitDesi is a static site with no package.json, so the main thing to keep
+# fresh is the GitHub Actions used in any workflows. CDN-loaded Firebase SDK
+# is pinned in firebase.js (line ~2) — bump it manually when a CVE drops.
+# GitHub's Dependabot alerts will warn you on the Security tab.
+version: 2
+updates:
+  # Keep GitHub Actions versions current (e.g. actions/checkout@v4 etc.)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/Toronto"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"

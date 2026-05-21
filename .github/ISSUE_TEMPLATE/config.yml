@@ -1,0 +1,6 @@
+# Issue chooser configuration — disables blank issues, shows the templates.
+blank_issues_enabled: false
+contact_links:
+  - name: 📖 Read the docs
+    url: https://github.com/jawandbajwa/FitDesi/blob/main/CLAUDE.md
+    about: Project overview, file map, gotchas, and architecture notes.

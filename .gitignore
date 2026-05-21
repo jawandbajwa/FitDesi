@@ -2,6 +2,7 @@ github_token.txt
 node_modules/
 *.log
 *.txt
+!robots.txt
 .DS_Store
 .claude/
 coach-config.js
