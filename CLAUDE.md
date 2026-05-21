@@ -87,10 +87,21 @@ This updates `manifest.json`, `profile.html` (About section), and `sw.js` cache 
 - **✏️ Edit** button → change coach inline
 - **📖 Recipes** button → view that user's personal recipes
 
+### Theming (Light + Warm)
+admin.css uses CSS variables throughout — `var(--text)`, `var(--text-dim)`, `var(--text-faint)`, `var(--card)`, `var(--bg)`, `var(--border)`, `var(--green)`, `rgb(var(--green-rgb) / 0.X)`. The Users-tab DOM is built dynamically in admin.js, so the same CSS-variable strings appear in inline `style.cssText` template literals there too.
+
+**Utility classes** (in admin.css, used in admin.html for inline-styled spots that need theming):
+- `.field-hint` — small "optional" hint text inside `<label>` (themed via `var(--text-faint)`)
+- `.muted-message` — empty-state / placeholder messages inside lists
+- `.danger-btn` — red themed destructive action
+- `.cancel-btn` — neutral themed cancel action
+- `.delete-message` — delete-modal subtitle
+
 ### Known past bugs (fixed)
 - **Members always 0** — `users/{uid}` top-level docs didn't exist; `getDocs(collection(db,"users"))` returned []. Fixed by switching to `collectionGroup`.
 - **Both tabs visible simultaneously** — stale cached `admin.js` used `.tab-content` selector (old name); `querySelectorAll(".tab-content")` found 0 elements so no pane was ever hidden. Fixed by renaming to `.admin-tab-pane` + adding `?v=2` import suffix.
 - **Wrong Firestore paths in old admin queries** — old code queried `users/{uid}` directly instead of `users/{uid}/data/profile`. Fixed when collectionGroup approach was introduced.
+- **Light/Warm admin panel invisible text** — 40+ hardcoded `rgba(255,255,255,X)` colors and broken `\${getGreenColor()}` template-literal escapes in admin.js/css/html. Fixed by refactoring everything to CSS variables. See Gotcha #14.
 
 ---
 
@@ -213,14 +224,14 @@ wrangler deploy
 ## Versioning
 
 Version is stored in two places: `manifest.json` and `profile.html` (About section).
-Current version: **4.2.0**
+Current version: **4.3.1**
 
 Rules:
 - Small change → `node bump-version.js patch` (+1 patch, 0–9, rolls to minor at 10)
 - Notable update → `node bump-version.js minor` (+1 minor, 0–9, rolls to major at 10)
 - Big release → `node bump-version.js major` (+1 major)
 
-The script also bumps `sw.js` cache version automatically (current: `fitdesi-v81`).
+The script also bumps `sw.js` cache version automatically (current: `fitdesi-v92`).
 
 ---
 
@@ -237,7 +248,19 @@ The script also bumps `sw.js` cache version automatically (current: `fitdesi-v81
   ```html
   <script>try{var t=localStorage.getItem("fitdesi_theme");if(t==="light"||t==="warm")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
   ```
-- CSS variables: `--bg`, `--card`, `--border`, `--text`, `--text-dim`, `--text-faint`, `--green` (accent), `--green-muted`, `--green-dark`, `--radius`
+- CSS variables: `--bg`, `--card`, `--border`, `--text`, `--text-dim`, `--text-faint`, `--green` (accent), `--green-rgb` (for transparent colors), `--green-muted`, `--green-dark`, `--radius`
+
+### How colors work with themes
+- **Never hardcode colors** — all green colors must use `var(--green)` so they adapt to Light/Warm/Dark themes
+- **For transparency**: use `rgb(var(--green-rgb) / 0.12)` instead of `rgba(126,217,154,0.12)`
+- **In JavaScript**: when setting inline styles, use `getGreenColor()` helper:
+  ```javascript
+  function getGreenColor() {
+    return getComputedStyle(document.documentElement).getPropertyValue('--green').trim();
+  }
+  ```
+- **Never use hardcoded hex**: `#7ed99a`, `#A85A1F`, `#E8B547` are theme-specific — always use the CSS variable
+- Files that use `getGreenColor()`: admin.js, tracker.js, onboarding.js, coach.js
 
 ### Theme palette reference
 | Variable | Light (Cream) | Warm (Gold) | Dark (default) |
@@ -361,7 +384,7 @@ First-time user intro shown once, ever. Implemented in `onboarding.js`, triggere
 ## Common Gotchas
 
 1. **Service worker caching** — always run `node bump-version.js patch` (or `minor`/`major`) before pushing JS/CSS changes.
-2. **`nav-item` vs `nav-tab`** — exercise.html/recipes.html/profile.html use `.nav-item`; index.html/tracker.html use `.nav-tab`. Both are styled identically in `style.css` (aliases). **SVG icons are now standardized** across all 5 pages — see "Bottom Nav Icons" reference above. If you add a new page or edit an icon, use the canonical SVG markup so the icon shape never changes between pages.
+2. **Bottom nav is standardized across all 5 pages** — all pages now use identical markup for the home button: `class="nav-tab nav-home-tab"` with `<span class="nav-label">Home</span>`. Other nav items use `class="nav-item"` (recipes/workout/profile) or `class="nav-tab"` (nutrition). Both are styled identically in `style.css` (aliases). **SVG icons are now standardized** across all 5 pages — see "Bottom Nav Icons" reference above. If you add a new page or edit an icon, use the canonical SVG markup so the icon shape never changes between pages.
 3. **Inline styles on modals** — some modal buttons in exercise.html have hardcoded dark colors as inline styles. Override with `!important` in style.css targeting the element's ID.
 4. **Chart.js** — loaded via CDN. Use `type: "category"` for x-axis (not `"time"` — no date adapter loaded). Always call `.destroy()` on old chart instance before creating a new one.
 5. **`deleteField()`** — imported from `firebase/firestore`, used in `clearWeightHistory` / `clearBodyFatHistory` to surgically remove one field from a progress doc without deleting the whole doc.
@@ -373,6 +396,9 @@ First-time user intro shown once, ever. Implemented in `onboarding.js`, triggere
 11. **`getAllUsers()` uses `collectionGroup` — requires a Firestore rule** — `match /{path=**}/data/{document} { allow read: if isAdmin(); }` must be present in `firestore.rules` AND deployed via `firebase deploy --only firestore:rules`. Without it the query silently returns `permission-denied` (no error thrown — just returns []).
 12. **Admin `firebase.js` import has a version suffix** — `from "./firebase.js?v=2"` in admin.js. When firebase.js changes significantly, increment the `?v=N` to bust the ES module cache in long-lived browser sessions.
 13. **Firestore rules are NOT deployed by git push** — always run `firebase deploy --only firestore:rules` after editing `firestore.rules`.
+14. **All green colors must use CSS variables** — never hardcode `#7ed99a`, `#A85A1F`, or `#E8B547`. Use `var(--green)` for solid colors and `rgb(var(--green-rgb) / alpha)` for transparency. Works directly inside JS template literals for `style.cssText` — no helper needed (browsers resolve CSS variables when the style is applied). The old `getGreenColor()` helper was removed in v4.3.0; use `var(--green)` instead.
+15. **Beware `\v` in JS template literals** — When writing CSS into a JS template literal (`` ` ... ` ``), don't accidentally introduce `\var(--green)` — JS interprets `\v` as the vertical-tab escape char, so the string becomes `<0x0B>ar(--green)` and the browser drops the whole declaration as invalid. Always write `var(--green)` (no leading backslash) in template literals.
+16. **Admin panel: NEVER hardcode `rgba(255,255,255,X)`** — these are invisible in Light theme (cream bg). Use `var(--text)`, `var(--text-dim)`, `var(--text-faint)`, `var(--card)`, `var(--bg)`, or `var(--border)`. For form-label hints, use the `.field-hint` class. For empty-state messages, use `.muted-message`. For destructive/cancel buttons, use `.danger-btn` / `.cancel-btn`. See "Admin Panel — Current State → Theming" above.
 
 ---
 
