@@ -35,6 +35,26 @@ let activeCuisine = "indian";
 let allUserRecipes = [];
 let userRecipesLoaded = false;
 
+// ─── SKELETON LOADER HELPER ──────────────────────────────────
+// Renders N shimmering skeleton cards into a container while data loads.
+// Each card matches the .admin-item layout (icon + 2 text lines + button slot).
+function renderSkeletonList(containerId, count = 4) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  let html = "";
+  for (let i = 0; i < count; i++) {
+    html += `
+      <div class="skeleton-card">
+        <div class="skeleton-icon skeleton"></div>
+        <div class="skeleton-info">
+          <div class="skeleton-line skeleton long"></div>
+          <div class="skeleton-line skeleton short"></div>
+        </div>
+      </div>`;
+  }
+  el.innerHTML = html;
+}
+
 // ─── INLINE VALIDATION HELPER ────────────────────────────────
 function validateField(id, required = true) {
   const el = document.getElementById(id);
@@ -148,7 +168,7 @@ async function loadUsers() {
     updateStats();
     renderUsers();
   } else {
-    list.innerHTML = `<div style="text-align:center;color:var(--text-dim);padding:40px;font-size:13px;">Loading members…</div>`;
+    renderSkeletonList("userList", 3);
     try {
       const fresh = await getAllUsers();
       allUsers = fresh;
@@ -165,7 +185,12 @@ function renderUsers() {
   const list = document.getElementById("userList");
 
   if (!allUsers.length) {
-    list.innerHTML = `<div style="text-align:center;color:var(--text-faint);font-size:12px;padding:40px;">No members yet — users appear here when they sign in with Google</div>`;
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">👥</div>
+        <div class="empty-title">No members yet</div>
+        <div class="empty-desc">Users will appear here automatically the first time they sign in with Google.</div>
+      </div>`;
     return;
   }
 
@@ -232,6 +257,7 @@ function renderUsers() {
 
     // Toggle button
     const toggleBtn = document.createElement("button");
+    toggleBtn.type = "button";
     toggleBtn.textContent = enabled ? "Remove Coach" : "Assign Coach";
     toggleBtn.style.cssText = `
       padding: 8px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
@@ -253,8 +279,10 @@ function renderUsers() {
 
     // Edit button — lets admin change the user's chosen coach
     const editBtn = document.createElement("button");
+    editBtn.type = "button";
     editBtn.textContent = "✏️";
     editBtn.title = "Change coach personality";
+    editBtn.setAttribute("aria-label", "Change coach personality");
     editBtn.style.cssText = `
       padding: 8px 10px; border-radius: 20px; font-size: 13px;
       cursor: pointer; border: 1.5px solid var(--border);
@@ -271,7 +299,10 @@ function renderUsers() {
 
     Object.values(COACHES).forEach((c) => {
       const opt = document.createElement("button");
+      opt.type = "button";
       const isActive = user.chosenCoach === c.id;
+      opt.setAttribute("aria-label", `Set ${user.name || "user"}'s coach to ${c.name}`);
+      if (isActive) opt.setAttribute("aria-pressed", "true");
       opt.style.cssText = `
         display: flex; align-items: center; gap: 8px;
         padding: 10px 12px; border-radius: 12px; cursor: pointer;
@@ -307,6 +338,7 @@ function renderUsers() {
 
     const isUserAdmin = !!user.isAdmin;
     const adminToggle = document.createElement("button");
+    adminToggle.type = "button";
     adminToggle.textContent = isUserAdmin ? "Revoke Admin" : "Grant Admin";
     adminToggle.style.cssText = `
       padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 600;
@@ -335,8 +367,10 @@ function renderUsers() {
 
     // ── Recipes button ──
     const recipesBtn = document.createElement("button");
+    recipesBtn.type = "button";
     recipesBtn.textContent = "📖";
     recipesBtn.title = "View user recipes";
+    recipesBtn.setAttribute("aria-label", "View user's personal recipes");
     recipesBtn.style.cssText = `
       padding: 8px 10px; border-radius: 20px; font-size: 13px;
       cursor: pointer; border: 1.5px solid var(--border);
@@ -375,7 +409,7 @@ function renderUsers() {
             <span style="font-size:12px;color:var(--text)">${r.name}
               <span style="font-size:10px;color:var(--text-faint);margin-left:4px">${r.category}</span>
             </span>
-            <button data-rid="${r.id}" style="background:none;border:none;color:rgba(255,80,80,0.4);cursor:pointer;font-size:13px;padding:4px 8px;flex-shrink:0">🗑️</button>
+            <button type="button" data-rid="${r.id}" aria-label="Delete recipe ${r.name}" style="background:none;border:none;color:rgba(255,80,80,0.4);cursor:pointer;font-size:13px;padding:4px 8px;flex-shrink:0">🗑️</button>
           </div>`).join("");
 
         recipesPanel.querySelectorAll("button[data-rid]").forEach((btn) => {
@@ -428,8 +462,7 @@ function renderUsers() {
 // ─── USER RECIPE SECTION (Recipes tab) ───────────────────────
 async function loadAllUserRecipes() {
   if (userRecipesLoaded) { renderUserRecipesSection(); return; }
-  const container = document.getElementById("userRecipeList");
-  container.innerHTML = `<div style="text-align:center;color:var(--text-dim);font-size:13px;padding:20px">Loading…</div>`;
+  renderSkeletonList("userRecipeList", 3);
   allUserRecipes = await getAllUserRecipes();
   userRecipesLoaded = true;
   renderUserRecipesSection();
@@ -438,7 +471,12 @@ async function loadAllUserRecipes() {
 function renderUserRecipesSection() {
   const container = document.getElementById("userRecipeList");
   if (!allUserRecipes.length) {
-    container.innerHTML = `<div style="text-align:center;color:var(--text-faint);font-size:12px;padding:30px">No personal recipes from any user yet</div>`;
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🍳</div>
+        <div class="empty-title">No personal recipes yet</div>
+        <div class="empty-desc">When any user submits a personal recipe, it'll appear here so you can promote it to the shared library.</div>
+      </div>`;
     return;
   }
   container.innerHTML = "";
@@ -468,7 +506,9 @@ function renderUserRecipesSection() {
 
     ["indian", "canadian"].forEach((cuisine) => {
       const pb = document.createElement("button");
+      pb.type = "button";
       pb.textContent = cuisine === "indian" ? "🇮🇳 Indian" : "🇨🇦 Canadian";
+      pb.setAttribute("aria-label", `Promote to ${cuisine} shared recipes`);
       pb.addEventListener("click", async () => {
         pb.textContent = "Promoting…";
         pb.disabled = true;
@@ -538,7 +578,19 @@ function renderIngredients(query = "") {
   );
 
   if (filtered.length === 0) {
-    list.innerHTML = `<div style="text-align:center;color:var(--text-faint);font-size:12px;padding:40px">No ingredients yet — add your first one</div>`;
+    const isSearch = query.length > 0;
+    list.innerHTML = isSearch
+      ? `<div class="empty-state">
+          <div class="empty-icon">🔍</div>
+          <div class="empty-title">No matches for "${query}"</div>
+          <div class="empty-desc">Try a different keyword, or add a new ingredient.</div>
+        </div>`
+      : `<div class="empty-state">
+          <div class="empty-icon">🥬</div>
+          <div class="empty-title">No ingredients yet</div>
+          <div class="empty-desc">Add your first ingredient to start building recipes with full macro breakdowns.</div>
+          <button type="button" class="empty-cta" onclick="document.getElementById('addIngredientBtn').click()">+ Add Ingredient</button>
+        </div>`;
     return;
   }
 
@@ -655,7 +707,20 @@ function renderRecipes(query = "") {
   );
 
   if (filtered.length === 0) {
-    list.innerHTML = `<div style="text-align:center;color:var(--text-faint);font-size:12px;padding:40px">No ${activeCuisine} recipes yet — add your first one</div>`;
+    const isSearch = query.length > 0;
+    const flag = activeCuisine === "indian" ? "🇮🇳" : "🇨🇦";
+    list.innerHTML = isSearch
+      ? `<div class="empty-state">
+          <div class="empty-icon">🔍</div>
+          <div class="empty-title">No matches for "${query}"</div>
+          <div class="empty-desc">Try a different keyword, or add a new recipe.</div>
+        </div>`
+      : `<div class="empty-state">
+          <div class="empty-icon">${flag}</div>
+          <div class="empty-title">No ${activeCuisine} recipes yet</div>
+          <div class="empty-desc">Build your first ${activeCuisine} recipe by combining ingredients with macros auto-calculated.</div>
+          <button type="button" class="empty-cta" onclick="document.getElementById('addRecipeBtn').click()">+ Add Recipe</button>
+        </div>`;
     return;
   }
 
@@ -952,6 +1017,9 @@ onAuthStateChanged(auth, async (user) => {
 
   document.getElementById("accessDenied").classList.add("hidden");
   document.getElementById("adminContent").classList.remove("hidden");
+  // Show skeleton loaders while we fetch — better than a 1-2s blank flash
+  renderSkeletonList("ingredientList", 5);
+  renderSkeletonList("recipeList", 4);
   // Ensure stub doc exists for the admin user so they appear in the users list.
   // Await it so the stub is written before getAllUsers() reads the collection.
   await getUserProfile(user.uid).catch(() => {});

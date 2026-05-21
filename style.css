@@ -2568,6 +2568,173 @@ input, select, textarea {
 [data-theme="warm"] .section-label { color: #5A4A35; }
 [data-theme="warm"] .page-title    { color: #F2E6CC; }
 
+/* ══════════════════════════════════════════════════════════
+   SKELETON LOADING STATES
+   Show a shimmering placeholder while data is loading instead
+   of a blank flash. Apply .skeleton to any element you want
+   shimmering, or use the structured .skeleton-card / .skeleton-row
+   composites for common patterns.
+   ══════════════════════════════════════════════════════════ */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--border);
+  border-radius: 6px;
+  color: transparent !important;
+  pointer-events: none;
+  user-select: none;
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.06) 50%,
+    transparent 100%
+  );
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+  transform: translateX(-100%);
+}
+[data-theme="light"] .skeleton::after {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.7) 50%,
+    transparent 100%
+  );
+}
+[data-theme="warm"] .skeleton::after {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.04) 50%,
+    transparent 100%
+  );
+}
+@keyframes skeleton-shimmer {
+  100% { transform: translateX(100%); }
+}
+
+/* Pre-built skeleton card matching .admin-item layout */
+.skeleton-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--card);
+  border: 0.5px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 18px;
+  margin-bottom: 8px;
+}
+.skeleton-icon {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: var(--border);
+  flex-shrink: 0;
+}
+.skeleton-line {
+  height: 12px;
+  background: var(--border);
+  border-radius: 4px;
+  margin-bottom: 6px;
+}
+.skeleton-line:last-child { margin-bottom: 0; }
+.skeleton-line.short  { width: 40%; }
+.skeleton-line.medium { width: 65%; }
+.skeleton-line.long   { width: 85%; }
+.skeleton-info { flex: 1; min-width: 0; }
+
+/* Stop animations for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .skeleton::after { animation: none; }
+}
+
+/* ══════════════════════════════════════════════════════════
+   EMPTY-STATE DESIGNS
+   Used when a list is empty. Friendly icon + heading + body
+   + optional CTA button. Themed automatically.
+   ══════════════════════════════════════════════════════════ */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 36px 24px;
+  background: var(--card);
+  border: 0.5px dashed var(--border);
+  border-radius: 14px;
+  margin: 8px 0;
+}
+.empty-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+  opacity: 0.7;
+}
+.empty-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.empty-desc {
+  font-size: 12px;
+  color: var(--text-dim);
+  max-width: 280px;
+  line-height: 1.45;
+  margin-bottom: 16px;
+}
+.empty-cta {
+  background: rgb(var(--green-rgb) / 0.1);
+  border: 0.5px solid rgb(var(--green-rgb) / 0.35);
+  color: var(--green);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 18px;
+  border-radius: 20px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.empty-cta:hover {
+  background: rgb(var(--green-rgb) / 0.18);
+}
+
+/* ══════════════════════════════════════════════════════════
+   ACCESSIBILITY — focus rings
+   Visible keyboard focus indicators using the theme accent.
+   Only shows on keyboard nav (:focus-visible), never on click.
+   ══════════════════════════════════════════════════════════ */
+*:focus { outline: none; }
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+.tab-btn:focus-visible,
+.tab-tab:focus-visible,
+.nav-tab:focus-visible,
+.nav-item:focus-visible,
+.theme-seg-btn:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Respect reduced motion across the entire app */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* ── INLINE FIELD VALIDATION ─────────────────────────────── */
 .field-error {
   font-size: 11px;
