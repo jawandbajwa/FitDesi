@@ -1,0 +1,23 @@
+{
+  "name": "fitdesi",
+  "version": "4.5.0",
+  "private": true,
+  "description": "Personal fitness PWA for Indian-Canadian families. Static site, no build step.",
+  "homepage": "https://jawandbajwa.github.io/FitDesi/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jawandbajwa/FitDesi.git"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.18.0",
+    "eslint": "^9.18.0",
+    "globals": "^15.14.0",
+    "prettier": "^3.4.2"
+  }
+}

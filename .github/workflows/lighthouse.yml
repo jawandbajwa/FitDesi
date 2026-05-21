@@ -1,0 +1,42 @@
+name: Lighthouse CI
+
+# Run Lighthouse against the live GitHub Pages deploy after every push
+# to main, and on every PR. Posts the scores as a workflow summary.
+# Doesn't fail the build — it's informational so a perf regression is
+# visible without blocking the deploy.
+
+on:
+  workflow_run:
+    workflows: ["Deploy to GitHub Pages"]
+    types: [completed]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    # Skip if the deploy that triggered us failed
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Wait for GitHub Pages to propagate
+        run: sleep 30
+
+      - name: Run Lighthouse
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          urls: |
+            https://jawandbajwa.github.io/FitDesi/
+            https://jawandbajwa.github.io/FitDesi/login.html
+          # Run 3 times per URL and use the median score
+          runs: 3
+          # Upload to temporary public storage so the report links are clickable
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+          # Use the config below
+          configPath: ./.github/lighthouserc.json

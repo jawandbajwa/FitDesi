@@ -1,0 +1,8 @@
+node_modules/
+.claude/
+ingredients.js
+ingredients_canada.js
+recipes_canada.js
+coach-config.js
+sw.js
+*.min.*
