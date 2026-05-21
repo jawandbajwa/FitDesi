@@ -164,6 +164,11 @@ body {
   transition: all 0.2s;
 }
 
+.cuisine-tab:hover {
+  color: var(--text);
+  background: var(--card);
+}
+
 .cuisine-tab.active {
   background: rgb(var(--green-rgb) / 0.1);
   border: 0.5px solid rgb(var(--green-rgb) / 0.25);

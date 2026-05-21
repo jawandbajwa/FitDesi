@@ -177,7 +177,7 @@ function renderUsers() {
     const row = document.createElement("div");
     row.style.cssText = `
       display: flex; align-items: center; gap: 14px;
-      background: var(--bg);
+      background: var(--card);
       border: 1px solid var(--border);
       border-radius: 14px; padding: 14px 16px; margin-bottom: 10px;
     `;
@@ -188,7 +188,7 @@ function renderUsers() {
     avatar.textContent = initials;
     avatar.style.cssText = `
       width: 42px; height: 42px; border-radius: 50%;
-      background: rgb(var(--green-rgb) / 0.15); color: \var(--green);
+      background: rgb(var(--green-rgb) / 0.15); color: var(--green);
       display: flex; align-items: center; justify-content: center;
       font-size: 18px; font-weight: 700; flex-shrink: 0;
     `;
@@ -211,7 +211,7 @@ function renderUsers() {
       : "No Coach";
     coachBadge.style.cssText = `
       font-size: 11px; margin-top: 4px;
-      color: ${enabled ? "\var(--green)" : "var(--text-faint)"};
+      color: ${enabled ? "var(--green)" : "var(--text-faint)"};
     `;
 
     const joinDate = document.createElement("div");
@@ -238,8 +238,8 @@ function renderUsers() {
       cursor: pointer; border: 1.5px solid;
       flex-shrink: 0;
       background: ${enabled ? "rgba(239,68,68,0.1)" : "rgb(var(--green-rgb) / 0.1)"};
-      border-color: ${enabled ? "#f87171" : "\var(--green)"};
-      color: ${enabled ? "#f87171" : "\var(--green)"};
+      border-color: ${enabled ? "#f87171" : "var(--green)"};
+      color: ${enabled ? "#f87171" : "var(--green)"};
     `;
 
     toggleBtn.addEventListener("click", async () => {
@@ -275,7 +275,7 @@ function renderUsers() {
       opt.style.cssText = `
         display: flex; align-items: center; gap: 8px;
         padding: 10px 12px; border-radius: 12px; cursor: pointer;
-        border: 1.5px solid ${isActive ? "\var(--green)" : "var(--border)"};
+        border: 1.5px solid ${isActive ? "var(--green)" : "var(--border)"};
         background: ${isActive ? "rgb(var(--green-rgb) / 0.1)" : "var(--bg)"};
         color: var(--text); font-size: 13px; text-align: left;
       `;
@@ -329,8 +329,8 @@ function renderUsers() {
     editBtn.addEventListener("click", () => {
       const open = picker.style.display === "grid";
       picker.style.display = open ? "none" : "grid";
-      editBtn.style.borderColor = open ? "var(--border)" : "\var(--green)";
-      editBtn.style.color = open ? "var(--text-dim)" : "\var(--green)";
+      editBtn.style.borderColor = open ? "var(--border)" : "var(--green)";
+      editBtn.style.color = open ? "var(--text-dim)" : "var(--green)";
     });
 
     // ── Recipes button ──
@@ -347,7 +347,7 @@ function renderUsers() {
     const recipesPanel = document.createElement("div");
     recipesPanel.style.cssText = `
       display: none; padding: 4px 16px 12px;
-      background: var(--bg);
+      background: var(--card);
       border: 1px solid var(--border);
       border-top: none; border-radius: 0 0 14px 14px;
     `;
@@ -360,8 +360,8 @@ function renderUsers() {
         recipesBtn.style.color = "var(--text-dim)";
         return;
       }
-      recipesBtn.style.borderColor = "\var(--green)";
-      recipesBtn.style.color = "\var(--green)";
+      recipesBtn.style.borderColor = "var(--green)";
+      recipesBtn.style.color = "var(--green)";
       recipesPanel.style.display = "block";
       recipesPanel.innerHTML = `<div style="font-size:12px;color:var(--text-dim);padding:10px 0">Loading recipes…</div>`;
       try {
@@ -406,7 +406,7 @@ function renderUsers() {
     row.style.marginBottom = "0";
     const pickerWrap = document.createElement("div");
     pickerWrap.style.cssText = `
-      background: var(--bg);
+      background: var(--card);
       border: 1px solid var(--border);
       border-top: none; border-radius: 0 0 14px 14px;
       padding: 0 16px 0;
