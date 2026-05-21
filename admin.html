@@ -118,7 +118,7 @@
           <div class="admin-section-title">Personal Recipes — All Users</div>
         </div>
         <div class="admin-list" id="userRecipeList">
-          <div style="text-align:center;color:rgba(255,255,255,0.2);font-size:12px;padding:20px">
+          <div class="muted-message">
             Switch to this tab to load personal recipes
           </div>
         </div>
@@ -203,9 +203,7 @@
         <div class="form-group">
           <label
             >Fiber (g)
-            <span style="color: rgba(255, 255, 255, 0.2); font-size: 10px"
-              >optional</span
-            ></label
+            <span class="field-hint">optional</span></label
           >
           <input type="number" id="ingFiber" placeholder="0" min="0" max="50" />
         </div>
@@ -273,18 +271,16 @@
         <div class="form-group">
           <label
             >Serving Size
-            <span style="color: rgba(255, 255, 255, 0.2); font-size: 10px"
-              >e.g. 1 bowl, 2 rotis</span
-            ></label
+            <span class="field-hint">e.g. 1 bowl, 2 rotis</span></label
           >
           <input type="text" id="recServing" placeholder="e.g. 1 bowl" />
         </div>
         <div class="form-group">
-          <label>Instructions <span style="color:rgba(255,255,255,0.2);font-size:10px">optional</span></label>
+          <label>Instructions <span class="field-hint">optional</span></label>
           <textarea id="recInstructions" placeholder="Step 1: Soak dal for 30 mins…&#10;Step 2: Heat oil in a pan…" rows="3"></textarea>
         </div>
         <div class="form-group">
-          <label>Notes <span style="color:rgba(255,255,255,0.2);font-size:10px">optional · tips, substitutions</span></label>
+          <label>Notes <span class="field-hint">optional · tips, substitutions</span></label>
           <textarea id="recNotes" placeholder="e.g. Add extra cumin for more flavour" rows="2"></textarea>
         </div>
         <div class="form-group">
@@ -330,9 +326,7 @@
         <div class="form-group">
           <label
             >YouTube Video ID
-            <span style="color: rgba(255, 255, 255, 0.2); font-size: 10px"
-              >optional — part after ?v=</span
-            ></label
+            <span class="field-hint">optional — part after ?v=</span></label
           >
           <input type="text" id="recVideoId" placeholder="e.g. vcBig73ojpE" />
         </div>
@@ -347,35 +341,12 @@
           <h2>Confirm Delete</h2>
           <button class="modal-close" id="deleteModalClose">✕</button>
         </div>
-        <p
-          style="
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.4);
-            margin-bottom: 20px;
-          "
-          id="deleteMessage"
-        ></p>
+        <p class="delete-message" id="deleteMessage"></p>
         <div style="display: flex; gap: 10px">
-          <button
-            class="save-btn"
-            style="
-              background: rgba(255, 100, 100, 0.1);
-              border-color: rgba(255, 100, 100, 0.4);
-              color: rgba(255, 100, 100, 0.8);
-            "
-            id="confirmDelete"
-          >
+          <button class="save-btn danger-btn" id="confirmDelete">
             Delete
           </button>
-          <button
-            class="save-btn"
-            style="
-              background: transparent;
-              border-color: rgba(255, 255, 255, 0.1);
-              color: rgba(255, 255, 255, 0.3);
-            "
-            id="cancelDelete"
-          >
+          <button class="save-btn cancel-btn" id="cancelDelete">
             Cancel
           </button>
         </div>

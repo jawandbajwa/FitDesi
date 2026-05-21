@@ -684,3 +684,44 @@ body {
   border: 1px solid rgba(239, 68, 68, 0.4);
   color: #f87171;
 }
+
+/* ── Utility / themed helpers used inline in admin.html ─────────────── */
+
+/* Small "optional" / hint text inside <label> tags */
+.field-hint {
+  color: var(--text-faint);
+  font-size: 10px;
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+/* Empty-state / placeholder message inside lists */
+.muted-message {
+  text-align: center;
+  color: var(--text-faint);
+  font-size: 12px;
+  padding: 20px;
+}
+
+/* Delete-modal red "Delete" button — themed danger action */
+.danger-btn {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.45);
+  color: #ef4444;
+}
+.danger-btn:hover { background: rgba(239, 68, 68, 0.2); }
+
+/* Cancel / secondary button — themed neutral action */
+.cancel-btn {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+}
+.cancel-btn:hover { background: var(--card); color: var(--text); }
+
+/* Delete-modal subtitle / confirmation message */
+.delete-message {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 20px;
+}

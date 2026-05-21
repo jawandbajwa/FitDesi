@@ -35,11 +35,6 @@ let activeCuisine = "indian";
 let allUserRecipes = [];
 let userRecipesLoaded = false;
 
-// ─── CSS VARIABLE HELPER (theme-aware colors) ─────────────────
-function getGreenColor() {
-  return getComputedStyle(document.documentElement).getPropertyValue('--green').trim();
-}
-
 // ─── INLINE VALIDATION HELPER ────────────────────────────────
 function validateField(id, required = true) {
   const el = document.getElementById(id);
@@ -153,7 +148,7 @@ async function loadUsers() {
     updateStats();
     renderUsers();
   } else {
-    list.innerHTML = `<div style="text-align:center;color:rgba(255,255,255,0.3);padding:40px;font-size:13px;">Loading members…</div>`;
+    list.innerHTML = `<div style="text-align:center;color:var(--text-dim);padding:40px;font-size:13px;">Loading members…</div>`;
     try {
       const fresh = await getAllUsers();
       allUsers = fresh;
@@ -161,7 +156,7 @@ async function loadUsers() {
       updateStats();
       renderUsers();
     } catch (e) {
-      list.innerHTML = `<div style="text-align:center;color:rgba(255,255,255,0.3);padding:40px;font-size:13px;">Offline — no cached data yet</div>`;
+      list.innerHTML = `<div style="text-align:center;color:var(--text-dim);padding:40px;font-size:13px;">Offline — no cached data yet</div>`;
     }
   }
 }
@@ -170,7 +165,7 @@ function renderUsers() {
   const list = document.getElementById("userList");
 
   if (!allUsers.length) {
-    list.innerHTML = `<div style="text-align:center;color:rgba(255,255,255,0.2);font-size:12px;padding:40px;">No members yet — users appear here when they sign in with Google</div>`;
+    list.innerHTML = `<div style="text-align:center;color:var(--text-faint);font-size:12px;padding:40px;">No members yet — users appear here when they sign in with Google</div>`;
     return;
   }
 
@@ -182,8 +177,8 @@ function renderUsers() {
     const row = document.createElement("div");
     row.style.cssText = `
       display: flex; align-items: center; gap: 14px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.07);
+      background: var(--bg);
+      border: 1px solid var(--border);
       border-radius: 14px; padding: 14px 16px; margin-bottom: 10px;
     `;
 
@@ -193,7 +188,7 @@ function renderUsers() {
     avatar.textContent = initials;
     avatar.style.cssText = `
       width: 42px; height: 42px; border-radius: 50%;
-      background: rgba(126,217,154,0.15); color: \${getGreenColor()};
+      background: rgb(var(--green-rgb) / 0.15); color: \var(--green);
       display: flex; align-items: center; justify-content: center;
       font-size: 18px; font-weight: 700; flex-shrink: 0;
     `;
@@ -204,11 +199,11 @@ function renderUsers() {
 
     const name = document.createElement("div");
     name.textContent = user.name || "Unnamed";
-    name.style.cssText = `font-size: 14px; font-weight: 600; color: #fff;`;
+    name.style.cssText = `font-size: 14px; font-weight: 600; color: var(--text);`;
 
     const email = document.createElement("div");
     email.textContent = user.email || user.uid;
-    email.style.cssText = `font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 1px;`;
+    email.style.cssText = `font-size: 12px; color: var(--text-dim); margin-top: 1px;`;
 
     const coachBadge = document.createElement("div");
     coachBadge.textContent = enabled
@@ -216,14 +211,14 @@ function renderUsers() {
       : "No Coach";
     coachBadge.style.cssText = `
       font-size: 11px; margin-top: 4px;
-      color: ${enabled ? "\${getGreenColor()}" : "rgba(255,255,255,0.25)"};
+      color: ${enabled ? "\var(--green)" : "var(--text-faint)"};
     `;
 
     const joinDate = document.createElement("div");
     joinDate.textContent = user.createdAt
       ? `Joined ${new Date(user.createdAt).toLocaleDateString("en-CA", { year: "numeric", month: "short", day: "numeric" })}`
       : "";
-    joinDate.style.cssText = `font-size: 10px; color: rgba(255,255,255,0.18); margin-top: 2px;`;
+    joinDate.style.cssText = `font-size: 10px; color: var(--text-faint); margin-top: 2px;`;
 
     const adminBadge = document.createElement("div");
     adminBadge.textContent = "⚙️ Admin";
@@ -242,9 +237,9 @@ function renderUsers() {
       padding: 8px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
       cursor: pointer; border: 1.5px solid;
       flex-shrink: 0;
-      background: ${enabled ? "rgba(239,68,68,0.1)" : "rgba(126,217,154,0.1)"};
-      border-color: ${enabled ? "#f87171" : "\${getGreenColor()}"};
-      color: ${enabled ? "#f87171" : "\${getGreenColor()}"};
+      background: ${enabled ? "rgba(239,68,68,0.1)" : "rgb(var(--green-rgb) / 0.1)"};
+      border-color: ${enabled ? "#f87171" : "\var(--green)"};
+      color: ${enabled ? "#f87171" : "\var(--green)"};
     `;
 
     toggleBtn.addEventListener("click", async () => {
@@ -262,9 +257,9 @@ function renderUsers() {
     editBtn.title = "Change coach personality";
     editBtn.style.cssText = `
       padding: 8px 10px; border-radius: 20px; font-size: 13px;
-      cursor: pointer; border: 1.5px solid rgba(255,255,255,0.15);
+      cursor: pointer; border: 1.5px solid var(--border);
       flex-shrink: 0; margin-left: 6px;
-      background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.5);
+      background: var(--bg); color: var(--text-dim);
     `;
 
     // Inline coach picker that expands below the row
@@ -280,9 +275,9 @@ function renderUsers() {
       opt.style.cssText = `
         display: flex; align-items: center; gap: 8px;
         padding: 10px 12px; border-radius: 12px; cursor: pointer;
-        border: 1.5px solid ${isActive ? "\${getGreenColor()}" : "rgba(255,255,255,0.1)"};
-        background: ${isActive ? "rgba(126,217,154,0.1)" : "rgba(255,255,255,0.03)"};
-        color: #fff; font-size: 13px; text-align: left;
+        border: 1.5px solid ${isActive ? "\var(--green)" : "var(--border)"};
+        background: ${isActive ? "rgb(var(--green-rgb) / 0.1)" : "var(--bg)"};
+        color: var(--text); font-size: 13px; text-align: left;
       `;
       opt.innerHTML = `<span style="font-size:18px">${c.emoji}</span><div>
         <div style="font-weight:600;font-size:13px">${c.name}</div>
@@ -304,11 +299,11 @@ function renderUsers() {
     adminRow.style.cssText = `
       grid-column: 1 / -1; display: flex; align-items: center;
       justify-content: space-between; padding-top: 10px; margin-top: 4px;
-      border-top: 0.5px solid rgba(255,255,255,0.06);
+      border-top: 0.5px solid var(--border);
     `;
     const adminLabel = document.createElement("span");
     adminLabel.textContent = "Admin Access";
-    adminLabel.style.cssText = `font-size: 12px; color: rgba(255,255,255,0.35);`;
+    adminLabel.style.cssText = `font-size: 12px; color: var(--text-dim);`;
 
     const isUserAdmin = !!user.isAdmin;
     const adminToggle = document.createElement("button");
@@ -334,8 +329,8 @@ function renderUsers() {
     editBtn.addEventListener("click", () => {
       const open = picker.style.display === "grid";
       picker.style.display = open ? "none" : "grid";
-      editBtn.style.borderColor = open ? "rgba(255,255,255,0.15)" : "\${getGreenColor()}";
-      editBtn.style.color = open ? "rgba(255,255,255,0.5)" : "\${getGreenColor()}";
+      editBtn.style.borderColor = open ? "var(--border)" : "\var(--green)";
+      editBtn.style.color = open ? "var(--text-dim)" : "\var(--green)";
     });
 
     // ── Recipes button ──
@@ -344,16 +339,16 @@ function renderUsers() {
     recipesBtn.title = "View user recipes";
     recipesBtn.style.cssText = `
       padding: 8px 10px; border-radius: 20px; font-size: 13px;
-      cursor: pointer; border: 1.5px solid rgba(255,255,255,0.15);
+      cursor: pointer; border: 1.5px solid var(--border);
       flex-shrink: 0; margin-left: 6px;
-      background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.5);
+      background: var(--bg); color: var(--text-dim);
     `;
 
     const recipesPanel = document.createElement("div");
     recipesPanel.style.cssText = `
       display: none; padding: 4px 16px 12px;
-      background: rgba(255,255,255,0.02);
-      border: 1px solid rgba(255,255,255,0.07);
+      background: var(--bg);
+      border: 1px solid var(--border);
       border-top: none; border-radius: 0 0 14px 14px;
     `;
 
@@ -361,24 +356,24 @@ function renderUsers() {
       const isOpen = recipesPanel.style.display !== "none";
       if (isOpen) {
         recipesPanel.style.display = "none";
-        recipesBtn.style.borderColor = "rgba(255,255,255,0.15)";
-        recipesBtn.style.color = "rgba(255,255,255,0.5)";
+        recipesBtn.style.borderColor = "var(--border)";
+        recipesBtn.style.color = "var(--text-dim)";
         return;
       }
-      recipesBtn.style.borderColor = "\${getGreenColor()}";
-      recipesBtn.style.color = "\${getGreenColor()}";
+      recipesBtn.style.borderColor = "\var(--green)";
+      recipesBtn.style.color = "\var(--green)";
       recipesPanel.style.display = "block";
-      recipesPanel.innerHTML = `<div style="font-size:12px;color:rgba(255,255,255,0.3);padding:10px 0">Loading recipes…</div>`;
+      recipesPanel.innerHTML = `<div style="font-size:12px;color:var(--text-dim);padding:10px 0">Loading recipes…</div>`;
       try {
         const userRecipes = await getUserRecipes(user.uid);
         if (userRecipes.length === 0) {
-          recipesPanel.innerHTML = `<div style="font-size:12px;color:rgba(255,255,255,0.2);padding:10px 0">No personal recipes yet</div>`;
+          recipesPanel.innerHTML = `<div style="font-size:12px;color:var(--text-faint);padding:10px 0">No personal recipes yet</div>`;
           return;
         }
         recipesPanel.innerHTML = userRecipes.map((r) => `
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid rgba(255,255,255,0.04)">
-            <span style="font-size:12px;color:rgba(255,255,255,0.65)">${r.name}
-              <span style="font-size:10px;color:rgba(255,255,255,0.25);margin-left:4px">${r.category}</span>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid var(--bg)">
+            <span style="font-size:12px;color:var(--text)">${r.name}
+              <span style="font-size:10px;color:var(--text-faint);margin-left:4px">${r.category}</span>
             </span>
             <button data-rid="${r.id}" style="background:none;border:none;color:rgba(255,80,80,0.4);cursor:pointer;font-size:13px;padding:4px 8px;flex-shrink:0">🗑️</button>
           </div>`).join("");
@@ -391,7 +386,7 @@ function renderUsers() {
               await deleteUserRecipe(user.uid, rid);
               btn.closest("div").remove();
               if (!recipesPanel.querySelector("button[data-rid]")) {
-                recipesPanel.innerHTML = `<div style="font-size:12px;color:rgba(255,255,255,0.2);padding:10px 0">No personal recipes yet</div>`;
+                recipesPanel.innerHTML = `<div style="font-size:12px;color:var(--text-faint);padding:10px 0">No personal recipes yet</div>`;
               }
             };
             document.getElementById("deleteMessage").textContent =
@@ -411,8 +406,8 @@ function renderUsers() {
     row.style.marginBottom = "0";
     const pickerWrap = document.createElement("div");
     pickerWrap.style.cssText = `
-      background: rgba(255,255,255,0.02);
-      border: 1px solid rgba(255,255,255,0.07);
+      background: var(--bg);
+      border: 1px solid var(--border);
       border-top: none; border-radius: 0 0 14px 14px;
       padding: 0 16px 0;
     `;
@@ -434,7 +429,7 @@ function renderUsers() {
 async function loadAllUserRecipes() {
   if (userRecipesLoaded) { renderUserRecipesSection(); return; }
   const container = document.getElementById("userRecipeList");
-  container.innerHTML = `<div style="text-align:center;color:rgba(255,255,255,0.3);font-size:13px;padding:20px">Loading…</div>`;
+  container.innerHTML = `<div style="text-align:center;color:var(--text-dim);font-size:13px;padding:20px">Loading…</div>`;
   allUserRecipes = await getAllUserRecipes();
   userRecipesLoaded = true;
   renderUserRecipesSection();
@@ -443,7 +438,7 @@ async function loadAllUserRecipes() {
 function renderUserRecipesSection() {
   const container = document.getElementById("userRecipeList");
   if (!allUserRecipes.length) {
-    container.innerHTML = `<div style="text-align:center;color:rgba(255,255,255,0.2);font-size:12px;padding:30px">No personal recipes from any user yet</div>`;
+    container.innerHTML = `<div style="text-align:center;color:var(--text-faint);font-size:12px;padding:30px">No personal recipes from any user yet</div>`;
     return;
   }
   container.innerHTML = "";
@@ -460,7 +455,7 @@ function renderUserRecipesSection() {
       <div class="admin-item-info">
         <div class="admin-item-name">${recipe.name}</div>
         <div class="admin-item-meta">${recipe.category} · P: ${recipe.protein}g · C: ${recipe.carbs}g · F: ${recipe.fat}g · ${recipe.calories} cal</div>
-        <div class="admin-item-meta" style="color:rgba(126,217,154,0.5);margin-top:3px">👤 ${recipe._ownerName}</div>
+        <div class="admin-item-meta" style="color:rgb(var(--green-rgb) / 0.7);margin-top:3px">👤 ${recipe._ownerName}</div>
       </div>
       <div class="admin-item-actions">
         <button class="admin-promote-btn">⬆ Promote</button>
@@ -543,7 +538,7 @@ function renderIngredients(query = "") {
   );
 
   if (filtered.length === 0) {
-    list.innerHTML = `<div style="text-align:center;color:rgba(255,255,255,0.2);font-size:12px;padding:40px">No ingredients yet — add your first one</div>`;
+    list.innerHTML = `<div style="text-align:center;color:var(--text-faint);font-size:12px;padding:40px">No ingredients yet — add your first one</div>`;
     return;
   }
 
@@ -660,7 +655,7 @@ function renderRecipes(query = "") {
   );
 
   if (filtered.length === 0) {
-    list.innerHTML = `<div style="text-align:center;color:rgba(255,255,255,0.2);font-size:12px;padding:40px">No ${activeCuisine} recipes yet — add your first one</div>`;
+    list.innerHTML = `<div style="text-align:center;color:var(--text-faint);font-size:12px;padding:40px">No ${activeCuisine} recipes yet — add your first one</div>`;
     return;
   }
 
@@ -736,7 +731,7 @@ function openRecipeModal(recipe = null) {
 function renderAddedIngredients() {
   const container = document.getElementById("addedIngredients");
   if (addedIngredients.length === 0) {
-    container.innerHTML = `<div style="text-align:center;color:rgba(255,255,255,0.2);font-size:11px;padding:12px">Search and add ingredients above</div>`;
+    container.innerHTML = `<div style="text-align:center;color:var(--text-faint);font-size:11px;padding:12px">Search and add ingredients above</div>`;
     return;
   }
   container.innerHTML = addedIngredients
@@ -803,7 +798,7 @@ function renderIngSearchResults(query) {
     .slice(0, 6);
 
   if (filtered.length === 0) {
-    results.innerHTML = `<div style="color:rgba(255,255,255,0.2);font-size:11px;padding:8px">Not found — add it in Ingredients tab first</div>`;
+    results.innerHTML = `<div style="color:var(--text-faint);font-size:11px;padding:8px">Not found — add it in Ingredients tab first</div>`;
     return;
   }
 
