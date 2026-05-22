@@ -1,5 +1,5 @@
 // FitDesi Service Worker — Updated for Android Auth Fix
-const CACHE_NAME = "fitdesi-v97"; // Bumped version
+const CACHE_NAME = "fitdesi-v98"; // Bumped version
 
 const STATIC_ASSETS = [
   "./",

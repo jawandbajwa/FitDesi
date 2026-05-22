@@ -490,6 +490,14 @@ document.addEventListener("click", async function (e) {
     return;
   }
 
+  // ── Print recipe ─────────────────────────────────────────────────────
+  // The CSS @media print block hides everything except the detail panel,
+  // so the browser print dialog renders only the recipe card.
+  if (e.target.closest("#detailPrintBtn")) {
+    window.print();
+    return;
+  }
+
   // ── Add to meal button ───────────────────────────────────────────────
   if (e.target.id === "addToMealBtn") {
     if (currentRecipe) openMealSelector(currentRecipe);

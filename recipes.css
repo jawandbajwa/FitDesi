@@ -680,3 +680,176 @@
 .ur-del-confirm-btn:hover { background: rgba(255, 80, 80, 0.18); }
 
 .hidden { display: none !important; }
+
+/* ── PRINT BUTTON (only shown in the detail panel) ─────────── */
+.detail-print-btn {
+  background: none;
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-dim);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-family: "Inter", sans-serif;
+  margin-left: auto;
+  transition: all 0.15s;
+}
+.detail-print-btn:hover {
+  color: var(--green);
+  border-color: var(--green);
+}
+
+/* ══════════════════════════════════════════════════════════
+   PRINT STYLES — Recipes page
+   Goal: when the user prints from the recipe detail panel, they
+   get a clean recipe card with name, macros, ingredients, and
+   instructions on a single sheet. Everything else (nav, header,
+   search, filter chips, list, buttons, video) is hidden.
+   ══════════════════════════════════════════════════════════ */
+@media print {
+  /* Reset to clean black-on-white */
+  html, body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  /* Hide all the chrome — only the recipe detail itself should print */
+  .app-header,
+  .bottom-nav,
+  .cuisine-toggle-row,
+  .category-scroll,
+  .search-bar,
+  .recipe-grid,
+  .empty-state,
+  .detail-header,
+  .detail-icon,
+  .add-to-meal-btn,
+  .ur-detail-actions,
+  .meal-selector-overlay,
+  .ur-modal-overlay,
+  .ur-delete-overlay,
+  .back-to-top,
+  .detail-print-btn,
+  .coach-bar,
+  .coach-fab,
+  .coach-sheet {
+    display: none !important;
+  }
+
+  /* Show the detail panel as the only content */
+  .detail-panel {
+    display: block !important;
+    position: static !important;
+    inset: auto !important;
+    height: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #fff !important;
+    box-shadow: none !important;
+    border: none !important;
+    overflow: visible !important;
+  }
+  .detail-panel.hidden { display: none !important; }
+
+  .detail-body {
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+
+  /* Recipe title — prominent, serif feel for "cookbook" look */
+  .detail-name {
+    font-size: 28pt !important;
+    font-weight: 700 !important;
+    color: #000 !important;
+    margin: 0 0 8px !important;
+    page-break-after: avoid;
+  }
+  .detail-meta {
+    font-size: 11pt !important;
+    color: #555 !important;
+    margin-bottom: 18px !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* Macro grid — keep as a 4-column row */
+  .macro-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 8px !important;
+    margin-bottom: 24px !important;
+    border-top: 1pt solid #000 !important;
+    border-bottom: 1pt solid #000 !important;
+    padding: 12px 0 !important;
+    page-break-inside: avoid;
+  }
+  .macro-grid > div,
+  .macro-card {
+    background: none !important;
+    border: none !important;
+    text-align: center !important;
+    padding: 0 !important;
+  }
+  .macro-val { font-size: 16pt !important; font-weight: 700 !important; color: #000 !important; }
+  .macro-lbl { font-size: 9pt !important; color: #555 !important; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* Section labels */
+  .detail-section-label {
+    font-size: 13pt !important;
+    font-weight: 700 !important;
+    color: #000 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    margin: 22px 0 10px !important;
+    border-bottom: 0.5pt solid #000 !important;
+    padding-bottom: 4px !important;
+    page-break-after: avoid;
+  }
+
+  /* Ingredients list */
+  .detail-ingredients {
+    font-size: 11pt !important;
+    color: #000 !important;
+    line-height: 1.7 !important;
+  }
+  .detail-ingredients > * {
+    padding: 4px 0 !important;
+    border-bottom: 0.5pt dotted #ccc !important;
+    background: none !important;
+  }
+
+  /* Instructions + notes — preserve line breaks */
+  .detail-instructions,
+  .detail-notes {
+    font-size: 11pt !important;
+    color: #000 !important;
+    line-height: 1.6 !important;
+    white-space: pre-wrap !important;
+    page-break-inside: avoid;
+  }
+
+  /* Hide YouTube embed when printing */
+  #videoLabel,
+  .detail-video {
+    display: none !important;
+  }
+
+  /* Print URL footer so the user knows where the recipe came from */
+  body::after {
+    content: "Printed from FitDesi · jawandbajwa.github.io/FitDesi";
+    display: block;
+    text-align: center;
+    font-size: 8pt;
+    color: #999;
+    margin-top: 40px;
+    padding-top: 12px;
+    border-top: 0.5pt solid #ccc;
+  }
+
+  /* Page setup — narrow margins, single A4 sheet for most recipes */
+  @page {
+    margin: 1.4cm 1.2cm;
+    size: A4;
+  }
+}
