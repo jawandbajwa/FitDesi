@@ -59,6 +59,9 @@ This updates `manifest.json`, `profile.html` (About section), and `sw.js` cache 
 | `onboarding-preview.html` | Dev-only preview of all 4 onboarding slides side by side (not in SW cache) |
 | `coach-config.js` | **Gitignored** — local dev overrides (e.g. `GEMINI_PROXY_URL`) |
 | `coach-config.example.js` | Template for coach-config.js |
+| `keyboard-shortcuts.js` | Global shortcuts (g h, g t, g r, g w, g p, /, Esc, ?). Self-contained, loaded on every page via `<script defer src="keyboard-shortcuts.js">`. |
+| `404.html` | Branded 404 page — auto-served by GitHub Pages for unmatched routes |
+| `privacy.html` / `terms.html` | Privacy policy + ToS; linked from Profile About |
 
 ### Tooling & CI files (added in v4.4-4.5)
 | File | Purpose |
@@ -244,14 +247,14 @@ wrangler deploy
 ## Versioning
 
 Version is stored in two places: `manifest.json` and `profile.html` (About section).
-Current version: **4.6.0**
+Current version: **4.6.3**
 
 Rules:
 - Small change → `node bump-version.js patch` (+1 patch, 0–9, rolls to minor at 10)
 - Notable update → `node bump-version.js minor` (+1 minor, 0–9, rolls to major at 10)
 - Big release → `node bump-version.js major` (+1 major)
 
-The script also bumps `sw.js` cache version automatically (current: `fitdesi-v96`).
+The script also bumps `sw.js` cache version automatically (current: `fitdesi-v99`).
 
 ---
 
@@ -455,6 +458,47 @@ First-time user intro shown once, ever. Implemented in `onboarding.js`, triggere
 - Left button: "Skip" on slide 1, "← Back" on slides 2–4
 - Dots: all 4 are clickable and jump directly to that slide
 - Right button: "Next →" on slides 1–3, "Let's Go 🚀" (purple) on slide 4
+
+---
+
+## UX Polish (v4.6.x)
+
+### Custom 404 page (`404.html`)
+- Themed (matches Light/Warm/Dark via the same flash-prevention inline script)
+- Shows the missing URL, "Go back" (uses history.back), "Back to FitDesi", and 4 quick-link buttons
+- `<meta name="robots" content="noindex">` so 404 URLs don't get indexed
+- Auto-served by GitHub Pages for any unmatched `/FitDesi/*` route
+- Cached by sw.js so it works offline
+
+### Back-to-top floating button (`.back-to-top`)
+- CSS in `style.css`; injected via ~12-line inline `<script>` block at the bottom of every long page (index, tracker, recipes, exercise, admin, profile, privacy, terms)
+- Hidden until `window.scrollY > 300`, then fades in
+- Sits above bottom nav with `env(safe-area-inset-bottom)` padding
+- Pages without bottom nav use `<body class="no-bottom-nav">` so the button sits lower
+- Themed via `var(--green)` accent + respects `prefers-reduced-motion`
+
+### Recipe print stylesheet (`@media print` in `recipes.css`)
+- 🖨️ Print button in the recipe detail panel header → triggers `window.print()` (handler in recipes.js)
+- All chrome (nav, header, search, filters, grid, buttons, modals, video, back-to-top) is hidden via `display: none !important`
+- Detail panel re-styled as a cookbook card: 28pt name, uppercase macros table, section labels with underline, dotted-underline ingredient list, line-break-preserving instructions
+- A4 page size, 1.4cm/1.2cm margins
+- Footer reads "Printed from FitDesi · jawandbajwa.github.io/FitDesi"
+
+### Global keyboard shortcuts (`keyboard-shortcuts.js`)
+Loaded as `<script defer>` on all 8 pages. Self-contained, runs after DOMContentLoaded. Skipped when typing in `<input>`/`<textarea>`/`<select>`/contenteditable. Modifier keys (Cmd/Ctrl/Alt) are ignored except for Cmd/Ctrl+K.
+
+| Key | Action |
+|---|---|
+| `/` or `Ctrl/Cmd+K` | Focus first visible search input |
+| `Esc` | Close any open modal/overlay/detail panel; blur input if focused |
+| `g` then `h` | Home |
+| `g` then `t` | Tracker (nutrition) |
+| `g` then `r` | Recipes |
+| `g` then `w` | Workout |
+| `g` then `p` | Profile |
+| `?` | Toggle keyboard-shortcuts help overlay |
+
+The help overlay (`.kbd-help-overlay`) is lazily injected on first `?` press. Styled via `.kbd-help-card` + `<kbd>` tag CSS in `style.css`. The Profile About section has a "⌨️ Keyboard shortcuts" row that dispatches a synthetic `?` keydown to discover the feature.
 
 ---
 

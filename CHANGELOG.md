@@ -6,6 +6,20 @@ This project uses [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH.
 
 ---
 
+## [4.6.3] — 2026-05-21
+### Added
+- **Global keyboard shortcuts** (`keyboard-shortcuts.js`). Press `?` for the help overlay. `/` or `Ctrl/Cmd+K` focuses search. `g h / g t / g r / g w / g p` navigates between Home / Tracker / Recipes / Workout / Profile in a vim-style sequence. `Esc` closes any open modal or overlay. Doesn't fire when typing in a field. Skipped when modifier keys are pressed (except Ctrl+K).
+- Profile About → new "⌨️ Keyboard shortcuts" row that dispatches the `?` key when clicked, so the feature is discoverable.
+
+## [4.6.2] — 2026-05-21
+### Added
+- **Recipe print stylesheet** — a 🖨️ Print button in the recipe detail header triggers `window.print()`. A `@media print` block in `recipes.css` strips all UI chrome and renders the recipe as a clean cookbook-style printable card (28pt title, uppercase macros table, dotted-underline ingredients, page-break-aware section labels, A4 layout, "Printed from FitDesi" footer).
+
+## [4.6.1] — 2026-05-21
+### Added
+- **Custom 404 page** — branded, themed, shows the missing URL and offers "Back to FitDesi" + quick links to main sections. Auto-served by GitHub Pages and cached by SW for offline.
+- **Back-to-top floating button** on all 8 main pages — appears after scrolling 300px, themed with the green accent, respects `prefers-reduced-motion`. Sits above the bottom nav (or lower on pages without nav).
+
 ## [4.6.0] — 2026-05-21
 ### Added
 - **Account deletion flow** (GDPR right-to-be-forgotten). Profile → "Delete my account & data" → confirmation modal requires typing "DELETE" → wipes all Firestore data (profile, meal logs, workouts, progress, recipes) and signs out. `deleteAllUserData(uid)` in firebase.js.
