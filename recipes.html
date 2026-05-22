@@ -393,5 +393,24 @@
           );
       })();
     </script>
+    <!-- Back-to-top floating button — appears after scrolling >300px -->
+    <script>
+      (function () {
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "back-to-top";
+        btn.setAttribute("aria-label", "Scroll to top");
+        btn.innerHTML = "↑";
+        document.body.appendChild(btn);
+        function tog() {
+          if (window.scrollY > 300) btn.classList.add("visible");
+          else btn.classList.remove("visible");
+        }
+        window.addEventListener("scroll", tog, { passive: true });
+        btn.addEventListener("click", function () {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+      })();
+    </script>
   </body>
 </html>

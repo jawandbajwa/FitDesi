@@ -168,7 +168,7 @@
         <div class="settings-group">
           <div class="settings-row">
             <span class="settings-row-label">App Version</span>
-            <span class="settings-row-value">4.6.0</span>
+            <span class="settings-row-value">4.6.1</span>
           </div>
           <div class="settings-row">
             <span class="settings-row-label">Data Storage</span>
@@ -1178,6 +1178,25 @@
       }
 
       loadCoach();
+    </script>
+    <!-- Back-to-top floating button — appears after scrolling >300px -->
+    <script>
+      (function () {
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "back-to-top";
+        btn.setAttribute("aria-label", "Scroll to top");
+        btn.innerHTML = "↑";
+        document.body.appendChild(btn);
+        function tog() {
+          if (window.scrollY > 300) btn.classList.add("visible");
+          else btn.classList.remove("visible");
+        }
+        window.addEventListener("scroll", tog, { passive: true });
+        btn.addEventListener("click", function () {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+      })();
     </script>
   </body>
 </html>

@@ -2704,6 +2704,56 @@ input, select, textarea {
 }
 
 /* ══════════════════════════════════════════════════════════
+   BACK-TO-TOP FLOATING BUTTON
+   Inject via tiny inline script (see initBackToTop() pattern).
+   Appears after the user scrolls >300px down; sits above bottom nav.
+   ══════════════════════════════════════════════════════════ */
+.back-to-top {
+  position: fixed;
+  right: 16px;
+  /* Sit above the bottom nav, respecting iOS safe area */
+  bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px) + 16px);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 0.5px solid var(--green);
+  background: rgb(var(--green-rgb) / 0.15);
+  color: var(--green);
+  font-size: 20px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  /* Hidden by default — JS adds .visible on scroll */
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: opacity 0.2s, transform 0.2s, background 0.15s;
+  z-index: 50;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.back-to-top.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+.back-to-top:hover {
+  background: rgb(var(--green-rgb) / 0.25);
+}
+@media (prefers-reduced-motion: reduce) {
+  .back-to-top { transition: opacity 0.01ms; }
+}
+/* Pages without bottom nav (privacy, terms, 404) — sit lower */
+.no-bottom-nav .back-to-top {
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 24px);
+}
+
+/* ══════════════════════════════════════════════════════════
    ACCESSIBILITY — focus rings
    Visible keyboard focus indicators using the theme accent.
    Only shows on keyboard nav (:focus-visible), never on click.
