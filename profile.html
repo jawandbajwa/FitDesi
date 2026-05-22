@@ -168,7 +168,7 @@
         <div class="settings-group">
           <div class="settings-row">
             <span class="settings-row-label">App Version</span>
-            <span class="settings-row-value">4.6.2</span>
+            <span class="settings-row-value">4.6.3</span>
           </div>
           <div class="settings-row">
             <span class="settings-row-label">Data Storage</span>
@@ -220,6 +220,24 @@
             <span class="settings-row-label">📜 Terms of Service</span>
             <span class="settings-row-value">View →</span>
           </a>
+          <button
+            type="button"
+            class="settings-row"
+            id="showKbdShortcuts"
+            style="
+              text-decoration: none;
+              color: inherit;
+              cursor: pointer;
+              background: none;
+              border: none;
+              font-family: inherit;
+              width: 100%;
+              text-align: left;
+            "
+          >
+            <span class="settings-row-label">⌨️ Keyboard shortcuts</span>
+            <span class="settings-row-value">Press ? →</span>
+          </button>
           <div class="settings-row last">
             <span class="settings-row-label">Made for</span>
             <span class="settings-row-value">South Asian Fitness 🇮🇳</span>
@@ -1057,6 +1075,17 @@
           window.location.href = "login.html";
         });
 
+      // ── Keyboard shortcuts row — open the help overlay on click ──────
+      document
+        .getElementById("showKbdShortcuts")
+        ?.addEventListener("click", () => {
+          // Dispatch a "?" keydown so keyboard-shortcuts.js handles it
+          // (uses the same toggleHelp() path) — keeps one source of truth.
+          document.dispatchEvent(
+            new KeyboardEvent("keydown", { key: "?", bubbles: true })
+          );
+        });
+
       // ── Delete Account flow ──────────────────────────────────
       // Double confirmation required: typing "DELETE" then clicking the
       // red button. After deletion, Firestore data is gone and we sign
@@ -1179,6 +1208,8 @@
 
       loadCoach();
     </script>
+    <!-- Global keyboard shortcuts (g+h, g+t, g+r, g+w, g+p, /, Esc, ?) -->
+    <script defer src="keyboard-shortcuts.js"></script>
     <!-- Back-to-top floating button — appears after scrolling >300px -->
     <script>
       (function () {
