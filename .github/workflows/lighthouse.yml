@@ -22,7 +22,7 @@ jobs:
     # Skip if the deploy that triggered us failed
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Wait for GitHub Pages to propagate
         run: sleep 30
