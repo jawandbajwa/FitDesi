@@ -143,7 +143,7 @@ function openDetail(recipe) {
           <span class="ingredient-name">${ing.name}</span>
           <span class="ingredient-amount">${ing.amount}${ing.unit || "g"}</span>
         </div>`).join("")
-    : '<div style="color:rgba(255,255,255,0.2);font-size:12px;padding:8px 0">No ingredients listed</div>';
+    : '<div style="color:var(--text-faint);font-size:12px;padding:8px 0">No ingredients listed</div>';
 
   const instructions = recipe.instructions || [];
   const instructionsEl    = document.getElementById("detailInstructions");

@@ -85,7 +85,7 @@
       .ring-val {
         font-size: 26px;
         font-weight: 700;
-        color: #f0f0f0;
+        color: var(--text);
         line-height: 1;
       }
 
@@ -99,7 +99,7 @@
 
       .ring-goal {
         font-size: 11px;
-        color: rgba(255, 255, 255, 0.3);
+        color: var(--text-dim);
         margin-top: 3px;
       }
 
@@ -115,8 +115,8 @@
         display: flex;
         align-items: center;
         gap: 10px;
-        background: #111a13;
-        border: 1px solid #1a2e1e;
+        background: var(--card);
+        border: 1px solid var(--border);
         border-radius: 10px;
         padding: 8px 12px;
       }
@@ -140,7 +140,7 @@
 
       .mini-ring-name {
         font-size: 10px;
-        color: rgba(255, 255, 255, 0.35);
+        color: var(--text-dim);
         text-transform: uppercase;
         letter-spacing: 0.5px;
       }
@@ -148,13 +148,13 @@
       .mini-ring-val {
         font-size: 14px;
         font-weight: 600;
-        color: #f0f0f0;
+        color: var(--text);
         line-height: 1.2;
       }
 
       .mini-ring-goal {
         font-size: 10px;
-        color: rgba(255, 255, 255, 0.25);
+        color: var(--text-faint);
       }
 
       /* Streak card */
@@ -163,8 +163,8 @@
         align-items: center;
         gap: 12px;
         margin: 0 16px 12px;
-        background: #111a13;
-        border: 1px solid #1a2e1e;
+        background: var(--card);
+        border: 1px solid var(--border);
         border-radius: 14px;
         padding: 14px 16px;
       }
@@ -186,7 +186,7 @@
 
       .streak-label {
         font-size: 11px;
-        color: rgba(255, 255, 255, 0.35);
+        color: var(--text-dim);
         margin-top: 2px;
       }
 
@@ -218,7 +218,7 @@
 
       .streak-day-lbl {
         font-size: 8px;
-        color: rgba(255, 255, 255, 0.25);
+        color: var(--text-faint);
         text-transform: uppercase;
         letter-spacing: 0.3px;
         line-height: 1;
@@ -231,7 +231,7 @@
       /* Workout card */
       .today-workout-card {
         margin: 0 16px 12px;
-        background: #111a13;
+        background: var(--card);
         border: 1px solid rgb(var(--green-rgb) / 0.2);
         border-radius: 14px;
         padding: 14px 16px;
@@ -251,13 +251,13 @@
       .workout-name {
         font-size: 16px;
         font-weight: 600;
-        color: #f0f0f0;
+        color: var(--text);
       }
 
       .workout-name.empty {
         font-size: 13px;
         font-weight: 400;
-        color: rgba(255, 255, 255, 0.3);
+        color: var(--text-dim);
       }
 
       .workout-card-info {
@@ -291,10 +291,10 @@
       }
 
       .quick-btn {
-        background: #111a13;
-        border: 1px solid #1a2e1e;
+        background: var(--card);
+        border: 1px solid var(--border);
         border-radius: 12px;
-        color: rgba(255, 255, 255, 0.7);
+        color: var(--text);
         font-size: 12px;
         font-weight: 500;
         padding: 14px 8px;
@@ -337,7 +337,7 @@
 
       .coach-msg-text {
         font-size: 12px;
-        color: rgba(255, 255, 255, 0.45);
+        color: var(--text-dim);
         line-height: 1.6;
       }
     </style>
@@ -810,8 +810,13 @@
         return splitDays[diffDays % splitDays.length];
       }
 
+      // Calories = TDEE + goal preset + user's calorieAdjustment slider
+      // (set in profile.html). Protein defaults to 2.0x bodyweight, bumped
+      // to 2.4x for a recomp goal while in a deficit (protects muscle).
+      const GOAL_PRESET = { recomp: 0, muscle: 300, fatloss: -500 };
       function calculateMacros(profile) {
-        const { weight, height, age, gender, activity, goal } = profile;
+        const { weight, height, age, gender, activity, goal, calorieAdjustment } =
+          profile;
         let bmr =
           gender === "male"
             ? 10 * weight + 6.25 * height - 5 * age + 5
@@ -823,18 +828,10 @@
           active: 1.725,
         };
         let tdee = bmr * (multipliers[activity] || 1.55);
-        let calTarget =
-          goal === "recomp"
-            ? tdee * 0.95
-            : goal === "muscle"
-              ? tdee * 1.1
-              : tdee * 0.85;
-        let protein =
-          goal === "recomp"
-            ? Math.round(weight * 2.2)
-            : goal === "muscle"
-              ? Math.round(weight * 2.0)
-              : Math.round(weight * 2.4);
+        const adjustment = calorieAdjustment || 0;
+        let calTarget = tdee + (GOAL_PRESET[goal] || 0) + adjustment;
+        const proteinMult = goal === "recomp" && adjustment < 0 ? 2.4 : 2.0;
+        let protein = Math.round(weight * proteinMult);
         let fat = Math.round((calTarget * 0.25) / 9);
         let carbs = Math.round((calTarget - protein * 4 - fat * 9) / 4);
         return { protein, carbs, fat, calories: Math.round(calTarget) };
@@ -876,7 +873,7 @@
           // Sign out button (small, in header)
           const signOutBtn = document.createElement("button");
           signOutBtn.textContent = "Sign Out";
-          signOutBtn.style.cssText = `font-size:11px;color:rgba(255,255,255,0.3);background:none;border:0.5px solid rgba(255,255,255,0.1);padding:4px 10px;border-radius:20px;cursor:pointer;font-family:Inter,sans-serif;`;
+          signOutBtn.style.cssText = `font-size:11px;color:var(--text-dim);background:none;border:0.5px solid var(--border);padding:4px 10px;border-radius:20px;cursor:pointer;font-family:Inter,sans-serif;`;
           signOutBtn.addEventListener("click", async () => {
             try {
               const { signOutUser } = await import("./firebase.js");

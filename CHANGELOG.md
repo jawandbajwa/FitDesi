@@ -6,6 +6,25 @@ This project uses [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH.
 
 ---
 
+## [4.8.0] — 2026-07-01
+### Changed
+- **Global theme-aware color refactor** — swept every page, component CSS, and dynamic JS style injection to replace hardcoded `rgba(255,255,255,X)` / `#f0f0f0` / dark-only hex tints with `var(--text)`, `var(--text-dim)`, `var(--text-faint)`, `var(--card)`, `var(--bg)`, `var(--border)`, `var(--red)`. This is the reliability fix behind the theme system: base tokens are redefined per theme in `[data-theme="light"]` / `[data-theme="warm"]` blocks, so any component that references a token auto-adapts to all 3 themes without needing per-selector override rules.
+- Files refactored: `recipes.css` (60+ hardcoded values → CSS vars), `tracker.css`, `coach.css`, `login.html` (inline styles), `404.html` (.nf-path contrast), `index.html` (home cards, quick actions, coach message), `exercise.html` (Set A/B and Train This Today modal inline styles), `tracker.html` (Waist/Hip helper labels, swap modal), `recipes.html` (meal selector subtitle), `admin.html` (Users empty state), `onboarding.js` (slide text), `tracker.js` (Chart.js tick/grid/tooltip colors now resolved from CSS vars at chart init), `exercise.js` and `recipes.js` (empty-state inline text).
+- Login page (`login.html`) card, subtitle, Google sign-in button, and footer now use CSS vars — Light theme was showing invisible white-on-white text on the sign-in card and footer before this fix.
+
+### Fixed
+- Login page in Light theme: "Continue with Google" button label, "Sign in with your Google account…" subtitle, and privacy footer text were nearly invisible on the cream card. All now use `var(--text)` / `var(--text-dim)` / `var(--text-faint)`.
+- Tracker Progress tab: Weight and Body Fat chart tick labels, gridlines, and tooltip colors were hardcoded `rgba(255,255,255,X)` (invisible on Light cream bg). Now resolved from `--text-dim` / `--border` / `--card` at chart init time via a `cssVar()` helper.
+- 404 page: the missing-URL path chip used `--text-faint` (cream-tan) on `--card` (white) in Light — invisible. Now uses `--text-dim` (medium brown) for readable contrast.
+- Recipes page: recipe cards, category chips, cuisine switcher, search input, detail panel, ingredient list, macro cards, meal-selector modal, user-recipe form — every text/border/bg color now theme-aware. Previously ~60 selectors relied on style.css per-selector overrides that only covered 5 of them.
+
+## [4.7.0] — 2026-07-01
+### Added
+- **Calorie deficit/surplus fine-tune slider** — Profile → Edit Profile, below the goal picker. Slider ranges −500 to +500 cal in steps of 50, shows the live delta (red for deficit, green for surplus) and the resulting calorie/macro target as you drag. Saved as `calorieAdjustment` on the user profile, either when the slider is released or via the "Recalculate Macros" button — not on every drag tick.
+### Changed
+- **Macro calculation formula** (`calculateMacros` in profile.html, tracker.js, index.html) now computes calories as `TDEE + goal preset + calorieAdjustment` (Recomp 0 / Muscle +300 / Fat Loss −500) instead of a flat TDEE percentage per goal. Protein defaults to 2.0× bodyweight(kg) app-wide, bumped to 2.4× for a Recomp goal while in a calorie deficit to protect muscle during a lean recomp.
+- `saveUserProfile()` in firebase.js now writes with `{ merge: true }` instead of a full document overwrite — fixes a pre-existing bug where editing your profile from Profile → Edit Profile silently wiped `isAdmin`, `coachEnabled`, `chosenCoach`, `onboardingDone`, `email`, `photoURL`, and `createdAt` from the profile doc.
+
 ## [4.6.3] — 2026-05-21
 ### Added
 - **Global keyboard shortcuts** (`keyboard-shortcuts.js`). Press `?` for the help overlay. `/` or `Ctrl/Cmd+K` focuses search. `g h / g t / g r / g w / g p` navigates between Home / Tracker / Recipes / Workout / Profile in a vim-style sequence. `Esc` closes any open modal or overlay. Doesn't fire when typing in a field. Skipped when modifier keys are pressed (except Ctrl+K).

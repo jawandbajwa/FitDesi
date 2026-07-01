@@ -1109,7 +1109,7 @@ function renderMyWorkout() {
   const cycleNum = cycleData.cycleCount || 1;
 
   if (!dayData) {
-    container.innerHTML = `${renderSplitSelector()}${renderWeekView()}<div style="text-align:center;padding:40px;color:rgba(255,255,255,0.3)">No workout data for today</div>`;
+    container.innerHTML = `${renderSplitSelector()}${renderWeekView()}<div style="text-align:center;padding:40px;color:var(--text-dim)">No workout data for today</div>`;
     attachSplitListeners();
     return;
   }
@@ -1171,7 +1171,7 @@ function renderMyWorkout() {
                 `,
                         )
                         .join("")
-                    : '<div style="color:rgba(255,255,255,0.2);text-align:center;padding:20px">No exercises found</div>'
+                    : '<div style="color:var(--text-faint);text-align:center;padding:20px">No exercises found</div>'
                 }
             </div>
         `
@@ -1328,7 +1328,7 @@ function renderLibrary() {
   });
 
   if (filtered.length === 0) {
-    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:rgba(255,255,255,0.2);padding:60px 0;font-size:14px">No exercises found</div>`;
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--text-faint);padding:60px 0;font-size:14px">No exercises found</div>`;
     return;
   }
 

@@ -177,8 +177,13 @@ function getWeightInKg() {
 }
 
 // ─── MACRO CALCULATOR ────────────────────────────────────────
+// Calories = TDEE + goal preset + user's calorieAdjustment slider
+// (set in profile.html). Protein defaults to 2.0x bodyweight, bumped
+// to 2.4x for a recomp goal while in a deficit (protects muscle).
+const GOAL_PRESET = { recomp: 0, muscle: 300, fatloss: -500 };
 function calculateMacros(profile) {
-  const { weight, height, age, gender, activity, goal } = profile;
+  const { weight, height, age, gender, activity, goal, calorieAdjustment } =
+    profile;
   let bmr =
     gender === "male"
       ? 10 * weight + 6.25 * height - 5 * age + 5
@@ -192,23 +197,12 @@ function calculateMacros(profile) {
   };
   let tdee = bmr * (multipliers[activity] || 1.55);
 
-  let calories, protein, carbs, fat;
-  if (goal === "recomp") {
-    calories = Math.round(tdee * 0.95);
-    protein = Math.round(weight * 2.2);
-    fat = Math.round((calories * 0.25) / 9);
-    carbs = Math.round((calories - protein * 4 - fat * 9) / 4);
-  } else if (goal === "muscle") {
-    calories = Math.round(tdee * 1.1);
-    protein = Math.round(weight * 2.0);
-    fat = Math.round((calories * 0.28) / 9);
-    carbs = Math.round((calories - protein * 4 - fat * 9) / 4);
-  } else {
-    calories = Math.round(tdee * 0.85);
-    protein = Math.round(weight * 2.4);
-    fat = Math.round((calories * 0.25) / 9);
-    carbs = Math.round((calories - protein * 4 - fat * 9) / 4);
-  }
+  const adjustment = calorieAdjustment || 0;
+  const calories = Math.round(tdee + (GOAL_PRESET[goal] || 0) + adjustment);
+  const proteinMult = goal === "recomp" && adjustment < 0 ? 2.4 : 2.0;
+  const protein = Math.round(weight * proteinMult);
+  const fat = Math.round((calories * 0.25) / 9);
+  const carbs = Math.round((calories - protein * 4 - fat * 9) / 4);
   return { calories, protein, carbs, fat };
 }
 
@@ -504,7 +498,7 @@ async function renderFoodList(query) {
   );
   const list = document.getElementById("foodList");
   if (filtered.length === 0) {
-    list.innerHTML = `<div style="text-align:center;color:rgba(255,255,255,0.2);font-size:12px;padding:16px">No recipes found — add them in admin panel</div>`;
+    list.innerHTML = `<div style="text-align:center;color:var(--text-faint);font-size:12px;padding:16px">No recipes found — add them in admin panel</div>`;
     return;
   }
   list.innerHTML = filtered
@@ -848,7 +842,7 @@ function openSwapModal(meal) {
         `,
           )
           .join("")
-      : '<div style="color:rgba(255,255,255,0.2);text-align:center;padding:20px;font-size:12px">No other options available</div>';
+      : '<div style="color:var(--text-faint);text-align:center;padding:20px;font-size:12px">No other options available</div>';
 
   document.querySelectorAll(".swap-item").forEach((el) => {
     el.addEventListener("click", () => {
@@ -1290,7 +1284,15 @@ function makeGradient(ctx, r, g, b) {
   return grad;
 }
 
+function cssVar(name) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
 function buildChartOptions(unit) {
+  const tickColor = cssVar("--text-dim");
+  const gridColor = cssVar("--border");
+  const cardBg = cssVar("--card");
+  const textColor = cssVar("--text");
   return {
     responsive: true,
     maintainAspectRatio: false,
@@ -1298,32 +1300,32 @@ function buildChartOptions(unit) {
     scales: {
       x: {
         ticks: {
-          color: "rgba(255,255,255,0.45)",
+          color: tickColor,
           font: { size: 10 },
           maxRotation: 0,
           maxTicksLimit: 7,
         },
-        grid: { color: "rgba(255,255,255,0.06)" },
+        grid: { color: gridColor },
         border: { display: false },
       },
       y: {
         ticks: {
-          color: "rgba(255,255,255,0.45)",
+          color: tickColor,
           font: { size: 10 },
           callback: (v) => v + unit,
         },
-        grid: { color: "rgba(255,255,255,0.06)" },
+        grid: { color: gridColor },
         border: { display: false },
       },
     },
     plugins: {
       legend: { display: false },
       tooltip: {
-        backgroundColor: "rgba(13,31,16,0.95)",
-        borderColor: "rgba(255,255,255,0.1)",
+        backgroundColor: cardBg,
+        borderColor: gridColor,
         borderWidth: 1,
-        titleColor: "rgba(255,255,255,0.5)",
-        bodyColor: "#f0f0f0",
+        titleColor: tickColor,
+        bodyColor: textColor,
         padding: 10,
         callbacks: { label: (c) => " " + c.parsed.y + unit },
       },
@@ -1345,7 +1347,7 @@ function renderProgressCharts(history) {
     // Set canvas logical size so text is centered
     canvas.height = 180;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "rgba(255,255,255,0.18)";
+    ctx.fillStyle = cssVar("--text-faint");
     ctx.font = "13px Inter, sans-serif";
     ctx.textAlign = "center";
     ctx.fillText("No entries yet — log your first entry above", canvas.width / 2, 90);

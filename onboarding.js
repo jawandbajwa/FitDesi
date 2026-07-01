@@ -112,7 +112,7 @@ function buildOnboarding(uid) {
   // Left button — Skip on slide 1, ← back on slides 2-4
   const leftBtn = document.createElement("button");
   leftBtn.style.cssText = `
-    font-size: 14px; color: rgba(255,255,255,0.35);
+    font-size: 14px; color: var(--text-dim);
     background: none; border: none; cursor: pointer;
     font-weight: 500; font-family: inherit; padding: 8px 4px;
     min-width: 44px; text-align: left;
@@ -184,7 +184,7 @@ function buildOnboarding(uid) {
 
     // Body
     const body = el("div", `
-      font-size: 14px; color: rgba(255,255,255,0.5);
+      font-size: 14px; color: var(--text-dim);
       text-align: center; line-height: 1.65; max-width: 280px;
       margin-bottom: 28px;
     `, s.body);
@@ -206,10 +206,10 @@ function buildOnboarding(uid) {
     // Sync left button
     if (current === 0) {
       leftBtn.textContent = "Skip";
-      leftBtn.style.color = "rgba(255,255,255,0.35)";
+      leftBtn.style.color = "var(--text-dim)";
     } else {
       leftBtn.textContent = "← Back";
-      leftBtn.style.color = "rgba(255,255,255,0.6)";
+      leftBtn.style.color = "var(--text)";
     }
 
     // Sync button
@@ -278,7 +278,7 @@ function buildMacroGrid() {
     card.innerHTML = `
       <div style="font-size:20px">${icon}</div>
       <div style="color:${getGreenColor()};font-size:15px;font-weight:800;line-height:1">${val}</div>
-      <div style="color:rgba(255,255,255,0.4);font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px">${lbl}</div>
+      <div style="color:var(--text-dim);font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px">${lbl}</div>
     `;
     grid.appendChild(card);
   });
@@ -326,9 +326,9 @@ function buildWorkoutVisual() {
       border:1px solid ${today ? "${getGreenColor()}" : "rgba(126,217,154,0.15)"};
     `;
     c.innerHTML = `
-      <div style="color:${today ? "${getGreenColor()}" : "rgba(255,255,255,0.4)"};font-size:9px;font-weight:700;text-transform:uppercase">${day}</div>
+      <div style="color:${today ? "${getGreenColor()}" : "var(--text-dim)"};font-size:9px;font-weight:700;text-transform:uppercase">${day}</div>
       <div style="font-size:18px;margin:5px 0">${icon}</div>
-      <div style="color:${today ? "${getGreenColor()}" : "rgba(255,255,255,0.35)"};font-size:9px;font-weight:${today ? "600" : "400"}">${label}</div>
+      <div style="color:${today ? "${getGreenColor()}" : "var(--text-dim)"};font-size:9px;font-weight:${today ? "600" : "400"}">${label}</div>
     `;
     row.appendChild(c);
   });
@@ -358,7 +358,7 @@ function buildCoachVisual() {
         box-shadow:${big ? "0 0 18px rgba(126,217,154,0.3)" : "none"};
         display:flex;align-items:center;justify-content:center;font-size:${fs};
       ">${emoji}</div>
-      <div style="font-size:9px;color:${big ? "${getGreenColor()}" : "rgba(255,255,255,0.45)"};font-weight:600;text-align:center;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${name}</div>
+      <div style="font-size:9px;color:${big ? "${getGreenColor()}" : "var(--text-dim)"};font-weight:600;text-align:center;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${name}</div>
     `;
     row.appendChild(wrap);
   });

@@ -134,7 +134,8 @@ admin.css uses CSS variables throughout — `var(--text)`, `var(--text-dim)`, `v
 users/{uid}/
   data/profile        → { name, email, photoURL, age, weight, height, goal,
                            activityLevel, gender, isAdmin, weightUnit, heightUnit,
-                           coachEnabled, chosenCoach, onboardingDone, createdAt }
+                           coachEnabled, chosenCoach, onboardingDone, createdAt,
+                           calorieAdjustment }
   data/cycle          → { startDate, currentSet, cycleCount, acknowledgedCycles,
                            activeSplit, customSplitDays, lastSetPickedDate }
   data/notifications  → { breakfast, lunch, dinner }  (HH:MM strings)
@@ -319,11 +320,23 @@ Admin and profile pages have `<meta name="robots" content="noindex">` (defence-i
 - CSS variables: `--bg`, `--card`, `--border`, `--text`, `--text-dim`, `--text-faint`, `--green` (accent), `--green-rgb` (for transparent colors), `--green-muted`, `--green-dark`, `--radius`
 
 ### How colors work with themes
-- **Never hardcode colors** — all green colors must use `var(--green)` so they adapt to Light/Warm/Dark themes
-- **For transparency**: use `rgb(var(--green-rgb) / 0.12)` instead of `rgba(126,217,154,0.12)`
-- **In JavaScript inline styles**: CSS variables work directly inside `style.cssText` template literals — `el.style.cssText = "color: var(--green);"` resolves correctly per theme. No helper function needed. (The old `getGreenColor()` helper was removed in v4.3.0.)
+- **Never hardcode text/surface colors** — use CSS vars everywhere. Base tokens are redefined per theme in `[data-theme="light"]`/`[data-theme="warm"]` blocks in style.css, so components auto-adapt with zero per-selector overrides.
+- **The token vocabulary** (dark theme default → Light → Warm):
+  - Text: `var(--text)` (bright→dark brown→cream), `var(--text-dim)` (medium), `var(--text-faint)` (subtle)
+  - Surfaces: `var(--bg)` (page bg), `var(--card)` (elevated card), `var(--border)` (hairlines/dividers)
+  - Accents: `var(--green)` (dark green→burnt orange→gold), `var(--red)` (destructive)
+- **Common replacements** (established v4.8.0):
+  - `rgba(255,255,255, 0.85+)` → `var(--text)`
+  - `rgba(255,255,255, 0.3–0.5)` → `var(--text-dim)`
+  - `rgba(255,255,255, 0.15–0.25)` → `var(--text-faint)`
+  - `rgba(255,255,255, 0.03–0.1)` as background → `var(--card)` (card-like) or `var(--bg)` (input-like)
+  - `rgba(255,255,255, 0.05–0.13)` as border → `var(--border)`
+  - `#f0f0f0` (text) → `var(--text)`
+- **For transparency on green accents**: use `rgb(var(--green-rgb) / 0.12)` instead of `rgba(126,217,154,0.12)`
+- **In JavaScript inline styles**: CSS vars work directly inside `style.cssText` template literals — `el.style.cssText = "color: var(--text);"` resolves correctly per theme. No helper function needed. (The old `getGreenColor()` helper was removed in v4.3.0.)
+- **For dynamic JS rendering that can't consume vars** (e.g. Chart.js configs, canvas fillStyle): resolve at render time — `getComputedStyle(document.documentElement).getPropertyValue('--text-dim').trim()`. See `cssVar()` helper at the top of tracker.js's `buildChartOptions()`.
 - **Beware `\v` in template literals**: writing `` `color: \var(--green);` `` makes JS interpret `\v` as the vertical-tab escape character → emits `<0x0B>ar(--green)` → invalid CSS. Always write `var(--green)` (no leading backslash).
-- **Never use hardcoded hex**: `#7ed99a`, `#A85A1F`, `#E8B547` are theme-specific — always use the CSS variable
+- **Never use hardcoded hex for theme-sensitive colors**: `#7ed99a`, `#A85A1F`, `#E8B547`, `#f0f0f0`, `#111a13`, `#1a2e1e` etc. are theme-specific — always use the corresponding CSS variable.
 
 ### Utility classes (v4.5+)
 | Class | Use case |
@@ -418,13 +431,18 @@ Only `startDate` is written back; page reloads after save.
 
 ## Nutrition / Macro Calculation
 
-Uses **Mifflin-St Jeor BMR** → multiply by activity factor → split into macros:
-- Protein: `bodyWeight(kg) * 2.0` g
+Uses **Mifflin-St Jeor BMR** → multiply by activity factor to get TDEE → apply goal preset → apply user's calorie adjustment slider → split into macros. `calculateMacros()` is duplicated (by design, mirrors intentionally) in `profile.html`, `tracker.js`, and `index.html` — keep all three in sync when changing the formula.
+
+- BMR: Mifflin-St Jeor (`10*weight + 6.25*height - 5*age + 5` male, `-161` female)
+- TDEE: `BMR × activity multiplier` (sedentary 1.2 / light 1.375 / moderate 1.55 / active 1.725)
+- Goal preset (added to TDEE): Recomp `0`, Muscle `+300`, Fat Loss `−500`
+- **Calorie adjustment slider**: user-set fine-tune from Profile → Edit Profile, `−500` to `+500` in steps of 50, stored as `calorieAdjustment` (integer, default 0) on the profile doc. Added on top of the goal preset.
+- **Final calories**: `TDEE + goalPreset + calorieAdjustment`
+- Protein: `bodyWeight(kg) * 2.0` g — bumped to `* 2.4` when `goal === "recomp"` AND `calorieAdjustment < 0` (deficit recomp), to protect muscle
 - Fat: `25%` of total calories
 - Carbs: remaining calories / 4
-- Calories: BMR × activity multiplier
 
-Profile stores: `age`, `weight` (kg or lbs), `height` (cm or ft/in), `gender`, `activityLevel`, `goal` (recomp/muscle/fatloss)
+Profile stores: `age`, `weight` (kg or lbs), `height` (cm or ft/in), `gender`, `activityLevel`, `goal` (recomp/muscle/fatloss), `calorieAdjustment` (integer, default 0)
 
 ---
 
@@ -558,6 +576,8 @@ The help overlay (`.kbd-help-overlay`) is lazily injected on first `?` press. St
 17. **Account deletion uses `auth.currentUser.uid`** — not a passed-in arg from outside. The button in profile.html reads `auth.currentUser` and calls `deleteAllUserData(user.uid)`. After deletion, also `localStorage.clear()` before redirecting. Firebase Auth account itself stays — user must revoke at myaccount.google.com to fully sever.
 18. **Adding a new admin action? Call `logAdminAction()` from inside the firebase.js function** — not from admin.js. Centralized so we never forget. Pattern: `try { ...; logAdminAction("name", { ...details }); } catch { ... }`.
 19. **Cloudflare Worker rate limiting requires KV namespace `RATE_LIMIT`** — set up via Cloudflare dashboard, bind in wrangler.toml, then `wrangler deploy`. Without it the worker still works (gracefully no-ops on rate check). Don't ship the worker without the binding once you're getting real traffic — runaway tabs can drain your Gemini quota.
+20. **`saveUserProfile()` writes with `{ merge: true }`** (fixed v4.7.0) — it used to be a full-document `setDoc` overwrite, which silently wiped `isAdmin`, `coachEnabled`, `chosenCoach`, `onboardingDone`, `email`, `photoURL`, and `createdAt` any time `profile.html`'s "Save & Recalculate" ran with a partial profile object. If you add a new profile field written from somewhere that only sends a subset of fields, merge semantics now protect the rest — but don't rely on this to skip validating what you're writing.
+21. **Prefer CSS vars over hardcoded `rgba(255,255,255,X)` — base tokens are re-themed per theme** (established v4.8.0). `--text`, `--text-dim`, `--text-faint`, `--bg`, `--card`, `--border`, `--green`, `--green-rgb`, `--red` are all redefined inside the `[data-theme="light"]` and `[data-theme="warm"]` root blocks in style.css (~lines 2056 and 2321). Any component using these vars auto-adapts to all 3 themes with zero per-selector override rules. New CSS should use these vars everywhere text or surface color is needed. The main remaining exception is the `.ep-*` edit-profile modal in `profile.css`, which still hardcodes some colors and depends on hand-tuned `[data-theme="light"] .ep-*` / `[data-theme="warm"] .ep-*` override blocks in style.css (~lines 2177 and 2437) — that's a legacy pattern; the modal works but new elements inside it should still prefer vars. For dynamic JS style injection (e.g. Chart.js configs) that can't consume CSS vars directly, use `getComputedStyle(document.documentElement).getPropertyValue('--text-dim').trim()` to resolve the current-theme value at render time (see `cssVar()` helper in tracker.js).
 
 ---
 

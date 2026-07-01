@@ -39,8 +39,8 @@
 }
 
 .prog-stat-card {
-  background: rgba(255,255,255,0.03);
-  border: 0.5px solid rgba(255,255,255,0.08);
+  background: var(--card);
+  border: 0.5px solid var(--border);
   border-radius: 14px;
   padding: 16px 12px 14px;
   text-align: center;
@@ -60,13 +60,13 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  color: rgba(255,255,255,0.3);
+  color: var(--text-dim);
   margin-bottom: 5px;
 }
 
 .prog-stat-note {
   font-size: 11px;
-  color: rgba(255,255,255,0.35);
+  color: var(--text-dim);
 }
 
 .prog-stat-note.good { color: var(--green); }
@@ -75,8 +75,8 @@
 /* ── CHART CARDS ─────────────────────────────────────── */
 .chart-card {
   margin: 0 16px;
-  background: rgba(255,255,255,0.03);
-  border: 0.5px solid rgba(255,255,255,0.08);
+  background: var(--card);
+  border: 0.5px solid var(--border);
   border-radius: 14px;
   overflow: hidden;
   padding: 14px 14px 10px;
@@ -92,7 +92,7 @@
 .chart-card-title {
   font-size: 13px;
   font-weight: 600;
-  color: rgba(255,255,255,0.75);
+  color: var(--text);
 }
 
 .chart-card-actions {
@@ -103,7 +103,7 @@
 
 .chart-card-unit {
   font-size: 11px;
-  color: rgba(255,255,255,0.25);
+  color: var(--text-faint);
 }
 
 .chart-reset-btn {
