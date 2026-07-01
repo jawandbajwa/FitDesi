@@ -237,7 +237,7 @@ function isAdmin(user) {
  */
 async function saveUserProfile(userId, profile) {
   try {
-    await setDoc(doc(db, "users", userId, "data", "profile"), profile);
+    await setDoc(doc(db, "users", userId, "data", "profile"), profile, { merge: true });
     // Write a stub to the top-level users/{uid} document so getDocs(collection(db,"users"))
     // can discover all users. Firestore subcollections don't create parent documents
     // automatically — without this stub, getAllUsers() always returns [].
@@ -743,6 +743,16 @@ async function saveCoachChoice(uid, coachId) {
   }
 }
 
+async function saveCalorieAdjustment(uid, calorieAdjustment) {
+  try {
+    const profileRef = doc(db, "users", uid, "data", "profile");
+    await setDoc(profileRef, { calorieAdjustment }, { merge: true });
+  } catch (error) {
+    console.error("Error saving calorie adjustment:", error);
+    throw error;
+  }
+}
+
 async function assignCoach(uid, enabled) {
   try {
     const profileRef = doc(db, "users", uid, "data", "profile");
@@ -1009,6 +1019,7 @@ export {
   getUserRecipes,
   deleteUserRecipe,
   saveCoachChoice,
+  saveCalorieAdjustment,
   assignCoach,
   setAdminStatus,
   getAllUsers,

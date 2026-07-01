@@ -401,6 +401,61 @@
 .ep-goal-desc { font-size: 11px; color: rgba(255,255,255,0.3); display: block; margin-top: 2px; }
 .ep-goal-btn.active .ep-goal-desc { color: rgb(var(--green-rgb) / 0.5); }
 
+/* Calorie adjustment slider */
+.ep-cal-slider-row { display: flex; align-items: center; gap: 12px; }
+.ep-cal-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.1);
+  outline: none;
+  cursor: pointer;
+}
+.ep-cal-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--green);
+  cursor: pointer;
+  border: 2px solid rgba(0,0,0,0.25);
+}
+.ep-cal-slider::-moz-range-thumb {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--green);
+  cursor: pointer;
+  border: 2px solid rgba(0,0,0,0.25);
+}
+.ep-cal-value {
+  font-size: 13px; font-weight: 700;
+  min-width: 64px; text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.ep-cal-value.deficit { color: var(--red); }
+.ep-cal-value.surplus { color: var(--green); }
+.ep-cal-value.neutral { color: rgba(255,255,255,0.4); }
+.ep-cal-target {
+  font-size: 12px;
+  color: rgba(255,255,255,0.45);
+  margin-top: 10px;
+}
+.ep-cal-target strong { color: rgba(255,255,255,0.85); font-weight: 700; }
+.ep-recalc-btn {
+  width: 100%; margin-top: 10px;
+  padding: 10px;
+  background: rgb(var(--green-rgb) / 0.12);
+  border: 0.5px solid rgb(var(--green-rgb) / 0.35);
+  border-radius: 10px;
+  color: var(--green); font-size: 13px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+  transition: opacity 0.15s;
+}
+.ep-recalc-btn:active { opacity: 0.8; }
+.ep-recalc-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
 .ep-save-btn {
   width: 100%; padding: 15px;
   background: var(--green); border: none; border-radius: 14px;

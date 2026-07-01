@@ -168,7 +168,7 @@
         <div class="settings-group">
           <div class="settings-row">
             <span class="settings-row-label">App Version</span>
-            <span class="settings-row-value">4.6.3</span>
+            <span class="settings-row-value">4.8.0</span>
           </div>
           <div class="settings-row">
             <span class="settings-row-label">Data Storage</span>
@@ -514,6 +514,30 @@
             </div>
           </div>
           <div class="ep-group">
+            <label>Fine-tune your calories</label>
+            <div class="ep-cal-slider-row">
+              <input
+                class="ep-cal-slider"
+                id="epCalAdjust"
+                type="range"
+                min="-500"
+                max="500"
+                step="50"
+                value="0"
+                aria-label="Calorie adjustment"
+              />
+              <span class="ep-cal-value neutral" id="epCalAdjustValue"
+                >0 cal</span
+              >
+            </div>
+            <div class="ep-cal-target" id="epCalTarget">
+              Fill in your stats to see your target
+            </div>
+            <button class="ep-recalc-btn" type="button" id="epRecalcBtn">
+              Recalculate Macros
+            </button>
+          </div>
+          <div class="ep-group">
             <label>Activity Level</label>
             <div class="ep-option-row">
               <button
@@ -674,6 +698,7 @@
         signOutUser,
         getUserProfile,
         saveUserProfile,
+        saveCalorieAdjustment,
         isAdmin,
         deleteAllUserData,
       } from "./firebase.js";
@@ -697,7 +722,11 @@
         epGoal = "",
         epActivity = "";
 
-      // ── Macro calculator (mirrors tracker.js) ────────────────
+      // ── Macro calculator (mirrors tracker.js / index.html) ───
+      // Calories = TDEE + goal preset + user's calorieAdjustment slider.
+      // Protein defaults to 2.0x bodyweight, bumped to 2.4x for a
+      // recomp goal while in a deficit (protects muscle on a lean recomp).
+      const GOAL_PRESET = { recomp: 0, muscle: 300, fatloss: -500 };
       function calculateMacros(p) {
         let bmr =
           p.gender === "male"
@@ -710,23 +739,14 @@
           active: 1.725,
         };
         const tdee = bmr * (mult[p.activity] || 1.55);
-        let calories, protein, carbs, fat;
-        if (p.goal === "recomp") {
-          calories = Math.round(tdee * 0.95);
-          protein = Math.round(p.weight * 2.2);
-          fat = Math.round((calories * 0.25) / 9);
-          carbs = Math.round((calories - protein * 4 - fat * 9) / 4);
-        } else if (p.goal === "muscle") {
-          calories = Math.round(tdee * 1.1);
-          protein = Math.round(p.weight * 2.0);
-          fat = Math.round((calories * 0.28) / 9);
-          carbs = Math.round((calories - protein * 4 - fat * 9) / 4);
-        } else {
-          calories = Math.round(tdee * 0.85);
-          protein = Math.round(p.weight * 2.4);
-          fat = Math.round((calories * 0.25) / 9);
-          carbs = Math.round((calories - protein * 4 - fat * 9) / 4);
-        }
+        const adjustment = p.calorieAdjustment || 0;
+        const calories = Math.round(
+          tdee + (GOAL_PRESET[p.goal] || 0) + adjustment,
+        );
+        const proteinMult = p.goal === "recomp" && adjustment < 0 ? 2.4 : 2.0;
+        const protein = Math.round(p.weight * proteinMult);
+        const fat = Math.round((calories * 0.25) / 9);
+        const carbs = Math.round((calories - protein * 4 - fat * 9) / 4);
         return { calories, protein, carbs, fat };
       }
 
@@ -844,6 +864,76 @@
         return Math.round(ft * 30.48 + inches * 2.54);
       }
 
+      // ── Calorie adjustment slider ─────────────────────────────
+      function getEpDraftProfile() {
+        return {
+          weight: getEpWeightKg(),
+          height: getEpHeightCm(),
+          age: parseFloat(document.getElementById("epAge").value) || 0,
+          gender: epGender,
+          activity: epActivity,
+          goal: epGoal,
+          calorieAdjustment:
+            parseInt(document.getElementById("epCalAdjust").value, 10) || 0,
+        };
+      }
+
+      function updateCalorieAdjustmentDisplay() {
+        const adj = parseInt(
+          document.getElementById("epCalAdjust").value,
+          10,
+        );
+        const valueEl = document.getElementById("epCalAdjustValue");
+        valueEl.classList.remove("deficit", "surplus", "neutral");
+        if (adj < 0) {
+          valueEl.textContent = `${adj} cal`;
+          valueEl.classList.add("deficit");
+        } else if (adj > 0) {
+          valueEl.textContent = `+${adj} cal`;
+          valueEl.classList.add("surplus");
+        } else {
+          valueEl.textContent = "0 cal";
+          valueEl.classList.add("neutral");
+        }
+
+        const targetEl = document.getElementById("epCalTarget");
+        const draft = getEpDraftProfile();
+        if (draft.weight && draft.height && draft.age && draft.gender && draft.activity && draft.goal) {
+          const macros = calculateMacros(draft);
+          targetEl.innerHTML = `Target: <strong>${macros.calories} cal</strong> · ${macros.protein}g protein · ${macros.carbs}g carbs · ${macros.fat}g fat`;
+        } else {
+          targetEl.textContent = "Fill in your stats to see your target";
+        }
+      }
+
+      async function saveCalorieAdjustmentOnly() {
+        if (!currentUser) return;
+        const adj =
+          parseInt(document.getElementById("epCalAdjust").value, 10) || 0;
+        const btn = document.getElementById("epRecalcBtn");
+        const prevLabel = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = "Saving…";
+        try {
+          await saveCalorieAdjustment(currentUser.uid, adj);
+          const draft = getEpDraftProfile();
+          if (draft.weight && draft.height && draft.age && draft.gender && draft.activity && draft.goal) {
+            const macros = calculateMacros(draft);
+            localStorage.setItem("proteinGoal", macros.protein);
+            localStorage.setItem("caloriesGoal", macros.calories);
+            localStorage.setItem("carbsGoal", macros.carbs);
+            localStorage.setItem("fatGoal", macros.fat);
+          }
+          showToast("✓ Calories updated");
+        } catch (e) {
+          console.error(e);
+          showToast("❌ Save failed — check connection");
+        } finally {
+          btn.disabled = false;
+          btn.textContent = prevLabel;
+        }
+      }
+
       // ── Open modal ───────────────────────────────────────────
       async function openEditModal() {
         if (!currentUser) return;
@@ -863,6 +953,8 @@
         document.getElementById("epNeck").value = profile.neck || "";
         document.getElementById("epWaist").value = profile.waist || "";
         document.getElementById("epHip").value = profile.hip || "";
+        document.getElementById("epCalAdjust").value =
+          profile.calorieAdjustment || 0;
 
         document
           .querySelectorAll(".ep-option-btn[data-ep-field='gender']")
@@ -879,6 +971,8 @@
           .forEach((b) =>
             b.classList.toggle("active", b.dataset.epVal === epGoal),
           );
+
+        updateCalorieAdjustmentDisplay();
 
         document.getElementById("epOverlay").classList.add("open");
         document.body.style.overflow = "hidden";
@@ -945,6 +1039,8 @@
           hip: parseFloat(document.getElementById("epHip").value) || 0,
           goal: epGoal,
           activity: epActivity,
+          calorieAdjustment:
+            parseInt(document.getElementById("epCalAdjust").value, 10) || 0,
         };
 
         try {
@@ -993,6 +1089,7 @@
           btn.classList.add("active");
           if (field === "gender") epGender = btn.dataset.epVal;
           if (field === "activity") epActivity = btn.dataset.epVal;
+          updateCalorieAdjustmentDisplay();
         });
       });
 
@@ -1004,8 +1101,21 @@
             .forEach((b) => b.classList.remove("active"));
           btn.classList.add("active");
           epGoal = btn.dataset.epVal;
+          updateCalorieAdjustmentDisplay();
         });
       });
+
+      // Calorie adjustment slider — live preview while dragging,
+      // save only on release (change) or the Recalculate button
+      document
+        .getElementById("epCalAdjust")
+        .addEventListener("input", updateCalorieAdjustmentDisplay);
+      document
+        .getElementById("epCalAdjust")
+        .addEventListener("change", saveCalorieAdjustmentOnly);
+      document
+        .getElementById("epRecalcBtn")
+        .addEventListener("click", saveCalorieAdjustmentOnly);
 
       // Weight unit toggle
       document.getElementById("epWtKg").addEventListener("click", () => {
@@ -1013,12 +1123,14 @@
         document.getElementById("epWtLbs").classList.remove("active");
         document.getElementById("epWtKgRow").classList.remove("hidden");
         document.getElementById("epWtLbsRow").classList.add("hidden");
+        updateCalorieAdjustmentDisplay();
       });
       document.getElementById("epWtLbs").addEventListener("click", () => {
         document.getElementById("epWtLbs").classList.add("active");
         document.getElementById("epWtKg").classList.remove("active");
         document.getElementById("epWtLbsRow").classList.remove("hidden");
         document.getElementById("epWtKgRow").classList.add("hidden");
+        updateCalorieAdjustmentDisplay();
       });
 
       // Height unit toggle
@@ -1027,12 +1139,28 @@
         document.getElementById("epHtFt").classList.remove("active");
         document.getElementById("epHtCmRow").classList.remove("hidden");
         document.getElementById("epHtFtRow").classList.add("hidden");
+        updateCalorieAdjustmentDisplay();
       });
       document.getElementById("epHtFt").addEventListener("click", () => {
         document.getElementById("epHtFt").classList.add("active");
         document.getElementById("epHtCm").classList.remove("active");
         document.getElementById("epHtFtRow").classList.remove("hidden");
         document.getElementById("epHtCmRow").classList.add("hidden");
+        updateCalorieAdjustmentDisplay();
+      });
+
+      // Live-update the calorie target preview as stat fields change
+      [
+        "epWeight",
+        "epWeightLbs",
+        "epHeight",
+        "epHeightFt",
+        "epHeightIn",
+        "epAge",
+      ].forEach((id) => {
+        document
+          .getElementById(id)
+          .addEventListener("input", updateCalorieAdjustmentDisplay);
       });
 
       // ── Auth & initial load ───────────────────────────────────

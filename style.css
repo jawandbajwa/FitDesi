@@ -2189,6 +2189,11 @@ input, select, textarea {
 [data-theme="light"] .ep-goal-btn    { background: #F0E1CC; border-color: #E8D9C2; color: #3D2817; }
 [data-theme="light"] .ep-goal-desc   { color: #8B6F4E; }
 [data-theme="light"] .ep-goal-btn.active .ep-goal-desc { color: rgba(168,90,31,0.85); }
+[data-theme="light"] .ep-cal-slider  { background: #E8D9C2; }
+[data-theme="light"] .ep-cal-value.neutral { color: #B8A082; }
+[data-theme="light"] .ep-cal-value.deficit { color: #c04040; }
+[data-theme="light"] .ep-cal-target  { color: #8B6F4E; }
+[data-theme="light"] .ep-cal-target strong { color: #3D2817; }
 
 /* ── Progress tab ── */
 [data-theme="light"] .prog-stat-card  { background: #FFFFFF; border-color: #E8D9C2; }
@@ -2449,6 +2454,11 @@ input, select, textarea {
 [data-theme="warm"] .ep-goal-btn    { background: #3D2F1F; border-color: #3D2F1F; color: #F2E6CC; }
 [data-theme="warm"] .ep-goal-desc   { color: #8A7558; }
 [data-theme="warm"] .ep-goal-btn.active .ep-goal-desc { color: rgba(232,181,71,0.85); }
+[data-theme="warm"] .ep-cal-slider  { background: #3D2F1F; }
+[data-theme="warm"] .ep-cal-value.neutral { color: #5A4A35; }
+[data-theme="warm"] .ep-cal-value.deficit { color: #e07070; }
+[data-theme="warm"] .ep-cal-target  { color: #8A7558; }
+[data-theme="warm"] .ep-cal-target strong { color: #F2E6CC; }
 
 /* ── Progress tab ── */
 [data-theme="warm"] .prog-stat-card  { background: #2A2118; border-color: #3D2F1F; }
