@@ -6,6 +6,29 @@ This project uses [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH.
 
 ---
 
+## [4.9.0] — 2026-07-01
+### Removed
+- **Set A/B workout system** — every split day now has a single unified exercise list. No more "New Cycle Starting!" popup, no more Set A vs Set B toggle. `MY_SPLIT` flattened from `{ sets: { A: [...], B: [...] } }` to `{ exercises: [...] }` per day.
+- **5-coach personality picker** — `coaches.js` deleted. The "AI Coach" is now a single inlined personality (formerly "Gojo"), no picker on first open, no coach switcher in the chat header. Renamed everywhere from "Gojo" / "Coach {Name}" → "AI Coach", emoji → 🤖.
+- **Quick reply buttons** in coach chat — deleted from `coach.js` and `coach.css`. Chat is now: message history + input + send + mic only.
+- **`saveCoachChoice()` and `chosenCoach` profile field** — no longer written or read anywhere. Existing values on user profile docs are harmless (unused).
+- **Cycle-tracking Firestore fields** — `currentSet`, `cycleCount`, `acknowledgedCycles`, `lastSetPickedDate` no longer written to `users/{uid}/data/cycle`. `saveWorkoutCycle` writes without `{merge:true}` so stale fields on existing docs get dropped on next save.
+- **Admin coach-assignment picker + Grant/Revoke coach personality buttons** — Users tab now has just a single "Enable Coach / Disable Coach" toggle (flips `coachEnabled` boolean) and a "Grant/Revoke Admin" button.
+- `fitdesi_cycle_ack` localStorage key.
+- `coaches.js` removed from the service-worker precache list.
+
+### Changed
+- **Coach chat is now FULL SCREEN** — was a 60vh bottom sheet, now `inset: 0` covers the whole viewport. Header at top with "🤖 AI Coach" title + ✕ close button (only way to close). Input bar fixed at the bottom with `env(safe-area-inset-bottom)` padding. Removed drag handle, removed swipe-to-close.
+- **Onboarding slide 4** — was 5 coach avatars (Vegeta, Hinata, Gojo center, Levi, All Might) with the Gojo one bigger. Now a single centered 🤖 "AI Coach" avatar with a gold glow.
+- Train This Today formula simplified to `newStartDate = todayMidnight − cycleIdx × 86400000` (no longer preserves cycle acknowledgement, since there's nothing to acknowledge).
+- Workout page subtitle no longer prints "Set A · Started …", just "Started …".
+- `getWorkoutCycle` context sent to the AI Coach now includes only `splitType` — no `currentSet`.
+
+### Preserved
+- Rolling split cycle logic (startDate + `diffDays % splitDays.length`), Train This Today interaction, custom split builder, per-exercise set logging, "Cycle N" display badge (derived on the fly from startDate).
+- Cloudflare Worker at `https://fitdesi-gemini.jawandbajwa.workers.dev` and its per-UID key routing — unchanged.
+- Everything about the coach system prompt knowledge base (nutrition/exercise/food science), action JSON parsing, voice input, mic button, and toast notifications.
+
 ## [4.8.0] — 2026-07-01
 ### Changed
 - **Global theme-aware color refactor** — swept every page, component CSS, and dynamic JS style injection to replace hardcoded `rgba(255,255,255,X)` / `#f0f0f0` / dark-only hex tints with `var(--text)`, `var(--text-dim)`, `var(--text-faint)`, `var(--card)`, `var(--bg)`, `var(--border)`, `var(--red)`. This is the reliability fix behind the theme system: base tokens are redefined per theme in `[data-theme="light"]` / `[data-theme="warm"]` blocks, so any component that references a token auto-adapts to all 3 themes without needing per-selector override rules.

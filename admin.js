@@ -10,15 +10,13 @@ import {
   deleteRecipe,
   getAllUsers,
   assignCoach,
-  saveCoachChoice,
   setAdminStatus,
   getUserRecipes,
   deleteUserRecipe,
   getAllUserRecipes,
   promoteUserRecipe,
   getUserProfile,
-} from "./firebase.js?v=2";
-import { COACHES } from "./coaches.js";
+} from "./firebase.js?v=3";
 
 let currentUser = null;
 let allIngredients = [];
@@ -196,7 +194,6 @@ function renderUsers() {
 
   list.innerHTML = "";
   allUsers.forEach((user) => {
-    const coach = user.chosenCoach ? COACHES[user.chosenCoach] : null;
     const enabled = !!user.coachEnabled;
 
     const row = document.createElement("div");
@@ -231,9 +228,7 @@ function renderUsers() {
     email.style.cssText = `font-size: 12px; color: var(--text-dim); margin-top: 1px;`;
 
     const coachBadge = document.createElement("div");
-    coachBadge.textContent = enabled
-      ? coach ? `${coach.emoji} Coach ${coach.name}` : "✅ Coach Enabled (not chosen yet)"
-      : "No Coach";
+    coachBadge.textContent = enabled ? "🤖 AI Coach Enabled" : "No AI Coach";
     coachBadge.style.cssText = `
       font-size: 11px; margin-top: 4px;
       color: ${enabled ? "var(--green)" : "var(--text-faint)"};
@@ -255,10 +250,10 @@ function renderUsers() {
     if (user.createdAt) info.appendChild(joinDate);
     info.appendChild(adminBadge);
 
-    // Toggle button
+    // AI Coach toggle button — enable/disable coachEnabled
     const toggleBtn = document.createElement("button");
     toggleBtn.type = "button";
-    toggleBtn.textContent = enabled ? "Remove Coach" : "Assign Coach";
+    toggleBtn.textContent = enabled ? "Disable Coach" : "Enable Coach";
     toggleBtn.style.cssText = `
       padding: 8px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
       cursor: pointer; border: 1.5px solid;
@@ -277,72 +272,15 @@ function renderUsers() {
       renderUsers();
     });
 
-    // Edit button — lets admin change the user's chosen coach
-    const editBtn = document.createElement("button");
-    editBtn.type = "button";
-    editBtn.textContent = "✏️";
-    editBtn.title = "Change coach personality";
-    editBtn.setAttribute("aria-label", "Change coach personality");
-    editBtn.style.cssText = `
-      padding: 8px 10px; border-radius: 20px; font-size: 13px;
-      cursor: pointer; border: 1.5px solid var(--border);
-      flex-shrink: 0; margin-left: 6px;
-      background: var(--bg); color: var(--text-dim);
-    `;
-
-    // Inline coach picker that expands below the row
-    const picker = document.createElement("div");
-    picker.style.cssText = `
-      display: none; grid-template-columns: 1fr 1fr;
-      gap: 8px; padding: 12px 0 4px; width: 100%;
-    `;
-
-    Object.values(COACHES).forEach((c) => {
-      const opt = document.createElement("button");
-      opt.type = "button";
-      const isActive = user.chosenCoach === c.id;
-      opt.setAttribute("aria-label", `Set ${user.name || "user"}'s coach to ${c.name}`);
-      if (isActive) opt.setAttribute("aria-pressed", "true");
-      opt.style.cssText = `
-        display: flex; align-items: center; gap: 8px;
-        padding: 10px 12px; border-radius: 12px; cursor: pointer;
-        border: 1.5px solid ${isActive ? "var(--green)" : "var(--border)"};
-        background: ${isActive ? "rgb(var(--green-rgb) / 0.1)" : "var(--bg)"};
-        color: var(--text); font-size: 13px; text-align: left;
-      `;
-      opt.innerHTML = `<span style="font-size:18px">${c.emoji}</span><div>
-        <div style="font-weight:600;font-size:13px">${c.name}</div>
-        <div style="font-size:10px;color:${c.tagColor.text};text-transform:uppercase;letter-spacing:0.5px">${c.tag}</div>
-      </div>`;
-
-      opt.addEventListener("click", async () => {
-        opt.textContent = "Saving…";
-        await saveCoachChoice(user.uid, c.id);
-        user.chosenCoach = c.id;
-        renderUsers();
-      });
-
-      picker.appendChild(opt);
-    });
-
-    // ── Admin toggle ─────────────────────────────────────────
-    const adminRow = document.createElement("div");
-    adminRow.style.cssText = `
-      grid-column: 1 / -1; display: flex; align-items: center;
-      justify-content: space-between; padding-top: 10px; margin-top: 4px;
-      border-top: 0.5px solid var(--border);
-    `;
-    const adminLabel = document.createElement("span");
-    adminLabel.textContent = "Admin Access";
-    adminLabel.style.cssText = `font-size: 12px; color: var(--text-dim);`;
-
-    const isUserAdmin = !!user.isAdmin;
+    // ── Admin toggle (moved into main row area, no picker) ────
     const adminToggle = document.createElement("button");
     adminToggle.type = "button";
+    const isUserAdmin = !!user.isAdmin;
     adminToggle.textContent = isUserAdmin ? "Revoke Admin" : "Grant Admin";
     adminToggle.style.cssText = `
-      padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 600;
+      padding: 8px 14px; border-radius: 20px; font-size: 11px; font-weight: 600;
       cursor: pointer; border: 1.5px solid;
+      flex-shrink: 0; margin-left: 6px;
       background: ${isUserAdmin ? "rgba(239,68,68,0.1)" : "rgba(240,160,80,0.1)"};
       border-color: ${isUserAdmin ? "#f87171" : "#f0a050"};
       color: ${isUserAdmin ? "#f87171" : "#f0a050"};
@@ -353,16 +291,6 @@ function renderUsers() {
       await setAdminStatus(user.uid, !isUserAdmin);
       user.isAdmin = !isUserAdmin;
       renderUsers();
-    });
-    adminRow.appendChild(adminLabel);
-    adminRow.appendChild(adminToggle);
-    picker.appendChild(adminRow);
-
-    editBtn.addEventListener("click", () => {
-      const open = picker.style.display === "grid";
-      picker.style.display = open ? "none" : "grid";
-      editBtn.style.borderColor = open ? "var(--border)" : "var(--green)";
-      editBtn.style.color = open ? "var(--text-dim)" : "var(--green)";
     });
 
     // ── Recipes button ──
@@ -433,27 +361,18 @@ function renderUsers() {
       }
     });
 
-    // Wrap row + picker in a container
+    // Wrap row + recipes panel in a container
     const container = document.createElement("div");
     container.style.cssText = `margin-bottom: 10px;`;
 
     row.style.marginBottom = "0";
-    const pickerWrap = document.createElement("div");
-    pickerWrap.style.cssText = `
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-top: none; border-radius: 0 0 14px 14px;
-      padding: 0 16px 0;
-    `;
-    pickerWrap.appendChild(picker);
 
     row.appendChild(avatar);
     row.appendChild(info);
     row.appendChild(toggleBtn);
-    row.appendChild(editBtn);
+    row.appendChild(adminToggle);
     row.appendChild(recipesBtn);
     container.appendChild(row);
-    container.appendChild(pickerWrap);
     container.appendChild(recipesPanel);
     list.appendChild(container);
   });

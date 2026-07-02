@@ -336,31 +336,17 @@ function buildWorkoutVisual() {
 }
 
 function buildCoachVisual() {
-  const row = document.createElement("div");
-  row.style.cssText = "display:flex;gap:6px;align-items:flex-end;justify-content:center;width:100%;";
-  [
-    { emoji: "🔥", name: "Vegeta",    bg: "rgba(239,68,68,0.12)",   big: false },
-    { emoji: "🌿", name: "Hinata",    bg: "rgba(126,217,154,0.12)", big: false },
-    { emoji: "✨", name: "Gojo",      bg: "rgba(99,179,237,0.15)",  big: true  },
-    { emoji: "⚡", name: "Levi",      bg: "rgba(251,191,36,0.12)",  big: false },
-    { emoji: "💪", name: "All Might", bg: "rgba(167,139,250,0.12)", big: false },
-  ].forEach(({ emoji, name, bg, big }) => {
-    const wrap = document.createElement("div");
-    const size = big ? "64px" : "46px";
-    const fs   = big ? "28px" : "20px";
-    const w    = big ? "72px" : "54px";
-    wrap.style.cssText = `display:flex;flex-direction:column;align-items:center;gap:5px;width:${w};flex-shrink:0;`;
-    wrap.innerHTML = `
-      <div style="
-        width:${size};height:${size};border-radius:50%;
-        background:${bg};
-        border:${big ? "2px solid ${getGreenColor()}" : "1.5px solid rgba(126,217,154,0.2)"};
-        box-shadow:${big ? "0 0 18px rgba(126,217,154,0.3)" : "none"};
-        display:flex;align-items:center;justify-content:center;font-size:${fs};
-      ">${emoji}</div>
-      <div style="font-size:9px;color:${big ? "${getGreenColor()}" : "var(--text-dim)"};font-weight:600;text-align:center;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${name}</div>
-    `;
-    row.appendChild(wrap);
-  });
-  return row;
+  const wrap = document.createElement("div");
+  wrap.style.cssText = "display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;";
+  wrap.innerHTML = `
+    <div style="
+      width:72px;height:72px;border-radius:50%;
+      background:rgb(var(--green-rgb) / 0.15);
+      border:2px solid var(--green);
+      box-shadow:0 0 18px rgb(var(--green-rgb) / 0.3);
+      display:flex;align-items:center;justify-content:center;font-size:32px;
+    ">🤖</div>
+    <div style="font-size:11px;color:var(--green);font-weight:700;letter-spacing:0.4px;">AI Coach</div>
+  `;
+  return wrap;
 }

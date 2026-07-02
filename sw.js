@@ -1,5 +1,5 @@
 // FitDesi Service Worker — Updated for Android Auth Fix
-const CACHE_NAME = "fitdesi-v101"; // Bumped version
+const CACHE_NAME = "fitdesi-v102"; // Bumped version
 
 const STATIC_ASSETS = [
   "./",
@@ -8,7 +8,6 @@ const STATIC_ASSETS = [
   "./coach.css",
   "./firebase.js",
   "./coach.js",
-  "./coaches.js",
   "./onboarding.js",
   "./coach-config.example.js",
   "./db.js",

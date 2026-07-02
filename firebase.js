@@ -14,7 +14,6 @@
  * @property {"cm"|"ft"} [heightUnit]
  * @property {boolean} [isAdmin]
  * @property {boolean} [coachEnabled]
- * @property {"vegeta"|"hinata"|"levi"|"allmight"|"gojo"} [chosenCoach]
  * @property {boolean} [onboardingDone]
  * @property {string} [createdAt]                    ISO timestamp
  */
@@ -40,12 +39,8 @@
 /**
  * @typedef {Object} WorkoutCycle
  * @property {string} startDate                      ISO timestamp — DO NOT reset on cycle complete
- * @property {"A"|"B"} [currentSet]
- * @property {number} [cycleCount]
- * @property {number} [acknowledgedCycles]
  * @property {string} [activeSplit]                  "mysplit", "ppl", "upperlower", etc.
  * @property {Object[]} [customSplitDays]
- * @property {string} [lastSetPickedDate]            ISO date
  */
 
 /**
@@ -733,16 +728,6 @@ async function markOnboardingDone(uid) {
 }
 
 // ─── COACH FUNCTIONS ─────────────────────────────────────────
-async function saveCoachChoice(uid, coachId) {
-  try {
-    const profileRef = doc(db, "users", uid, "data", "profile");
-    await setDoc(profileRef, { chosenCoach: coachId }, { merge: true });
-  } catch (error) {
-    console.error("Error saving coach choice:", error);
-    throw error;
-  }
-}
-
 async function saveCalorieAdjustment(uid, calorieAdjustment) {
   try {
     const profileRef = doc(db, "users", uid, "data", "profile");
@@ -1018,7 +1003,6 @@ export {
   saveUserRecipe,
   getUserRecipes,
   deleteUserRecipe,
-  saveCoachChoice,
   saveCalorieAdjustment,
   assignCoach,
   setAdminStatus,

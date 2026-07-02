@@ -40,12 +40,11 @@ This updates `manifest.json`, `profile.html` (About section), and `sw.js` cache 
 | `index.html` | Home page — protein ring, macro rings, streak, today's workout card |
 | `tracker.html` / `tracker.js` / `tracker.css` | Nutrition tracker — Today tab, Meal Plan tab, Progress tab |
 | `recipes.html` / `recipes.js` / `recipes.css` | Recipe browser — Indian & Canadian, filter by meal type |
-| `exercise.html` / `exercise.js` / `exercise.css` | Workout page — rolling split cycle, exercise library, set logging, Train This Today (tap any week-day chip to shift startDate) |
+| `exercise.html` / `exercise.js` / `exercise.css` | Workout page — rolling split cycle (single unified exercise list per day, no A/B), exercise library, set logging, Train This Today (tap any week-day chip to shift startDate) |
 | `profile.html` / `profile.css` | User profile — edit stats, theme toggle, sign out, app version |
-| `admin.html` / `admin.js` / `admin.css` | Admin panel — manage ingredients, recipes, users + coach assignment |
+| `admin.html` / `admin.js` / `admin.css` | Admin panel — manage ingredients, recipes, users + AI Coach on/off toggle |
 | `firebase.js` | ALL Firebase calls — auth, Firestore reads/writes, cache helpers |
-| `coach.js` | AI coach UI — floating button, chat sheet, personality picker, Gemini calls |
-| `coaches.js` | Coach definitions — 5 coaches with names, personalities, system prompts |
+| `coach.js` | AI Coach UI — floating button, full-screen chat, single inlined personality, Gemini calls |
 | `cloudflare-worker.js` | Source for the Cloudflare Worker proxy (deploy manually, not via GitHub) |
 | `bump-version.js` | Version bump script — updates manifest.json, profile.html, sw.js together |
 | `style.css` | Global styles shared by all pages — also contains ALL light theme overrides |
@@ -134,10 +133,9 @@ admin.css uses CSS variables throughout — `var(--text)`, `var(--text-dim)`, `v
 users/{uid}/
   data/profile        → { name, email, photoURL, age, weight, height, goal,
                            activityLevel, gender, isAdmin, weightUnit, heightUnit,
-                           coachEnabled, chosenCoach, onboardingDone, createdAt,
+                           coachEnabled, onboardingDone, createdAt,
                            calorieAdjustment }
-  data/cycle          → { startDate, currentSet, cycleCount, acknowledgedCycles,
-                           activeSplit, customSplitDays, lastSetPickedDate }
+  data/cycle          → { startDate, activeSplit, customSplitDays }
   data/notifications  → { breakfast, lunch, dinner }  (HH:MM strings)
   logs/{YYYY-MM-DD}   → { breakfast:[...], lunch:[...], snack:[...], dinner:[...] }
   progress/{YYYY-MM-DD} → { weight, bodyFat }
@@ -158,8 +156,7 @@ shared/ingredients/items/{id}       → { name, protein, carbs, fat, calories, f
 Auth: Google Sign-In only. `isAdmin: true` on the user profile doc grants admin access.
 
 **Coach-related profile fields:**
-- `coachEnabled: boolean` — set by admin to grant coach access to a user
-- `chosenCoach: "vegeta"|"hinata"|"levi"|"allmight"|"gojo"` — set by the user on first open
+- `coachEnabled: boolean` — set by admin to grant AI Coach access. There is only ONE coach personality (formerly "Gojo"), so no per-user coach selection is stored.
 - `onboardingDone: boolean` — set to `true` after user dismisses or completes onboarding slides
 
 ---
@@ -167,22 +164,20 @@ Auth: Google Sign-In only. `isAdmin: true` on the user profile doc grants admin 
 ## AI Coach System
 
 ### How it works
-1. Admin assigns coach access to a user in **Admin Panel → Users tab** (`coachEnabled: true`)
-2. User sees the coach floating button on any page (fixed position: `bottom: 160px, right: 16px`)
-3. First time they tap it → personality picker appears (choose once, saved forever)
-4. User can switch coach anytime via the coach name button in the chat header (top-left)
-5. Admin can also change a user's coach from the Users tab edit button (`✏️`)
+1. Admin toggles **Enable Coach / Disable Coach** for a user in **Admin Panel → Users tab** (`coachEnabled: true/false`)
+2. Any user with `coachEnabled: true` (or an admin) sees the 🤖 floating button on every page
+3. Tap it → full-screen chat opens with a welcome message from the AI Coach
+4. There is exactly ONE coach personality (formerly "Gojo") inlined at the top of `coach.js` as `COACH_PERSONALITY`. No picker, no per-user coach selection.
 
 ### Chat UI details
 - **Floating button**: 48×48px, `bottom: 160px, right: 16px` — positioned above bottom nav and page content
-- **Chat sheet**: 60vh bottom sheet, slides up on button tap
-- **Header**: 3-column CSS grid (`1fr auto 1fr`) — coach name/emoji pill (left, `justify-self: start`) | drag handle dot (center) | ✕ close (right, `justify-self: end`). Border-bottom separates from messages.
-- **Backdrop**: `#coachBackdrop` fixed overlay, click to close, fades in/out with `.visible` class
-- **Swipe to close**: touch listeners on `.chat-header` (full header, not just the dot). Closes if drag >50px down OR velocity >0.4px/ms. Springs back otherwise.
+- **Chat sheet**: **FULL SCREEN** (`inset: 0`), slides up on button tap. No bottom-sheet, no drag handle, no swipe-to-close.
+- **Header**: `.chat-title` (🤖 AI Coach) on the left, `.chat-close` (✕) on the right. Only way to close.
+- **Backdrop**: `#coachBackdrop` still exists behind the sheet during entry animation (visual only).
 - **Messages**: `textContent` rendering (not innerHTML) — safe against HTML injection from AI
 - **Typing indicator**: animated three-dot pulse bubble shown while Gemini responds
-- **Quick replies**: contextual and time-of-day aware. Opening replies based on hour (morning/afternoon/evening/night). Follow-up replies based on coach message content. Generic replies rotate from a pool so they never feel repeated.
-- **Input area**: text field + send button (green circle) + mic button (voice input)
+- **No quick replies.** The chat has only: message history + text input + send button + mic button.
+- **Input area**: text field + send button (green circle) + mic button (voice input), fixed at bottom with `env(safe-area-inset-bottom)` padding
 - **Action JSON**: coach can append `{"action":"add_meal"|"complete_workout"|"swap_exercise",...}` on a new line — only stripped if line starts with `{"action"`
 - **Name display**: coach addresses user by first name only — `fullName.split(" ")[0]` extracted in `getContext()`
 
@@ -190,7 +185,7 @@ Auth: Google Sign-In only. `isAdmin: true` on the user profile doc grants admin 
 Fetches in parallel via `Promise.all`:
 - `getUserProfile` — name, weight, height, age, gender, goal, activity, units
 - `getDailyLog` — today's meals by type (breakfast/lunch/snack/dinner), names, per-meal cal/protein summary
-- `getWorkoutCycle` — active split type, current set (A/B)
+- `getWorkoutCycle` — active split type only (no Set A/B — that system was removed)
 - `getProgressHistory` — latest weight + body fat entry, weight trend vs previous entry
 Also from localStorage (instant): proteinGoal, carbsGoal, fatGoal, caloriesGoal, todayWorkout, time of day
 
@@ -205,14 +200,8 @@ Also from localStorage (instant): proteinGoal, carbsGoal, fatGoal, caloriesGoal,
 - **Temperature**: 0.85 (more natural, less robotic responses)
 - **History**: last 16 messages kept for context
 
-### The 5 coaches (defined in `coaches.js`)
-| ID | Name | Tag | Personality |
-|----|------|-----|-------------|
-| `vegeta` | Vegeta | Strict | Demanding, elite mentality, rare compliments |
-| `hinata` | Hinata | Polite | Warm, encouraging, celebrates every win |
-| `levi` | Levi | No-Nonsense | Blunt, data-driven, exact numbers only |
-| `allmight` | All Might | Hype | PLUS ULTRA energy, explosive motivation |
-| `gojo` | Gojo | The Honored One | All 4 personalities combined, adapts to user's energy |
+### The single AI Coach personality
+Only one personality — inlined in `coach.js` as `COACH_PERSONALITY`. Formerly the "Gojo" personality: fluid, confident, slightly cocky but always earns it; reads user energy and shifts tone accordingly; uses their first name naturally; 1 emoji max; no wasted words. `COACH_NAME = "AI Coach"`, `COACH_EMOJI = "🤖"`.
 
 ### Cloudflare Worker (API proxy)
 - **URL**: `https://fitdesi-gemini.jawandbajwa.workers.dev`
@@ -236,7 +225,6 @@ wrangler deploy
 - `getAllUsers()` — uses `collectionGroup(db, "data")` filtered to `d.ref.id === "profile"` to discover ALL users who have ever signed in. No top-level stub docs needed. Requires `/{path=**}/data/{document}` read rule for admin in firestore.rules.
 - `setAdminStatus(uid, adminStatus)` — sets `isAdmin` on a user's profile
 - `assignCoach(uid, enabled)` — sets `coachEnabled` on a user's profile
-- `saveCoachChoice(uid, coachId)` — sets `chosenCoach` on a user's profile
 - `markOnboardingDone(uid)` — sets `onboardingDone: true` on a user's profile (merge)
 - `getUserRecipes(uid)` — reads users/{uid}/recipes
 - `deleteUserRecipe(uid, recipeId)` — deletes from users/{uid}/recipes
@@ -248,14 +236,14 @@ wrangler deploy
 ## Versioning
 
 Version is stored in two places: `manifest.json` and `profile.html` (About section).
-Current version: **4.6.3**
+Current version: **4.9.0**
 
 Rules:
 - Small change → `node bump-version.js patch` (+1 patch, 0–9, rolls to minor at 10)
 - Notable update → `node bump-version.js minor` (+1 minor, 0–9, rolls to major at 10)
 - Big release → `node bump-version.js major` (+1 major)
 
-The script also bumps `sw.js` cache version automatically (current: `fitdesi-v99`).
+The script also bumps `sw.js` cache version automatically (current: `fitdesi-v102`).
 
 ---
 
@@ -353,7 +341,7 @@ Admin and profile pages have `<meta name="robots" content="noindex">` (defence-i
 ### Accessibility
 - **Focus rings**: `:focus-visible` outline using `var(--green)` is applied to all interactive elements (`button`, `a`, `input`, `select`, `textarea`, `.tab-btn`, `.nav-tab`, `.nav-item`, `.theme-seg-btn`). Only shows on keyboard nav, never on click.
 - **Reduced motion**: a global `@media (prefers-reduced-motion: reduce)` block caps all animations/transitions to 0.01ms across the app. Skeleton shimmer also respects this.
-- **ARIA**: all icon-only buttons (✕ close, ✏️ edit, 📖 view, 🗑️ delete) have `aria-label`; toggle buttons (coach picker) use `aria-pressed`; modals close buttons use `type="button"` to prevent accidental form submission.
+- **ARIA**: all icon-only buttons (✕ close, ✏️ edit, 📖 view, 🗑️ delete) have `aria-label`; modals close buttons use `type="button"` to prevent accidental form submission.
 
 ### Theme palette reference
 | Variable | Light (Cream) | Warm (Gold) | Dark (default) |
@@ -410,20 +398,15 @@ Active page only changes the icon **color** (via `var(--green)`), never the shap
 - The app uses a **rolling split** — days cycle continuously from the `startDate`.
 - `getTodayDayIndex()` = `Math.floor((today - startDate) / 86400000) % splitDays.length`
 - **Never reset `startDate`** when a cycle completes — it corrupts the day index.
-- New cycle detection uses `acknowledgedCycles` (integer in Firestore):
-  - `elapsedCycleCount()` = `Math.floor(diffDays / splitDays.length)`
-  - Show Set A/B popup when `elapsedCycleCount() > cycleData.acknowledgedCycles`
-  - On picking Set A/B: save `acknowledgedCycles = elapsedCycleCount()` to Firestore
-- `localStorage("fitdesi_cycle_ack")` = today's date string — blocks popup re-showing on same-day refresh
+- **No Set A/B alternation.** Each split day has a single flat `exercises: [...]` list in `MY_SPLIT`. Standard splits (PPL, Upper/Lower, etc.) pick exercises from the library by muscle. No cycle-completion popup, no `currentSet`, no `acknowledgedCycles`, no `fitdesi_cycle_ack` localStorage.
+- **Cycle number for display**: `getCurrentCycleNumber()` = `Math.floor(diffDays / splitDays.length) + 1` — derived from `startDate` on the fly, not persisted.
 
 ### Train This Today
-Tapping any non-today chip in the week strip shows a confirmation popup. On confirm, `startDate` is recalculated so the tapped cycle day index becomes today — without touching `cycleCount` or `acknowledgedCycles`.
+Tapping any non-today chip in the week strip shows a confirmation popup. On confirm, `startDate` is moved back so the tapped chip's cycle day index becomes today.
 
-**Formula (safe — no cycle popup re-trigger):**
+**Formula:**
 ```
-ack          = cycleData.acknowledgedCycles ?? 0
-newDiffDays  = ack × splitDays.length + cycleIdx
-newStartDate = todayMidnight − newDiffDays × 86400000
+newStartDate = todayMidnight − cycleIdx × 86400000
 ```
 Only `startDate` is written back; page reloads after save.
 
@@ -470,7 +453,7 @@ First-time user intro shown once, ever. Implemented in `onboarding.js`, triggere
 | 1 — Welcome | green | 2×2 macro grid (Protein, Carbs, Fat, Calories) — each card `height: 60px` |
 | 2 — Nutrition | teal | 3 recipe cards (Dal Tadka, Greek Yogurt, Peanut Butter) |
 | 3 — Workouts | orange | 5-day rolling split strip with today highlighted |
-| 4 — AI Coach | purple | 5 coach avatars, Gojo center + larger |
+| 4 — AI Coach | purple | Single 🤖 AI Coach avatar (bigger, centered, gold glow) |
 
 ### Navigation
 - Left button: "Skip" on slide 1, "← Back" on slides 2–4
@@ -576,8 +559,9 @@ The help overlay (`.kbd-help-overlay`) is lazily injected on first `?` press. St
 17. **Account deletion uses `auth.currentUser.uid`** — not a passed-in arg from outside. The button in profile.html reads `auth.currentUser` and calls `deleteAllUserData(user.uid)`. After deletion, also `localStorage.clear()` before redirecting. Firebase Auth account itself stays — user must revoke at myaccount.google.com to fully sever.
 18. **Adding a new admin action? Call `logAdminAction()` from inside the firebase.js function** — not from admin.js. Centralized so we never forget. Pattern: `try { ...; logAdminAction("name", { ...details }); } catch { ... }`.
 19. **Cloudflare Worker rate limiting requires KV namespace `RATE_LIMIT`** — set up via Cloudflare dashboard, bind in wrangler.toml, then `wrangler deploy`. Without it the worker still works (gracefully no-ops on rate check). Don't ship the worker without the binding once you're getting real traffic — runaway tabs can drain your Gemini quota.
-20. **`saveUserProfile()` writes with `{ merge: true }`** (fixed v4.7.0) — it used to be a full-document `setDoc` overwrite, which silently wiped `isAdmin`, `coachEnabled`, `chosenCoach`, `onboardingDone`, `email`, `photoURL`, and `createdAt` any time `profile.html`'s "Save & Recalculate" ran with a partial profile object. If you add a new profile field written from somewhere that only sends a subset of fields, merge semantics now protect the rest — but don't rely on this to skip validating what you're writing.
+20. **`saveUserProfile()` writes with `{ merge: true }`** (fixed v4.7.0) — it used to be a full-document `setDoc` overwrite, which silently wiped `isAdmin`, `coachEnabled`, `onboardingDone`, `email`, `photoURL`, and `createdAt` any time `profile.html`'s "Save & Recalculate" ran with a partial profile object. If you add a new profile field written from somewhere that only sends a subset of fields, merge semantics now protect the rest — but don't rely on this to skip validating what you're writing.
 21. **Prefer CSS vars over hardcoded `rgba(255,255,255,X)` — base tokens are re-themed per theme** (established v4.8.0). `--text`, `--text-dim`, `--text-faint`, `--bg`, `--card`, `--border`, `--green`, `--green-rgb`, `--red` are all redefined inside the `[data-theme="light"]` and `[data-theme="warm"]` root blocks in style.css (~lines 2056 and 2321). Any component using these vars auto-adapts to all 3 themes with zero per-selector override rules. New CSS should use these vars everywhere text or surface color is needed. The main remaining exception is the `.ep-*` edit-profile modal in `profile.css`, which still hardcodes some colors and depends on hand-tuned `[data-theme="light"] .ep-*` / `[data-theme="warm"] .ep-*` override blocks in style.css (~lines 2177 and 2437) — that's a legacy pattern; the modal works but new elements inside it should still prefer vars. For dynamic JS style injection (e.g. Chart.js configs) that can't consume CSS vars directly, use `getComputedStyle(document.documentElement).getPropertyValue('--text-dim').trim()` to resolve the current-theme value at render time (see `cssVar()` helper in tracker.js).
+22. **v4.9.0 simplification — Set A/B system and 5-coach picker removed**. If you find references in old branches to `currentSet`, `cycleCount`, `acknowledgedCycles`, `lastSetPickedDate`, `fitdesi_cycle_ack`, `chosenCoach`, `saveCoachChoice`, `COACHES`, or `coaches.js` — those all went away. `saveWorkoutCycle` writes without `{merge:true}`, so any stale fields on existing Firestore `data/cycle` docs get dropped on next save. Existing `chosenCoach` fields on user profile docs are harmless (unused). The Cloudflare Worker + key routing are unchanged — only the frontend was simplified.
 
 ---
 

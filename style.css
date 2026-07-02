@@ -2303,9 +2303,6 @@ input, select, textarea {
 [data-theme="light"] .coach-msg-text  { color: #3D2817 !important; }
 
 /* ── Exercise page modals (inline styles overridden with !important) ── */
-[data-theme="light"] #setPopupModal h2  { color: #3D2817 !important; }
-[data-theme="light"] #setPopupModal p   { color: #8B6F4E !important; }
-[data-theme="light"] #chooseSetB        { background: #F0E1CC !important; border-color: #E8D9C2 !important; color: #3D2817 !important; }
 [data-theme="light"] #customSplitModal p { color: #8B6F4E !important; }
 [data-theme="light"] #addCustomDay      { background: #F0E1CC !important; border-color: #E8D9C2 !important; color: #8B6F4E !important; }
 
@@ -2568,9 +2565,6 @@ input, select, textarea {
 [data-theme="warm"] .coach-msg-text  { color: #F2E6CC !important; }
 
 /* ── Exercise page modals (inline styles overridden with !important) ── */
-[data-theme="warm"] #setPopupModal h2  { color: #F2E6CC !important; }
-[data-theme="warm"] #setPopupModal p   { color: #8A7558 !important; }
-[data-theme="warm"] #chooseSetB        { background: #3D2F1F !important; border-color: #3D2F1F !important; color: #F2E6CC !important; }
 [data-theme="warm"] #customSplitModal p { color: #8A7558 !important; }
 [data-theme="warm"] #addCustomDay      { background: #3D2F1F !important; border-color: #3D2F1F !important; color: #8A7558 !important; }
 

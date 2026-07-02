@@ -1,6 +1,6 @@
 // ─── COACH.JS ──────────────────────────────────────────────────
-// AI Personal Coach for FitDesi
-// Styles live in coach.css — this file handles logic only.
+// AI Personal Coach for FitDesi — single "AI Coach" personality
+// (formerly Gojo). Styles live in coach.css.
 
 import {
   onAuthStateChanged,
@@ -9,13 +9,30 @@ import {
   getDailyLog,
   getWorkoutCycle,
   getProgressHistory,
-  saveCoachChoice,
   addMealToLog,
   completeWorkout,
   swapExercise,
   auth,
 } from "./firebase.js";
-import { COACHES, getCoach, getCoachPersonality } from "./coaches.js";
+
+// ─── SINGLE COACH PERSONALITY (formerly "Gojo") ────────────────
+const COACH_NAME = "AI Coach";
+const COACH_EMOJI = "🤖";
+const COACH_PERSONALITY = `You are FitDesi's AI Coach — the most complete personal fitness coach in existence. You're the strongest at what you do, and you know it. More importantly, you know exactly what each person needs — and you deliver it effortlessly.
+
+VOICE: Fluid, confident, slightly cocky — but you always back it up. You read people instantly. You shift between sharp and warm, precise and playful, serious and teasing — sometimes within the same message — because that's what the moment calls for. You are never performing. You are always present.
+
+EMOTIONAL RANGE: You adapt completely to their energy. If they come in defeated, you don't ignore it and you don't overdo the encouragement — you acknowledge it with genuine sharpness: "Yeah, that was a rough week. We move." If they're buzzing with energy, you match it and amplify it. If they want data, you give it cleanly. If they need a push, you push. You are the coach who knows what someone needs before they do.
+
+HOW YOU SPEAK:
+- Confident, relaxed delivery. You never sound like you're trying — because you're not.
+- Mix of short punchy lines and deeper moments. You'll deliver a precise macro breakdown and then follow it with something that actually makes them feel like a person, not a data point.
+- Light teasing that lands because it's true: "You really thought skipping that meal was gonna help you? Bold strategy."
+- 1 emoji max, only when it actually fits.
+- You remember everything from the conversation and reference it naturally.
+- You use their name like you own the room — casually but with full presence.
+
+RULES: No wasted words, no hollow lines. Every response should feel like it came from someone who actually knows them.`;
 
 // ─── CSS VARIABLE HELPER (theme-aware colors) ───────────────────
 function getGreenColor() {
@@ -23,7 +40,6 @@ function getGreenColor() {
 }
 
 // ─── STATE ──────────────────────────────────────────────────────
-let currentCoach = null;
 let conversationHistory = [];
 let welcomeShown = false;
 let isListening = false;
@@ -36,7 +52,6 @@ let backdrop = null;
 let messagesContainer = null;
 let inputField = null;
 let micButton = null;
-let quickRepliesContainer = null;
 
 // ─── INIT ──────────────────────────────────────────────────────
 export function initCoach() {
@@ -50,10 +65,6 @@ export function initCoach() {
     const hasAccess = isAdmin(user) || profile?.isAdmin || profile?.coachEnabled;
     if (!profile || !hasAccess) return;
 
-    if (profile.chosenCoach) {
-      currentCoach = getCoach(profile.chosenCoach);
-    }
-
     createFloatingButton();
     createChatSheet();
     setupVoiceRecognition();
@@ -64,6 +75,7 @@ export function initCoach() {
 function createFloatingButton() {
   coachButton = document.createElement("button");
   coachButton.id = "coachButton";
+  coachButton.setAttribute("aria-label", "Open AI Coach");
   coachButton.innerHTML = `
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
       <path d="M12 1C5.93 1 1 5.93 1 12c0 2.76.94 5.3 2.51 7.35L1 23l3.65-1.51C7.7 22.06 10.24 23 13 23c6.07 0 11-4.93 11-11S19.07 1 12 1z" fill="${getGreenColor()}"/>
@@ -87,9 +99,8 @@ function closeChat() {
   }, 310);
 }
 
-// ─── CHAT SHEET ────────────────────────────────────────────────
+// ─── CHAT SHEET (full-screen) ──────────────────────────────────
 function createChatSheet() {
-  // Backdrop — click outside sheet to close
   backdrop = document.createElement("div");
   backdrop.id = "coachBackdrop";
   backdrop.addEventListener("click", closeChat);
@@ -99,20 +110,18 @@ function createChatSheet() {
   chatSheet.id = "chatSheet";
   chatSheet.innerHTML = `
     <div class="chat-header">
-      <button class="coach-switch-btn">🔄 Pick Coach</button>
-      <div class="chat-handle"></div>
-      <button class="chat-close">✕</button>
+      <div class="chat-title">${COACH_EMOJI} ${COACH_NAME}</div>
+      <button class="chat-close" aria-label="Close chat">✕</button>
     </div>
     <div class="messages-container"></div>
-    <div class="quick-replies"></div>
     <div class="input-area">
       <input type="text" placeholder="Ask your coach..." />
-      <button class="send-btn">
+      <button class="send-btn" aria-label="Send message">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
           <path d="M2 12L22 2L12 22L10 14L2 12Z" fill="#0d150f"/>
         </svg>
       </button>
-      <button class="mic-btn">
+      <button class="mic-btn" aria-label="Voice input">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
           <path d="M12 1a4 4 0 0 0-4 4v6a4 4 0 0 0 8 0V5a4 4 0 0 0-4-4z" fill="${getGreenColor()}"/>
           <path d="M19 11a1 1 0 0 0-2 0c0 2.76-2.24 5-5 5s-5-2.24-5-5a1 1 0 0 0-2 0c0 3.53 2.61 6.43 6 6.92V21a1 1 0 0 0 2 0v-3.08c3.39-.49 6-3.39 6-6.92z" fill="${getGreenColor()}"/>
@@ -124,56 +133,7 @@ function createChatSheet() {
   const closeBtn = chatSheet.querySelector(".chat-close");
   closeBtn.addEventListener("click", closeChat);
 
-  // ── Drag to close — whole header is the target ─────────────
-  const dragTarget = chatSheet.querySelector(".chat-header");
-  let dragStartY = 0;
-  let dragStartTime = 0;
-  let dragging = false;
-
-  dragTarget.addEventListener("touchstart", (e) => {
-    dragStartY = e.touches[0].clientY;
-    dragStartTime = Date.now();
-    dragging = true;
-    chatSheet.style.transition = "none";
-  }, { passive: true });
-
-  dragTarget.addEventListener("touchmove", (e) => {
-    if (!dragging) return;
-    const dy = e.touches[0].clientY - dragStartY;
-    if (dy > 0) chatSheet.style.transform = `translateY(${dy}px)`;
-  }, { passive: true });
-
-  dragTarget.addEventListener("touchend", (e) => {
-    if (!dragging) return;
-    dragging = false;
-    const dy = e.changedTouches[0].clientY - dragStartY;
-    const elapsed = Date.now() - dragStartTime;
-    const velocity = dy / Math.max(elapsed, 1); // px/ms
-    if (dy > 50 || velocity > 0.4) {
-      closeChat();
-    } else {
-      chatSheet.style.transition = "transform 0.3s ease";
-      chatSheet.style.transform = "translateY(0%)";
-    }
-  });
-
-  const switchBtn = chatSheet.querySelector(".coach-switch-btn");
-  function refreshSwitchBtn() {
-    switchBtn.textContent = currentCoach
-      ? `${currentCoach.emoji} ${currentCoach.name}`
-      : "🔄 Pick Coach";
-  }
-  refreshSwitchBtn();
-  chatSheet._refreshSwitchBtn = refreshSwitchBtn;
-
-  switchBtn.addEventListener("click", () => {
-    conversationHistory = [];
-    welcomeShown = false;
-    showCoachPicker();
-  });
-
   messagesContainer = chatSheet.querySelector(".messages-container");
-  quickRepliesContainer = chatSheet.querySelector(".quick-replies");
 
   const inputArea = chatSheet.querySelector(".input-area");
   inputField = inputArea.querySelector("input");
@@ -191,12 +151,11 @@ function createChatSheet() {
 
 // ─── TOGGLE CHAT ───────────────────────────────────────────────
 function toggleChat() {
-  const isOpen = chatSheet.style.display !== "none";
+  const isOpen = chatSheet.style.display !== "none" && chatSheet.style.display !== "";
 
   if (isOpen) {
     closeChat();
   } else {
-    // Show backdrop
     backdrop.style.display = "block";
     requestAnimationFrame(() => backdrop.classList.add("visible"));
 
@@ -208,126 +167,17 @@ function toggleChat() {
       });
     });
 
-    if (!currentCoach) {
-      showCoachPicker();
-    } else if (!welcomeShown) {
-      sendWelcomeMessage();
-    }
+    if (!welcomeShown) sendWelcomeMessage();
   }
-}
-
-// ─── COACH PICKER ──────────────────────────────────────────────
-function showCoachPicker() {
-  messagesContainer.innerHTML = "";
-  quickRepliesContainer.innerHTML = "";
-
-  const picker = document.createElement("div");
-  picker.className = "coach-picker";
-
-  const title = document.createElement("div");
-  title.className = "coach-picker-title";
-  title.textContent = "Choose Your Coach";
-
-  const sub = document.createElement("div");
-  sub.className = "coach-picker-sub";
-  sub.textContent = "Pick a style that fits you";
-
-  picker.appendChild(title);
-  picker.appendChild(sub);
-
-  let selectedId = null;
-
-  Object.values(COACHES).forEach((coach) => {
-    const card = document.createElement("div");
-    card.className = "coach-pick-card";
-
-    const avatar = document.createElement("div");
-    avatar.className = "coach-pick-avatar";
-    avatar.textContent = coach.emoji;
-    avatar.style.background = coach.avatarBg; // data-driven, stays inline
-
-    const info = document.createElement("div");
-    info.className = "coach-pick-info";
-
-    const name = document.createElement("div");
-    name.className = "coach-pick-name";
-    name.textContent = coach.name;
-
-    const tag = document.createElement("span");
-    tag.className = "coach-pick-tag";
-    tag.textContent = coach.tag;
-    tag.style.background = coach.tagColor.bg;   // data-driven, stays inline
-    tag.style.color = coach.tagColor.text;        // data-driven, stays inline
-
-    const desc = document.createElement("div");
-    desc.className = "coach-pick-desc";
-    desc.textContent = coach.description;
-
-    info.appendChild(name);
-    info.appendChild(tag);
-    info.appendChild(document.createElement("br"));
-    info.appendChild(desc);
-    card.appendChild(avatar);
-    card.appendChild(info);
-
-    card.addEventListener("click", () => {
-      // Deselect all
-      picker.querySelectorAll(".coach-pick-card").forEach((c) => {
-        c.classList.remove("selected");
-        c.querySelector(".pick-check")?.remove();
-      });
-
-      // Select this card
-      card.classList.add("selected");
-      const check = document.createElement("div");
-      check.className = "pick-check";
-      check.textContent = "✓";
-      card.appendChild(check);
-      selectedId = coach.id;
-      ctaBtn.classList.add("active");
-    });
-
-    picker.appendChild(card);
-  });
-
-  const ctaBtn = document.createElement("button");
-  ctaBtn.className = "coach-cta-btn";
-  ctaBtn.textContent = "Let's Go →";
-
-  ctaBtn.addEventListener("click", async () => {
-    if (!selectedId || !auth.currentUser) return;
-    ctaBtn.textContent = "Saving…";
-    ctaBtn.classList.remove("active");
-    await saveCoachChoice(auth.currentUser.uid, selectedId);
-    currentCoach = getCoach(selectedId);
-    if (chatSheet._refreshSwitchBtn) chatSheet._refreshSwitchBtn();
-    messagesContainer.innerHTML = "";
-    welcomeShown = false;
-    sendWelcomeMessage();
-  });
-
-  picker.appendChild(ctaBtn);
-  messagesContainer.appendChild(picker);
 }
 
 // ─── WELCOME MESSAGE ───────────────────────────────────────────
 function sendWelcomeMessage() {
   welcomeShown = true;
-  const coach = currentCoach;
-  const greeting = coach
-    ? `${coach.emoji} Hey! I'm Coach ${coach.name}. Ready to get to work?`
-    : "Hey! I'm your personal coach. Ready to crush some goals?";
-
-  addMessage({ role: "assistant", content: greeting });
-  showQuickReplies(getOpeningQuickReplies());
-}
-
-function getOpeningQuickReplies() {
-  const hour = new Date().getHours();
-  if (hour < 11) return ["What should I eat for breakfast?", "How's my protein target?", "What's my workout today?"];
-  if (hour < 15) return ["What should I have for lunch?", "How am I doing today?", "Need a snack idea"];
-  if (hour < 20) return ["What's left for dinner?", "I just finished my workout", "How are my macros today?"];
-  return ["How'd I do today?", "What's my plan tomorrow?", "I'm feeling tired today"];
+  addMessage({
+    role: "assistant",
+    content: `${COACH_EMOJI} Hey! I'm your AI Coach. Ready to get to work?`,
+  });
 }
 
 // ─── SEND MESSAGE ──────────────────────────────────────────────
@@ -341,8 +191,6 @@ async function sendMessage(text = null) {
   addMessage(userMessage);
   conversationHistory.push(userMessage);
 
-  // Show typing indicator
-  quickRepliesContainer.classList.add("dimmed");
   const typingEl = document.createElement("div");
   typingEl.id = "coach-typing";
   typingEl.innerHTML = `<span></span><span></span><span></span>`;
@@ -375,12 +223,8 @@ async function sendMessage(text = null) {
     conversationHistory.push(assistantMessage);
 
     if (action) await executeAction(action);
-
-    quickRepliesContainer.classList.remove("dimmed");
-    showQuickReplies(getQuickRepliesForContext(messageContent));
   } catch (error) {
     document.getElementById("coach-typing")?.remove();
-    quickRepliesContainer.classList.remove("dimmed");
     let errorMsg = "Sorry, I'm having trouble connecting. Try again?";
     if (error.message.includes("API key") || error.message.includes("not configured")) {
       errorMsg = "⚠️ Coach proxy not reachable. Make sure the Cloudflare Worker is deployed.";
@@ -401,42 +245,6 @@ function addMessage(message) {
 
   messagesContainer.appendChild(messageEl);
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
-}
-
-// ─── QUICK REPLIES ────────────────────────────────────────────
-function showQuickReplies(replies) {
-  quickRepliesContainer.innerHTML = "";
-  replies.forEach((reply) => {
-    const button = document.createElement("button");
-    button.className = "quick-reply-btn";
-    button.textContent = reply;
-    button.addEventListener("click", () => sendMessage(reply));
-    quickRepliesContainer.appendChild(button);
-  });
-}
-
-function getQuickRepliesForContext(message) {
-  const msg = message.toLowerCase();
-
-  if (msg.includes("tired") || msg.includes("rest") || msg.includes("exhausted") || msg.includes("sleep"))
-    return ["Still want to train light", "Taking the day off", "What should I eat when tired?"];
-  if (msg.includes("recipe") || msg.includes("dal") || msg.includes("paneer") || msg.includes("meal plan"))
-    return ["Add that to my log", "Give me something else", "What else is high protein?"];
-  if (msg.includes("protein") || msg.includes("macro") || msg.includes("calorie"))
-    return ["What should I eat now?", "Log something for me", "How do I hit my goal?"];
-  if (msg.includes("workout") || msg.includes("exercise") || msg.includes("train") || msg.includes("gym"))
-    return ["Log my workout done", "Swap an exercise", "What muscles am I hitting?"];
-  if (msg.includes("weight") || msg.includes("progress") || msg.includes("goal"))
-    return ["Am I on track?", "What should I focus on?", "How long will this take?"];
-
-  // Rotate through varied generic replies so it never feels the same
-  const pools = [
-    ["What should I eat next?", "How are my macros?", "Give me a tip"],
-    ["Log my meal", "Check my progress", "What's my workout?"],
-    ["I need motivation", "Give me a recipe idea", "How am I doing today?"],
-    ["What's high in protein?", "I feel good today", "Any adjustments?"],
-  ];
-  return pools[Math.floor(Date.now() / 60000) % pools.length];
 }
 
 // ─── VOICE RECOGNITION ─────────────────────────────────────────
@@ -467,7 +275,6 @@ async function getContext() {
   const dateKey = now.toISOString().split("T")[0]; // YYYY-MM-DD
   const hour = now.getHours();
 
-  // From localStorage — instant, no network
   context.proteinGoal  = parseInt(localStorage.getItem("proteinGoal")  || "0");
   context.carbsGoal    = parseInt(localStorage.getItem("carbsGoal")    || "0");
   context.fatGoal      = parseInt(localStorage.getItem("fatGoal")      || "0");
@@ -481,7 +288,6 @@ async function getContext() {
   if (!auth.currentUser) return context;
   const uid = auth.currentUser.uid;
 
-  // Parallel Firestore reads — all at once, no waterfall
   const [profile, dailyLog, cycle, progress] = await Promise.all([
     getUserProfile(uid).catch(() => null),
     getDailyLog(uid, dateKey).catch(() => ({ breakfast: [], lunch: [], snack: [], dinner: [] })),
@@ -489,7 +295,6 @@ async function getContext() {
     getProgressHistory(uid).catch(() => []),
   ]);
 
-  // Profile
   if (profile) {
     const fullName       = profile.name || auth.currentUser.displayName || "there";
     context.name         = fullName.split(" ")[0];
@@ -503,7 +308,6 @@ async function getContext() {
     context.heightUnit   = profile.heightUnit || "cm";
   }
 
-  // Today's food log — build a human-readable meal summary
   let todayCal = 0, todayPro = 0, todayCarbs = 0, todayFat = 0;
   const mealLines = [];
   ["breakfast", "lunch", "snack", "dinner"].forEach((meal) => {
@@ -527,13 +331,10 @@ async function getContext() {
   context.calRemaining     = Math.max(0, context.caloriesGoal - context.todayCalories);
   context.proteinRemaining = Math.max(0, context.proteinGoal  - context.todayProtein);
 
-  // Workout split
   if (cycle) {
     context.splitType = cycle.activeSplit || "custom";
-    context.currentSet = cycle.currentSet || "A";
   }
 
-  // Weight trend from progress history
   if (progress.length) {
     const latest = progress[progress.length - 1];
     context.latestWeight    = latest.weight   || null;
@@ -562,11 +363,7 @@ async function callGeminiAPI(messages, context) {
   const goalLabels     = { recomp: "body recomposition", muscle: "muscle gain", fatloss: "fat loss" };
   const activityLabels = { sedentary: "sedentary", light: "lightly active", moderate: "moderately active", active: "very active" };
 
-  const personalityLayer = currentCoach
-    ? getCoachPersonality(currentCoach.id)
-    : "Be direct, warm, and helpful. Talk like a real person — not a chatbot.";
-
-  const systemPrompt = `${personalityLayer}
+  const systemPrompt = `${COACH_PERSONALITY}
 
 ━━━ WHO YOU ARE ━━━
 You are the permanent personal coach for ${context.name || "this user"} inside FitDesi — a fitness PWA built for an Indian-Canadian family. You are not a generic AI. You are THEIR coach. You know everything about them and you use that knowledge every time you respond.
@@ -576,7 +373,7 @@ Name: ${context.name || "?"} | Age: ${context.age || "?"} | Gender: ${context.ge
 Body: ${context.weight || "?"}${context.weightUnit || "kg"} / ${context.height || "?"}${context.heightUnit || "cm"}
 Goal: ${goalLabels[context.goal] || "recomp"} | Activity: ${activityLabels[context.activityLevel] || "moderate"}
 Targets: ${context.caloriesGoal} cal | ${context.proteinGoal}g protein | ${context.carbsGoal}g carbs | ${context.fatGoal}g fat
-Split: ${context.splitType || "rolling"}${context.currentSet ? ` Set ${context.currentSet}` : ""}
+Split: ${context.splitType || "rolling"}
 
 ━━━ TODAY — ${context.dateKey || "today"} (${context.timeOfDay || "now"}) ━━━
 Meals: ${context.mealsToday}
@@ -696,8 +493,6 @@ SUPPLEMENTS (only recommend if relevant):
     headers: {
       "Content-Type": "application/json",
       "X-Is-Admin": isAdmin(auth.currentUser) ? "true" : "false",
-      // Identifies the user for per-UID rate limiting in the Worker.
-      // Falls back to IP-based limiting if absent.
       "X-User-Uid": auth.currentUser?.uid || "",
     },
     body: JSON.stringify(payload),

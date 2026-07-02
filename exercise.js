@@ -14,283 +14,147 @@ const MY_SPLIT = [
     name: "Chest + Triceps",
     muscles: ["chest", "triceps"],
     icon: "💪",
-    sets: {
-      A: [
-        {
-          name: "Incline Bench Press",
-          muscle: "chest",
-          target: "Upper Chest",
-          video: "jPLdzuHckI8",
-        },
-        {
-          name: "Barbell Bench Press",
-          muscle: "chest",
-          target: "Middle Chest",
-          video: "vcBig73ojpE",
-        },
-        {
-          name: "Chest Dips",
-          muscle: "chest",
-          target: "Lower Chest",
-          video: "2z8JmcrW-As",
-        },
-        {
-          name: "Overhead Tricep Extension",
-          muscle: "triceps",
-          target: "Triceps Long Head",
-          video: "YbX7Wd8jQ-Q",
-        },
-        {
-          name: "Tricep Pushdown",
-          muscle: "triceps",
-          target: "Triceps Contraction",
-          video: "2-LAMcpzODU",
-        },
-      ],
-      B: [
-        {
-          name: "Incline Dumbbell Press",
-          muscle: "chest",
-          target: "Upper Chest",
-          video: "8iPEnn-ltC8",
-        },
-        {
-          name: "Dumbbell Flyes",
-          muscle: "chest",
-          target: "Middle Chest",
-          video: "eozdVDA78K0",
-        },
-        {
-          name: "Decline Bench Press",
-          muscle: "chest",
-          target: "Lower Chest",
-          video: "6fotcWsMb0c",
-        },
-        {
-          name: "Skull Crushers",
-          muscle: "triceps",
-          target: "Triceps Stretch",
-          video: "d_KZxkY_0cM",
-        },
-        {
-          name: "Close Grip Bench Press",
-          muscle: "triceps",
-          target: "Triceps Compound",
-          video: "UYJsFzqdgK4",
-        },
-      ],
-    },
+    exercises: [
+      {
+        name: "Incline Bench Press",
+        muscle: "chest",
+        target: "Upper Chest",
+        video: "jPLdzuHckI8",
+      },
+      {
+        name: "Barbell Bench Press",
+        muscle: "chest",
+        target: "Middle Chest",
+        video: "vcBig73ojpE",
+      },
+      {
+        name: "Chest Dips",
+        muscle: "chest",
+        target: "Lower Chest",
+        video: "2z8JmcrW-As",
+      },
+      {
+        name: "Overhead Tricep Extension",
+        muscle: "triceps",
+        target: "Triceps Long Head",
+        video: "YbX7Wd8jQ-Q",
+      },
+      {
+        name: "Tricep Pushdown",
+        muscle: "triceps",
+        target: "Triceps Contraction",
+        video: "2-LAMcpzODU",
+      },
+    ],
   },
   {
     day: 2,
     name: "Back + Biceps",
     muscles: ["back", "biceps"],
     icon: "🏋️",
-    sets: {
-      A: [
-        {
-          name: "Pull-Ups / Chin-Ups",
-          muscle: "back",
-          target: "Lats Vertical",
-          video: "eGo4IYlbE5g",
-        },
-        {
-          name: "Seated Cable Row",
-          muscle: "back",
-          target: "Lats Horizontal",
-          video: "GZbfZ033f74",
-        },
-        {
-          name: "Barbell Row",
-          muscle: "back",
-          target: "Mid Back",
-          video: "FWJR5Ve8bnQ",
-        },
-        {
-          name: "Incline Dumbbell Curl",
-          muscle: "biceps",
-          target: "Biceps Stretch",
-          video: "soxrZlIl35U",
-        },
-        {
-          name: "Concentration Curl",
-          muscle: "biceps",
-          target: "Biceps Contraction",
-          video: "4tqc6FQSHn8",
-        },
-      ],
-      B: [
-        {
-          name: "Lat Pulldown",
-          muscle: "back",
-          target: "Lats Vertical",
-          video: "CAwf7n6Luuc",
-        },
-        {
-          name: "Single Arm Dumbbell Row",
-          muscle: "back",
-          target: "Lats Horizontal",
-          video: "roCP6wCXPqo",
-        },
-        {
-          name: "T-Bar Row",
-          muscle: "back",
-          target: "Mid Back",
-          video: "j3Igk5nyZE4",
-        },
-        {
-          name: "Preacher Curl",
-          muscle: "biceps",
-          target: "Biceps Stretch",
-          video: "fIWP-FRFNU0",
-        },
-        {
-          name: "Barbell Curl",
-          muscle: "biceps",
-          target: "Biceps Contraction",
-          video: "kwG2ipFRgfo",
-        },
-      ],
-    },
+    exercises: [
+      {
+        name: "Pull-Ups / Chin-Ups",
+        muscle: "back",
+        target: "Lats Vertical",
+        video: "eGo4IYlbE5g",
+      },
+      {
+        name: "Seated Cable Row",
+        muscle: "back",
+        target: "Lats Horizontal",
+        video: "GZbfZ033f74",
+      },
+      {
+        name: "Barbell Row",
+        muscle: "back",
+        target: "Mid Back",
+        video: "FWJR5Ve8bnQ",
+      },
+      {
+        name: "Incline Dumbbell Curl",
+        muscle: "biceps",
+        target: "Biceps Stretch",
+        video: "soxrZlIl35U",
+      },
+      {
+        name: "Concentration Curl",
+        muscle: "biceps",
+        target: "Biceps Contraction",
+        video: "4tqc6FQSHn8",
+      },
+    ],
   },
   {
     day: 3,
     name: "Legs + Core",
     muscles: ["quads", "hamstrings", "glutes", "calves", "abs"],
     icon: "🦵",
-    sets: {
-      A: [
-        {
-          name: "Squat",
-          muscle: "quads",
-          target: "Quads",
-          video: "Dy28eq2PjcM",
-        },
-        {
-          name: "Romanian Deadlift",
-          muscle: "hamstrings",
-          target: "Hamstrings",
-          video: "_oyxCn2iSjU",
-        },
-        {
-          name: "Hip Thrust",
-          muscle: "glutes",
-          target: "Glutes",
-          video: "SEdqd1n0cvg",
-        },
-        {
-          name: "Standing Calf Raise",
-          muscle: "calves",
-          target: "Calves",
-          video: "c5Kv6-fnTj8",
-        },
-        { name: "Plank", muscle: "abs", target: "Core", video: "pSHjTRCQxIw" },
-      ],
-      B: [
-        {
-          name: "Hack Squat",
-          muscle: "quads",
-          target: "Quads",
-          video: "fE5BWPy7uRc",
-        },
-        {
-          name: "Leg Curl",
-          muscle: "hamstrings",
-          target: "Hamstrings",
-          video: "ELOCsoDSmrg",
-        },
-        {
-          name: "Bulgarian Split Squat",
-          muscle: "glutes",
-          target: "Glutes",
-          video: "2C-uNgKwPLE",
-        },
-        {
-          name: "Seated Calf Raise",
-          muscle: "calves",
-          target: "Calves",
-          video: "JbyjNymZOt0",
-        },
-        {
-          name: "Side Plank",
-          muscle: "abs",
-          target: "Core",
-          video: "44ND4bOB-T0",
-        },
-      ],
-    },
+    exercises: [
+      {
+        name: "Squat",
+        muscle: "quads",
+        target: "Quads",
+        video: "Dy28eq2PjcM",
+      },
+      {
+        name: "Romanian Deadlift",
+        muscle: "hamstrings",
+        target: "Hamstrings",
+        video: "_oyxCn2iSjU",
+      },
+      {
+        name: "Hip Thrust",
+        muscle: "glutes",
+        target: "Glutes",
+        video: "SEdqd1n0cvg",
+      },
+      {
+        name: "Standing Calf Raise",
+        muscle: "calves",
+        target: "Calves",
+        video: "c5Kv6-fnTj8",
+      },
+      { name: "Plank", muscle: "abs", target: "Core", video: "pSHjTRCQxIw" },
+    ],
   },
   {
     day: 4,
     name: "Shoulders + Abs",
     muscles: ["shoulders", "abs"],
     icon: "🏔️",
-    sets: {
-      A: [
-        {
-          name: "Overhead Press",
-          muscle: "shoulders",
-          target: "Front Delts",
-          video: "_RlRDWO2jfg",
-        },
-        {
-          name: "Dumbbell Lateral Raise",
-          muscle: "shoulders",
-          target: "Side Delts",
-          video: "b_LEX4n9lOs",
-        },
-        {
-          name: "Face Pulls",
-          muscle: "shoulders",
-          target: "Rear Delts",
-          video: "rep-qVOkqgk",
-        },
-        {
-          name: "Ab Wheel Rollout",
-          muscle: "abs",
-          target: "Upper Abs",
-          video: "j6lR4u193gE",
-        },
-        {
-          name: "Leg Raise",
-          muscle: "abs",
-          target: "Lower Abs",
-          video: "JB2oyawG9KI",
-        },
-      ],
-      B: [
-        {
-          name: "Arnold Press",
-          muscle: "shoulders",
-          target: "Front Delts",
-          video: "6Z15_WdXmVw",
-        },
-        {
-          name: "Upright Row",
-          muscle: "shoulders",
-          target: "Side Delts",
-          video: "93BUvCE92As",
-        },
-        {
-          name: "Reverse Pec Deck",
-          muscle: "shoulders",
-          target: "Rear Delts",
-          video: "Z57CtFmRMxA",
-        },
-        {
-          name: "Cable Crunch",
-          muscle: "abs",
-          target: "Upper Abs",
-          video: "aBd6T01PBqw",
-        },
-        {
-          name: "Hanging Knee Raise",
-          muscle: "abs",
-          target: "Lower Abs",
-          video: "hdng3Nm1x_E",
-        },
-      ],
-    },
+    exercises: [
+      {
+        name: "Overhead Press",
+        muscle: "shoulders",
+        target: "Front Delts",
+        video: "_RlRDWO2jfg",
+      },
+      {
+        name: "Dumbbell Lateral Raise",
+        muscle: "shoulders",
+        target: "Side Delts",
+        video: "b_LEX4n9lOs",
+      },
+      {
+        name: "Face Pulls",
+        muscle: "shoulders",
+        target: "Rear Delts",
+        video: "rep-qVOkqgk",
+      },
+      {
+        name: "Ab Wheel Rollout",
+        muscle: "abs",
+        target: "Upper Abs",
+        video: "j6lR4u193gE",
+      },
+      {
+        name: "Leg Raise",
+        muscle: "abs",
+        target: "Lower Abs",
+        video: "JB2oyawG9KI",
+      },
+    ],
   },
   {
     day: 5,
@@ -950,43 +814,27 @@ function getTodayDayIndex() {
   return diffDays % splitDays.length;
 }
 
-// Returns how many full cycles have elapsed since cycleData.startDate
-function elapsedCycleCount() {
+// Current cycle number (1-based) for display — derived from startDate.
+function getCurrentCycleNumber() {
+  if (!cycleData || !cycleData.startDate) return 1;
   const splitDays = getSplitDays();
-  if (!splitDays.length) return 0;
+  if (!splitDays.length) return 1;
   const start = new Date(cycleData.startDate);
   const today = new Date();
   start.setHours(0, 0, 0, 0);
   today.setHours(0, 0, 0, 0);
   const diffDays = Math.floor((today - start) / (1000 * 60 * 60 * 24));
-  return Math.floor(diffDays / splitDays.length);
-}
-
-function isNewCycle() {
-  if (!cycleData || !cycleData.startDate) return false;
-
-  // Same-day localStorage guard — blocks re-show on refresh before Firestore loads
-  const todayStr = new Date().toISOString().split("T")[0];
-  if (localStorage.getItem("fitdesi_cycle_ack") === todayStr) return false;
-
-  // Compare elapsed cycles vs how many the user has already acknowledged
-  const elapsed = elapsedCycleCount();
-  const acknowledged = cycleData.acknowledgedCycles ?? 0;
-  return elapsed > acknowledged;
-}
-
-function getCurrentSet() {
-  return cycleData?.currentSet || "A";
+  return Math.floor(diffDays / splitDays.length) + 1;
 }
 
 // ─── GET EXERCISES FOR DAY ───────────────────────────────
 function getExercisesForDay(dayData) {
   if (!dayData || dayData.isCardio) return null;
 
-  // If it's My Split, use the structured Set A/B
+  // If it's My Split, use the flat exercise list per day
   if (activeSplit === "mysplit") {
     const mySplitDay = MY_SPLIT.find((d) => d.name === dayData.name);
-    if (mySplitDay) return mySplitDay.sets[getCurrentSet()];
+    if (mySplitDay) return mySplitDay.exercises;
   }
 
   // For other splits, pull from exercise library by muscle
@@ -1092,8 +940,6 @@ function renderMyWorkout() {
       ?.addEventListener("click", async () => {
         cycleData = {
           startDate: new Date().toISOString(),
-          currentSet: "A",
-          cycleCount: 1,
           activeSplit,
         };
         await saveWorkoutCycle(currentUser.uid, cycleData);
@@ -1105,8 +951,7 @@ function renderMyWorkout() {
 
   const dayIdx = getTodayDayIndex();
   const dayData = splitDays[dayIdx];
-  const currentSet = getCurrentSet();
-  const cycleNum = cycleData.cycleCount || 1;
+  const cycleNum = getCurrentCycleNumber();
 
   if (!dayData) {
     container.innerHTML = `${renderSplitSelector()}${renderWeekView()}<div style="text-align:center;padding:40px;color:var(--text-dim)">No workout data for today</div>`;
@@ -1122,7 +967,7 @@ function renderMyWorkout() {
         <hr class="workout-divider">
         <div class="workout-day-badge">Day ${dayIdx + 1} of ${splitDays.length} · Cycle ${cycleNum}</div>
         <div class="workout-title">${dayData.icon} ${dayData.name}</div>
-        <div class="workout-subtitle">Set ${currentSet} · Started ${new Date(cycleData.startDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</div>
+        <div class="workout-subtitle">Started ${new Date(cycleData.startDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</div>
 
         ${
           dayData.isCardio
@@ -1451,22 +1296,6 @@ document
     updateHomeWorkout();
   });
 
-// ─── SET SELECTOR POPUP ──────────────────────────────────
-document.addEventListener("click", async (e) => {
-  if (e.target.id === "chooseSetA" || e.target.id === "chooseSetB") {
-    cycleData.currentSet = e.target.id === "chooseSetA" ? "A" : "B";
-    cycleData.cycleCount = (cycleData.cycleCount || 1) + 1;
-    // Record how many cycles have been acknowledged so isNewCycle() won't
-    // fire again until another full split length has elapsed.
-    cycleData.acknowledgedCycles = elapsedCycleCount();
-    // Belt-and-suspenders localStorage stamp
-    localStorage.setItem("fitdesi_cycle_ack", new Date().toISOString().split("T")[0]);
-    await saveWorkoutCycle(currentUser.uid, cycleData);
-    document.getElementById("setPopupModal").classList.remove("open");
-    renderMyWorkout();
-  }
-});
-
 // ─── MODE SWITCHING ──────────────────────────────────────
 document.querySelectorAll(".mode-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
@@ -1533,21 +1362,15 @@ document.getElementById("trainTodayModal").addEventListener("click", (e) => {
 document.getElementById("trainTodayConfirm").addEventListener("click", async () => {
   if (trainTodayPendingIdx === null || !cycleData) return;
 
-  const splitDays = getSplitDays();
   const cycleIdx = trainTodayPendingIdx;
 
-  // Recalculate startDate so that cycleIdx becomes today's index,
-  // while keeping the elapsed cycle count intact (no popup re-trigger).
-  // newDiffDays = acknowledgedCycles * splitLen + cycleIdx
-  // → today is exactly cycleIdx days into the current "acknowledged" cycle.
-  const ack = cycleData.acknowledgedCycles ?? 0;
-  const newDiffDays = ack * splitDays.length + cycleIdx;
-
+  // Recalculate startDate so that cycleIdx becomes today's index in the split.
+  // With no Set A/B or cycle acknowledgement to preserve, we can simply move
+  // startDate back cycleIdx days from today.
   const todayMidnight = new Date();
   todayMidnight.setHours(0, 0, 0, 0);
-  const newStartDate = new Date(todayMidnight.getTime() - newDiffDays * 86400000);
+  const newStartDate = new Date(todayMidnight.getTime() - cycleIdx * 86400000);
 
-  // Only update startDate — never touch cycleCount or acknowledgedCycles
   cycleData.startDate = newStartDate.toISOString();
   await saveWorkoutCycle(currentUser.uid, cycleData);
 
@@ -1599,12 +1422,6 @@ onAuthStateChanged(auth, async (user) => {
         isCardio:
           day.muscles.includes("Cardio") || day.muscles.includes("Rest"),
       }));
-    }
-    if (isNewCycle()) {
-      // Stamp localStorage immediately so refresh before picking a set
-      // doesn't re-show the popup.
-      localStorage.setItem("fitdesi_cycle_ack", new Date().toISOString().split("T")[0]);
-      document.getElementById("setPopupModal").classList.add("open");
     }
   }
 
